@@ -106,7 +106,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       final res = await http
           .post(
-        Uri.parse('${Constants.backendUri}/auth/login'),
+        Uri.parse(
+          '${Constants.backendUri}/auth/login-using-email-and-password',
+        ),
         headers: {
           'Content-Type': 'application/json',
         },

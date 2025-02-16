@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import './init_dependencies.dart';
@@ -16,28 +17,35 @@ import './features/verify_email_or_phone/presentation/bloc/verify_email_or_phone
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   await initDependencies();
 
-  runApp(MultiBlocProvider(
-    providers: [
-      BlocProvider.value(
-        value: serviceLocator<ThemeCubit>(),
-      ),
-      BlocProvider.value(
-        value: serviceLocator<AppUserCubit>(),
-      ),
-      BlocProvider(
-        create: (context) => serviceLocator<SplashBloc>(),
-      ),
-      BlocProvider(
-        create: (context) => serviceLocator<AuthBloc>(),
-      ),
-      BlocProvider(
-        create: (context) => serviceLocator<VerifyEmailOrPhoneBloc>(),
-      ),
-    ],
-    child: const MyApp(),
-  ));
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider.value(
+          value: serviceLocator<ThemeCubit>(),
+        ),
+        BlocProvider.value(
+          value: serviceLocator<AppUserCubit>(),
+        ),
+        BlocProvider(
+          create: (context) => serviceLocator<SplashBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => serviceLocator<AuthBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => serviceLocator<VerifyEmailOrPhoneBloc>(),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

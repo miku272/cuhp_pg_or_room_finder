@@ -24,29 +24,52 @@ class ShellScaffold extends StatelessWidget {
               break;
 
             case 1:
-              context.go('/profile');
+              context.go('/saved');
               break;
 
             case 2:
-              context.go('/settings');
+              context.go('/my-listings');
+              break;
+
+            case 3:
+              context.go('/profile');
               break;
           }
         },
-        destinations: [
+        destinations: const <Widget>[
           NavigationDestination(
             icon: Icon(Icons.home),
             label: 'Home',
           ),
           NavigationDestination(
+            icon: Icon(Icons.favorite),
+            label: 'Saved',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.real_estate_agent),
+            label: 'My Listings',
+          ),
+          NavigationDestination(
             icon: Icon(Icons.person),
             label: 'Profile',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
         ],
       ),
+      floatingActionButton: currentIndex == 0 || currentIndex == 2
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                context.push('/add-property');
+              },
+              tooltip: 'Add Property',
+              label: const Row(
+                spacing: 10.0,
+                children: <Widget>[
+                  Icon(Icons.add),
+                  Text('Add Property'),
+                ],
+              ),
+            )
+          : null,
     );
   }
 }

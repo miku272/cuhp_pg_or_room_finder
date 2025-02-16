@@ -70,10 +70,6 @@ class _SignupScreenState extends State<SignupScreen> {
           }
         },
         builder: (context, state) {
-          if (state is AuthLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
           return SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
@@ -266,7 +262,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton(
-                      onPressed: signup,
+                      onPressed: state is AuthLoading ? null : signup,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -277,48 +273,50 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         elevation: 2,
                       ),
-                      child: const Text(
-                        'Sign Up',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        Expanded(child: Divider()),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            'Or continue with',
-                            style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withAlpha(179),
+                      child: state is AuthLoading
+                          ? const CircularProgressIndicator()
+                          : const Text(
+                              'Sign Up',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        ),
-                        Expanded(child: Divider()),
-                      ],
                     ),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _SocialButton(
-                          icon: Icons.g_mobiledata,
-                          onPressed: () {},
-                        ),
-                        const SizedBox(width: 16),
-                        _SocialButton(
-                          icon: Icons.apple,
-                          onPressed: () {},
-                        ),
-                      ],
-                    ),
+                    // const SizedBox(height: 24),
+                    // Row(
+                    //   children: [
+                    //     Expanded(child: Divider()),
+                    //     Padding(
+                    //       padding: EdgeInsets.symmetric(horizontal: 16),
+                    //       child: Text(
+                    //         'Or continue with',
+                    //         style: TextStyle(
+                    //           color: Theme.of(context)
+                    //               .colorScheme
+                    //               .onSurface
+                    //               .withAlpha(179),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     Expanded(child: Divider()),
+                    //   ],
+                    // ),
+                    // const SizedBox(height: 24),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     _SocialButton(
+                    //       icon: Icons.g_mobiledata,
+                    //       onPressed: () {},
+                    //     ),
+                    //     const SizedBox(width: 16),
+                    //     _SocialButton(
+                    //       icon: Icons.apple,
+                    //       onPressed: () {},
+                    //     ),
+                    //   ],
+                    // ),
                     const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -333,9 +331,11 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                         ),
                         TextButton(
-                          onPressed: () {
-                            context.replace('/login');
-                          },
+                          onPressed: state is AuthLoading
+                              ? null
+                              : () {
+                                  context.replace('/login');
+                                },
                           child: Text(
                             'Login',
                             style: TextStyle(
@@ -351,41 +351,6 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class _SocialButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onPressed;
-
-  const _SocialButton({
-    required this.icon,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withAlpha(51),
-            ),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            icon,
-            size: 32,
-          ),
-        ),
       ),
     );
   }

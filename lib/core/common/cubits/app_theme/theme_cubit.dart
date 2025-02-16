@@ -13,8 +13,8 @@ class ThemeCubit extends Cubit<ThemeState> {
     _loadTheme();
   }
 
-  Future<void> _loadTheme() async {
-    final isDarkMode = await prefs.loadTheme();
+  void _loadTheme() {
+    final isDarkMode = prefs.loadTheme();
 
     isDarkMode
         ? emit(DarkThemeState(AppThemes.darkTheme))

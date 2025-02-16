@@ -1,9 +1,11 @@
-import 'package:cuhp_pg_or_room_finder/core/utils/theme_preference.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 import './core/common/cubits/app_theme/theme_cubit.dart';
-import 'core/utils/sf_handler.dart';
+import './core/utils/theme_preference.dart';
+import './core/utils/sf_handler.dart';
 import './core/common/cubits/app_user/app_user_cubit.dart';
 
 import './features/splash/data/datasources/splash_remote_data_source.dart';
@@ -32,6 +34,9 @@ import './features/verify_email_or_phone/presentation/bloc/verify_email_or_phone
 final serviceLocator = GetIt.instance;
 
 Future<void> initDependencies() async {
+  await _loadEnv();
+
+  _initMapBox();
   _initTheme();
   _initTokenHandler();
   _initSplash();
@@ -43,6 +48,18 @@ Future<void> initDependencies() async {
   serviceLocator.registerLazySingleton(() => prefs);
 
   serviceLocator.registerLazySingleton(() => AppUserCubit());
+}
+
+Future<void> _loadEnv() async {
+  await dotenv.load(fileName: '.env');
+}
+
+void _initMapBox() {
+  if (dotenv.env['MAPBOX_ACCESS_TOKEN'] != null) {
+    MapboxOptions.setAccessToken(dotenv.env['MAPBOX_ACCESS_TOKEN']!);
+  } else {
+    throw Exception('Mapbox access token is required');
+  }
 }
 
 void _initTheme() {
