@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import './shell_scaffold.dart';
 import './features/splash/presentation/screens/splash_screen.dart';
 import './features/not_found/presentation/screens/not_found_screen.dart';
-import './features/add_property/presentation/screens/add_property_screen.dart';
+import 'features/property_listings/presentation/screens/add_property_screen.dart';
 import './features/auth/presentation/screens/login_screen.dart';
 import './features/auth/presentation/screens/signup_screen.dart';
 import './features/home/presentation/screens/home_screen.dart';
@@ -12,8 +12,8 @@ import './features/verify_email_or_phone/presentation/screens/verify_email_or_ph
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    // initialLocation: '/splash',
-    initialLocation: '/',
+    initialLocation: '/splash',
+    // initialLocation: '/',
     errorBuilder: (context, state) => const NotFoundScreen(),
     routes: [
       GoRoute(

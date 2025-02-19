@@ -36,7 +36,7 @@ class SplashRemoteDataSourceImpl implements SplashRemoteDataSource {
           .timeout(
         const Duration(seconds: 10),
         onTimeout: () {
-          throw SocketException('Connection timed out');
+          throw const SocketException('Connection timed out');
         },
       );
 

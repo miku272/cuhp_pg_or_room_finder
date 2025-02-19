@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../core/common/cubits/app_theme/theme_cubit.dart';
-import '../../../../core/common/cubits/app_theme/theme_state.dart';
 
 import '../widgets/category_card.dart';
 import '../widgets/filter_bottom_sheet.dart';
@@ -25,17 +21,6 @@ class _HomeScreenState extends State<HomeScreen> {
           child: AppBar(
             toolbarHeight: 80,
             title: const Text('CUHP PG or Room Finder'),
-            actions: <Widget>[
-              BlocBuilder<ThemeCubit, ThemeState>(
-                builder: (context, state) => IconButton(
-                  onPressed: () {
-                    context.read<ThemeCubit>().toggleTheme();
-                  },
-                  icon: Icon(
-                      state.isDarkMode ? Icons.light_mode : Icons.dark_mode),
-                ),
-              ),
-            ],
           ),
         ),
         Expanded(
@@ -90,15 +75,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       spacing: 8,
                       children: <Widget>[
                         FilterChip(
-                          label: Text('Under ₹5000'),
+                          label: const Text('Under ₹5000'),
                           onSelected: (bool selected) {},
                         ),
                         FilterChip(
-                          label: Text('Verified Only'),
+                          label: const Text('Verified Only'),
                           onSelected: (bool selected) {},
                         ),
                         FilterChip(
-                          label: Text('With Food'),
+                          label: const Text('With Food'),
                           onSelected: (bool selected) {},
                         ),
                       ],
@@ -111,15 +96,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       spacing: 8,
                       children: <Widget>[
                         FilterChip(
-                          label: Text('Boys'),
+                          label: const Text('Boys'),
                           onSelected: (bool selected) {},
                         ),
                         FilterChip(
-                          label: Text('Girls'),
+                          label: const Text('Girls'),
                           onSelected: (bool selected) {},
                         ),
                         FilterChip(
-                          label: Text('Co-ed'),
+                          label: const Text('Co-ed'),
                           onSelected: (bool selected) {},
                         ),
                       ],
@@ -132,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: TextField(
                           decoration: InputDecoration(
                             hintText: 'Search properties...',
-                            prefixIcon: Icon(Icons.search),
+                            prefixIcon: const Icon(Icons.search),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -165,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ListView(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    children: [
+                    children: const <Widget>[
                       PropertyCard(
                         images: [
                           'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267',

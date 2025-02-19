@@ -336,7 +336,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               : () {
                                   context.replace('/login');
                                 },
-                          child: Text(
+                          child: const Text(
                             'Login',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,

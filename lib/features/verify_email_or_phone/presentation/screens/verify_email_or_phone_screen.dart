@@ -154,7 +154,7 @@ class _VerifyEmailOrPhoneScreenState extends State<VerifyEmailOrPhoneScreen> {
               if (state is VerifyEmailOtpSuccessState) {
                 if (state.isVerified) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text('Email verified successfully'),
                     ),
                   );
@@ -163,7 +163,7 @@ class _VerifyEmailOrPhoneScreenState extends State<VerifyEmailOrPhoneScreen> {
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Invalid code. Please try again'),
+                      content: const Text('Invalid code. Please try again'),
                       backgroundColor: Theme.of(context).colorScheme.error,
                     ),
                   );
@@ -264,7 +264,7 @@ class _VerifyEmailOrPhoneScreenState extends State<VerifyEmailOrPhoneScreen> {
                                         await _verifyOtp(_pinController.text);
                                       },
                                 child: state is VerifyEmailOrPhoneLoadingState
-                                    ? CircularProgressIndicator()
+                                    ? const CircularProgressIndicator()
                                     : Text(
                                         'Verify',
                                         style: Theme.of(context)

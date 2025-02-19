@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/common/cubits/app_theme/theme_cubit.dart';
+import '../../../../core/common/cubits/app_theme/theme_state.dart';
 import '../../../../core/common/cubits/app_user/app_user_cubit.dart';
 
 import '../widgets/verification_pill.dart';
@@ -119,22 +121,22 @@ class ProfileScreen extends StatelessWidget {
                         const SizedBox(height: 16),
 
                         // Listings Card
-                        Card(
+                        const Card(
                           child: Column(
                             children: [
                               ListTile(
-                                leading: const Icon(Icons.home_outlined),
-                                title: const Text('My Listings'),
-                                trailing: const Text('2 Active'),
+                                leading: Icon(Icons.home_outlined),
+                                title: Text('My Listings'),
+                                trailing: Text('2 Active'),
                               ),
-                              const Divider(),
+                              Divider(),
                               ListTile(
-                                title: const Text('Total Listings'),
-                                trailing: const Text('5'),
+                                title: Text('Total Listings'),
+                                trailing: Text('5'),
                               ),
                               ListTile(
-                                title: const Text('Active Listings'),
-                                trailing: const Text('2'),
+                                title: Text('Active Listings'),
+                                trailing: Text('2'),
                               ),
                             ],
                           ),
@@ -142,22 +144,112 @@ class ProfileScreen extends StatelessWidget {
                         const SizedBox(height: 16),
 
                         // Reviews Card
-                        Card(
+                        const Card(
                           child: Column(
                             children: [
                               ListTile(
-                                leading: const Icon(Icons.star_outline),
-                                title: const Text('Reviews'),
-                                trailing: const Text('4.5★'),
+                                leading: Icon(Icons.star_outline),
+                                title: Text('Reviews'),
+                                trailing: Text('4.5★'),
                               ),
-                              const Divider(),
+                              Divider(),
                               ListTile(
-                                title: const Text('Total Reviews'),
-                                trailing: const Text('12'),
+                                title: Text('Total Reviews'),
+                                trailing: Text('12'),
                               ),
                             ],
                           ),
                         ),
+                        const SizedBox(height: 16),
+
+// Account Actions Card
+                        Card(
+                          child: Column(
+                            children: <Widget>[
+                              const ListTile(
+                                leading: Icon(
+                                  Icons.account_circle_outlined,
+                                  color: Colors.grey,
+                                ),
+                                title: Text('Account Actions'),
+                              ),
+                              const Divider(),
+                              BlocBuilder<ThemeCubit, ThemeState>(
+                                builder: (context, state) {
+                                  return ListTile(
+                                    leading: Icon(
+                                      state.isDarkMode
+                                          ? Icons.dark_mode_outlined
+                                          : Icons.light_mode_outlined,
+                                      color: Colors.grey,
+                                    ),
+                                    title: const Text('Theme'),
+                                    trailing: Switch(
+                                      value: state.isDarkMode,
+                                      onChanged: (_) => context
+                                          .read<ThemeCubit>()
+                                          .toggleTheme(),
+                                      activeColor:
+                                          Theme.of(context).primaryColor,
+                                    ),
+                                  );
+                                },
+                              ),
+                              ListTile(
+                                leading: const Icon(
+                                  Icons.help_outline,
+                                  color: Colors.grey,
+                                ),
+                                title: const Text('Help & Support'),
+                                trailing: const Icon(Icons.chevron_right),
+                                onTap: () {
+                                  // Handle help tap
+                                },
+                              ),
+                              ListTile(
+                                leading: const Icon(
+                                  Icons.logout,
+                                  color: Colors.redAccent,
+                                ),
+                                title: const Text(
+                                  'Logout',
+                                  style: TextStyle(
+                                    color: Colors.redAccent,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Logout'),
+                                      content: const Text(
+                                          'Are you sure you want to logout?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: const Text('Cancel'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            // Handle logout
+                                          },
+                                          child: const Text(
+                                            'Logout',
+                                            style: TextStyle(
+                                                color: Colors.redAccent),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
                       ],
                     ),
                   ),

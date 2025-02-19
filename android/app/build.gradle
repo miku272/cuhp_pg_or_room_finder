@@ -8,8 +8,8 @@ plugins {
 android {
     namespace = "com.example.cuhp_pg_or_room_finder"
     compileSdk = 34
-    ndkVersion = flutter.ndkVersion
-    // ndkVersion = "25.1.8937393"
+    // ndkVersion = flutter.ndkVersion
+    ndkVersion = "25.1.8937393"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

@@ -48,7 +48,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           .timeout(
         const Duration(seconds: 10),
         onTimeout: () {
-          throw SocketException('Connection timed out');
+          throw const SocketException('Connection timed out');
         },
       );
 
@@ -118,7 +118,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         }),
       )
           .timeout(const Duration(seconds: 10), onTimeout: () {
-        throw SocketException('Connection timed out');
+        throw const SocketException('Connection timed out');
       });
 
       final decodedBody = jsonDecode(res.body) as Map<String, dynamic>;
@@ -187,7 +187,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         }),
       )
           .timeout(const Duration(seconds: 10), onTimeout: () {
-        throw SocketException('Connection timed out');
+        throw const SocketException('Connection timed out');
       });
 
       final decodedBody = jsonDecode(res.body) as Map<String, dynamic>;
