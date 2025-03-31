@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/common/cubits/app_user/app_user_cubit.dart';
+import '../../../../core/common/entities/user.dart';
 
 import '../../data/models/property_form_data.dart';
 
-import 'add_property_screen_step_3.dart';
-
 class AddPropertyScreenStep2 extends StatefulWidget {
-  const AddPropertyScreenStep2({super.key});
+  final bool isEditing;
+  final PropertyFormData propertyFormData;
+
+  const AddPropertyScreenStep2({
+    required this.isEditing,
+    required this.propertyFormData,
+    super.key,
+  });
 
   @override
   State<AddPropertyScreenStep2> createState() => _AddPropertyScreenStep2State();
 }
 
 class _AddPropertyScreenStep2State extends State<AddPropertyScreenStep2> {
+  User? user;
+
   final _formKey = GlobalKey<FormState>();
   final _ownerNameController = TextEditingController();
   final _ownerPhoneController = TextEditingController();
@@ -25,6 +37,60 @@ class _AddPropertyScreenStep2State extends State<AddPropertyScreenStep2> {
     'laundry': false,
     'parking': false,
   };
+
+  @override
+  void initState() {
+    super.initState();
+
+    final userState = context.read<AppUserCubit>().state;
+
+    if (userState is AppUserLoggedin) {
+      user = userState.user;
+
+      _ownerNameController.text = user?.name ?? '';
+      _ownerPhoneController.text = user?.phone ?? '';
+      _ownerEmailController.text = user?.email ?? '';
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _checkIfEditing();
+        });
+      });
+    } else {
+      context.pop();
+    }
+  }
+
+  void _checkIfEditing() {
+    if (widget.isEditing) {
+      _rentAgreementAvailable = widget.propertyFormData.rentAgreementAvailable!;
+
+      widget.propertyFormData.services!.forEach((key, value) {
+        if (_services.containsKey(key)) {
+          _services[key] = value;
+        }
+      });
+    }
+  }
+
+  void _onNext() {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    final property = widget.propertyFormData.copyWith(
+      ownerName: _ownerNameController.text,
+      ownerPhone: _ownerPhoneController.text,
+      ownerEmail: _ownerEmailController.text,
+      rentAgreementAvailable: _rentAgreementAvailable,
+      services: _services,
+    );
+
+    context.push('/add-property/step-3', extra: {
+      'isEditing': widget.isEditing,
+      'propertyFormData': property,
+    });
+  }
 
   @override
   void dispose() {
@@ -104,6 +170,7 @@ class _AddPropertyScreenStep2State extends State<AddPropertyScreenStep2> {
                             const SizedBox(height: 16),
                             TextFormField(
                               controller: _ownerNameController,
+                              enabled: user?.name == null,
                               decoration: InputDecoration(
                                 labelText: 'Owner Name',
                                 prefixIcon: const Icon(Icons.person),
@@ -118,6 +185,7 @@ class _AddPropertyScreenStep2State extends State<AddPropertyScreenStep2> {
                             const SizedBox(height: 16),
                             TextFormField(
                               controller: _ownerPhoneController,
+                              enabled: user?.phone == null,
                               decoration: InputDecoration(
                                 labelText: 'Phone Number',
                                 prefixIcon: const Icon(Icons.phone),
@@ -133,6 +201,7 @@ class _AddPropertyScreenStep2State extends State<AddPropertyScreenStep2> {
                             const SizedBox(height: 16),
                             TextFormField(
                               controller: _ownerEmailController,
+                              enabled: user?.email == null,
                               decoration: InputDecoration(
                                 labelText: 'Email Address',
                                 prefixIcon: const Icon(Icons.email),
@@ -196,7 +265,7 @@ class _AddPropertyScreenStep2State extends State<AddPropertyScreenStep2> {
                       children: [
                         Expanded(
                           child: OutlinedButton(
-                            onPressed: () => Navigator.pop(context),
+                            onPressed: () => context.pop(),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
@@ -209,19 +278,7 @@ class _AddPropertyScreenStep2State extends State<AddPropertyScreenStep2> {
                         const SizedBox(width: 16),
                         Expanded(
                           child: ElevatedButton(
-                            onPressed: () {
-                              // if (_formKey.currentState?.validate() ?? false) {
-                              //   // Add navigation logic here
-                              // }
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const AddPropertyScreenStep3(),
-                                ),
-                              );
-                            },
+                            onPressed: _onNext,
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(

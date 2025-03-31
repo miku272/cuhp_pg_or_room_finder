@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/common/widgets/custom_app_bar.dart';
+
 import '../widgets/category_card.dart';
 import '../widgets/filter_bottom_sheet.dart';
-import '../widgets/property_card.dart';
+import '../../../../core/common/widgets/property_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,13 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Material(
-          elevation: 4,
-          child: AppBar(
-            toolbarHeight: 80,
-            title: const Text('CUHP PG or Room Finder'),
-          ),
-        ),
+        const CustomAppBar(appBarTitle: 'CUHP PG or Room Finder'),
         Expanded(
           child: SingleChildScrollView(
             child: Padding(
@@ -36,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisCount: 2,
                     mainAxisSpacing: 10,
                     crossAxisSpacing: 10,
-                    childAspectRatio: 1.8,
+                    childAspectRatio: 1.5,
                     children: const <Widget>[
                       CategoryCard(
                         icon: Icons.home,

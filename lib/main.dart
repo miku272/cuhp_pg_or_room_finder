@@ -13,6 +13,8 @@ import 'core/common/cubits/app_user/app_user_cubit.dart';
 import './features/splash/presentation/bloc/splash_bloc.dart';
 import './features/auth/presentation/bloc/auth_bloc.dart';
 import './features/verify_email_or_phone/presentation/bloc/verify_email_or_phone_bloc.dart';
+import './features/property_listings/presentation/bloc/property_listings_bloc.dart';
+import './features/my_listings/presentation/bloc/my_listings_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +44,12 @@ Future<void> main() async {
         BlocProvider(
           create: (context) => serviceLocator<VerifyEmailOrPhoneBloc>(),
         ),
+        BlocProvider(
+          create: (context) => serviceLocator<PropertyListingsBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => serviceLocator<MyListingsBloc>(),
+        ),
       ],
       child: const MyApp(),
     ),
@@ -56,7 +64,7 @@ class MyApp extends StatelessWidget {
     return BlocBuilder<ThemeCubit, ThemeState>(
       builder: (context, state) {
         ThemeData themeData =
-            state.isDarkMode ? AppThemes.darkTheme : AppThemes.lightTheme;
+        state.isDarkMode ? AppThemes.darkTheme : AppThemes.lightTheme;
 
         return MaterialApp.router(
           title: 'CUHP PG or Room Finder',
@@ -66,5 +74,17 @@ class MyApp extends StatelessWidget {
         );
       },
     );
+
+    // return BlocBuilder<ThemeCubit, ThemeState>(builder: (context, state) {
+    //   ThemeData themeData =
+    //       state.isDarkMode ? AppThemes.darkTheme : AppThemes.lightTheme;
+
+    //   return MaterialApp(
+    //     title: 'CUHP PG or Room Finder',
+    //     debugShowCheckedModeBanner: false,
+    //     theme: themeData,
+    //     home: const AddPropertySuccessScreen(),
+    //   );
+    // });
   }
 }

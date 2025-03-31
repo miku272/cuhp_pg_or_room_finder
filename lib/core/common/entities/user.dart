@@ -7,6 +7,7 @@ class User {
   final bool isPhoneVerified;
   final String jwtToken;
   final String expiresIn;
+  final List<String> property;
   final String? createdAt;
   final String? updatedAt;
 
@@ -19,6 +20,7 @@ class User {
     required this.isPhoneVerified,
     required this.jwtToken,
     required this.expiresIn,
+    this.property = const [],
     this.createdAt,
     this.updatedAt,
   });
@@ -32,6 +34,7 @@ class User {
     bool? isPhoneVerified,
     String? jwtToken,
     String? expiresIn,
+    List<String>? property,
     String? createdAt,
     String? updatedAt,
   }) {
@@ -44,6 +47,7 @@ class User {
       isPhoneVerified: isPhoneVerified ?? this.isPhoneVerified,
       jwtToken: jwtToken ?? this.jwtToken,
       expiresIn: expiresIn ?? this.expiresIn,
+      property: property ?? this.property,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

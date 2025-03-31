@@ -7,11 +7,13 @@ class PropertyCard extends StatelessWidget {
   final List<String> images;
   final String propertyName;
   final String address;
-  final double price;
+  final int price;
   final bool isVerified;
   final String propertyGenderAllowance;
   final Map<String, bool> services;
   final double distanceFromUniversity;
+
+  final bool showFavouriteButton;
 
   const PropertyCard({
     super.key,
@@ -23,6 +25,7 @@ class PropertyCard extends StatelessWidget {
     required this.propertyGenderAllowance,
     required this.services,
     required this.distanceFromUniversity,
+    this.showFavouriteButton = true,
   });
 
   @override
@@ -84,18 +87,19 @@ class PropertyCard extends StatelessWidget {
                   );
                 }).toList(),
               ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.favorite_border),
-                  style: IconButton.styleFrom(
-                    backgroundColor: theme.colorScheme.surface,
-                    foregroundColor: theme.colorScheme.primary,
+              if (showFavouriteButton)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.favorite_border),
+                    style: IconButton.styleFrom(
+                      backgroundColor: theme.colorScheme.surface,
+                      foregroundColor: theme.colorScheme.primary,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
           Padding(
@@ -162,7 +166,7 @@ class PropertyCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  '₹${price.toStringAsFixed(0)} / month',
+                  '₹$price / month',
                   style: theme.textTheme.titleLarge?.copyWith(
                     color: theme.colorScheme.primary,
                     fontSize: 20,

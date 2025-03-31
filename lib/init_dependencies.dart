@@ -1,11 +1,13 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:dio/dio.dart';
 
+import './core/constants/constants.dart';
 import './core/common/cubits/app_theme/theme_cubit.dart';
 import './core/utils/theme_preference.dart';
 import './core/utils/sf_handler.dart';
+import './core/utils/supabase_manager.dart';
 import './core/common/cubits/app_user/app_user_cubit.dart';
 
 import './features/splash/data/datasources/splash_remote_data_source.dart';
@@ -22,30 +24,56 @@ import './features/auth/domain/usecases/user_login.dart';
 import './features/auth/domain/usecases/current_user.dart';
 import './features/auth/presentation/bloc/auth_bloc.dart';
 
-import './features/verify_email_or_phone/data/datasourses/verify_email_or_phone_remote_data_source.dart';
+import './features/verify_email_or_phone/data/datasources/verify_email_or_phone_remote_data_source.dart';
 import './features/verify_email_or_phone/domain/repositories/verify_email_or_phone_repository.dart';
 import './features/verify_email_or_phone/data/repositories/verify_email_or_phone_repository_impl.dart';
 import './features/verify_email_or_phone/domain/usecases/send_email_otp.dart';
+
 // import './features/verify_email_or_phone/domain/usecases/send_phone_otp.dart';
 import './features/verify_email_or_phone/domain/usecases/verify_email_otp.dart';
+
 // import './features/verify_email_or_phone/domain/usecases/verify_phone_otp.dart';
 import './features/verify_email_or_phone/presentation/bloc/verify_email_or_phone_bloc.dart';
+
+import './features/property_listings/data/datasources/property_listing_remote_datasource.dart';
+import './features/property_listings/data/repositories/property_listing_repository_impl.dart';
+import './features/property_listings/domain/repository/property_listing_repository.dart';
+import './features/property_listings/domain/usecases/add_property_listing.dart';
+import './features/property_listings/domain/usecases/update_property_listing.dart';
+import './features/property_listings/presentation/bloc/property_listings_bloc.dart';
+
+import './features/my_listings/data/datasources/my_listings_remote_data_source.dart';
+import './features/my_listings/data/repositories/my_listings_repository_impl.dart';
+import './features/my_listings/domain/repository/my_listings_repository.dart';
+import './features/my_listings/domain/usecases/get_properties_by_id.dart';
+import 'features/my_listings/domain/usecases/toggle_property_activation.dart';
+import 'features/my_listings/presentation/bloc/my_listings_bloc.dart';
 
 final serviceLocator = GetIt.instance;
 
 Future<void> initDependencies() async {
   await _loadEnv();
 
-  _initMapBox();
+  await _initSupabase();
   _initTheme();
   _initTokenHandler();
   _initSplash();
   _initAuth();
   _initVerifyEmailOrPhone();
+  _initPropertyListings();
+  _initMyListings();
 
   final prefs = await SharedPreferences.getInstance();
 
+  final dio = Dio()
+    ..options = BaseOptions(
+      baseUrl: Constants.backendUri,
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+    );
+
   serviceLocator.registerLazySingleton(() => prefs);
+  serviceLocator.registerLazySingleton(() => dio);
 
   serviceLocator.registerLazySingleton(() => AppUserCubit());
 }
@@ -54,12 +82,8 @@ Future<void> _loadEnv() async {
   await dotenv.load(fileName: '.env');
 }
 
-void _initMapBox() {
-  if (dotenv.env['MAPBOX_ACCESS_TOKEN'] != null) {
-    MapboxOptions.setAccessToken(dotenv.env['MAPBOX_ACCESS_TOKEN']!);
-  } else {
-    throw Exception('Mapbox access token is required');
-  }
+Future<void> _initSupabase() async {
+  await SupabaseManager.initialize();
 }
 
 void _initTheme() {
@@ -80,7 +104,7 @@ void _initTokenHandler() {
 
 void _initSplash() {
   serviceLocator.registerFactory<SplashRemoteDataSource>(
-    () => SplashRemoteDataSourceImpl(),
+    () => SplashRemoteDataSourceImpl(dio: serviceLocator()),
   );
 
   serviceLocator.registerFactory<SplashRepository>(
@@ -106,7 +130,7 @@ void _initSplash() {
 
 void _initAuth() {
   serviceLocator.registerFactory<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(),
+    () => AuthRemoteDataSourceImpl(dio: serviceLocator()),
   );
 
   serviceLocator.registerFactory<AuthRepository>(
@@ -146,7 +170,7 @@ void _initAuth() {
 
 void _initVerifyEmailOrPhone() {
   serviceLocator.registerFactory<VerifyEmailOrPhoneRemoteDataSource>(
-    () => VerifyEmailOrPhoneRemoteDataSourceImpl(),
+    () => VerifyEmailOrPhoneRemoteDataSourceImpl(dio: serviceLocator()),
   );
 
   serviceLocator.registerFactory<VerifyEmailOrPhoneRepository>(
@@ -186,6 +210,65 @@ void _initVerifyEmailOrPhone() {
       verifyEmailOtp: serviceLocator(),
       // verifyPhoneOtp: serviceLocator(),
       appUserCubit: serviceLocator(),
+    ),
+  );
+}
+
+void _initPropertyListings() {
+  serviceLocator.registerFactory<PropertyListingRemoteDataSource>(
+    () => PropertyListingRemoteDataSourceImpl(dio: serviceLocator()),
+  );
+
+  serviceLocator.registerFactory<PropertyListingRepository>(
+    () => PropertyListingRepositoryImpl(
+      propertyListingRemoteDataSource: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<AddPropertyListing>(
+    () => AddPropertyListing(
+      propertyListingRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<UpdatePropertyListing>(
+    () => UpdatePropertyListing(
+      propertyListingRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerLazySingleton<PropertyListingsBloc>(
+    () => PropertyListingsBloc(
+      addPropertyListing: serviceLocator(),
+      updatePropertyListing: serviceLocator(),
+      appUserCubit: serviceLocator(),
+    ),
+  );
+}
+
+void _initMyListings() {
+  serviceLocator.registerFactory<MyListingsRemoteDataSource>(
+    () => MyListingsRemoteDataSourceImpl(dio: serviceLocator()),
+  );
+
+  serviceLocator.registerFactory<MyListingsRepository>(
+    () => MyListingsRepositoryImpl(
+      myListingsRemoteDataSource: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<GetPropertiesById>(
+    () => GetPropertiesById(myListingsRepository: serviceLocator()),
+  );
+
+  serviceLocator.registerFactory<TogglePropertyActivation>(
+    () => TogglePropertyActivation(myListingsRepository: serviceLocator()),
+  );
+
+  serviceLocator.registerLazySingleton<MyListingsBloc>(
+    () => MyListingsBloc(
+      getPropertiesById: serviceLocator(),
+      togglePropertyActivation: serviceLocator(),
     ),
   );
 }

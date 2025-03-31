@@ -1,9 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
-import '../../../../core/constants/constants.dart';
 import '../../../../core/error/exception.dart';
 
 import '../models/user_model.dart';
@@ -24,6 +22,10 @@ abstract interface class AuthRemoteDataSource {
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
+  final Dio dio;
+
+  AuthRemoteDataSourceImpl({required this.dio});
+
   @override
   Future<UserModel?> getCurrentUser(String? token, String? id) async {
     if (token == null || token == '' || id == null || id == '') {
@@ -34,37 +36,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
 
     try {
-      final res = await http
-          .post(
-        Uri.parse('${Constants.backendUri}/auth/token-auth'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode({
-          '_id': id,
-        }),
-      )
-          .timeout(
-        const Duration(seconds: 10),
-        onTimeout: () {
-          throw const SocketException('Connection timed out');
-        },
-      );
-
-      final decodedBody = jsonDecode(res.body) as Map<String, dynamic>;
+      final res = await dio.post('/auth/token-auth',
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          }),
+          data: {
+            '_id': id,
+          });
 
       if (res.statusCode.toString().startsWith('5')) {
         throw ServerException(
           status: res.statusCode,
-          message: decodedBody['message'],
+          message: res.data['message'],
         );
       }
 
       if (res.statusCode.toString().startsWith('4')) {
         throw UserException(
           status: res.statusCode,
-          message: decodedBody['message'],
+          message: res.data['message'],
         );
       }
 
@@ -72,7 +63,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw Exception('An error occurred');
       }
 
-      print(decodedBody);
+      final decodedBody = res.data;
 
       final UserModel user = UserModel(
         id: decodedBody['data']['user']['_id'],
@@ -88,11 +79,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       return user;
-    } on SocketException {
-      throw ServerException(
-        status: 503,
-        message: 'Unable to connect to the server',
-      );
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout) {
+        throw ServerException(
+          status: 503,
+          message: 'Unable to connect to the server',
+        );
+      }
+
+      rethrow;
     } catch (error) {
       rethrow;
     }
@@ -104,36 +100,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String password,
   ) async {
     try {
-      final res = await http
-          .post(
-        Uri.parse(
-          '${Constants.backendUri}/auth/login-using-email-and-password',
-        ),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
-      )
-          .timeout(const Duration(seconds: 10), onTimeout: () {
-        throw const SocketException('Connection timed out');
-      });
-
-      final decodedBody = jsonDecode(res.body) as Map<String, dynamic>;
+      final res = await dio.post('/auth/login-using-email-and-password',
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+          }),
+          data: {
+            'email': email,
+            'password': password,
+          });
 
       if (res.statusCode.toString().startsWith('5')) {
         throw ServerException(
           status: res.statusCode,
-          message: decodedBody['message'],
+          message: res.data['message'],
         );
       }
 
       if (res.statusCode.toString().startsWith('4')) {
         throw UserException(
           status: res.statusCode,
-          message: decodedBody['message'],
+          message: res.data['message'],
         );
       }
 
@@ -141,7 +127,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw Exception('An error occurred');
       }
 
-      print(decodedBody);
+      final decodedBody = res.data;
 
       final UserModel user = UserModel(
         id: decodedBody['data']['user']['_id'],
@@ -157,7 +143,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       return user;
-    } on SocketException {
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout) {
+        throw ServerException(
+          status: 503,
+          message: 'Unable to connect to the server',
+        );
+      }
+
+      rethrow;
+    } on SocketException catch (_) {
       throw ServerException(
         status: 503,
         message: 'Unable to connect to the server',
@@ -174,35 +170,27 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String password,
   ) async {
     try {
-      final res = await http
-          .post(
-        Uri.parse('${Constants.backendUri}/auth/signup'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'name': name,
-          'email': email,
-          'password': password,
-        }),
-      )
-          .timeout(const Duration(seconds: 10), onTimeout: () {
-        throw const SocketException('Connection timed out');
-      });
-
-      final decodedBody = jsonDecode(res.body) as Map<String, dynamic>;
+      final res = await dio.post('/auth/signup',
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+          }),
+          data: {
+            'name': name,
+            'email': email,
+            'password': password,
+          });
 
       if (res.statusCode.toString().startsWith('5')) {
         throw ServerException(
           status: res.statusCode,
-          message: decodedBody['message'],
+          message: res.data['message'],
         );
       }
 
       if (res.statusCode.toString().startsWith('4')) {
         throw UserException(
           status: res.statusCode,
-          message: decodedBody['message'],
+          message: res.data['message'],
         );
       }
 
@@ -210,7 +198,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw Exception('An error occurred');
       }
 
-      print(decodedBody);
+      final decodedBody = res.data;
 
       final UserModel user = UserModel(
         id: decodedBody['data']['user']['_id'],
@@ -221,16 +209,22 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         isPhoneVerified: decodedBody['data']['user']['isPhoneVerified'],
         jwtToken: decodedBody['data']['tokenData']['token'],
         expiresIn: decodedBody['data']['tokenData']['expiresIn'],
+        property: decodedBody['data']['tokenData']['property'] ?? const <String>[],
         createdAt: decodedBody['data']['user']['createdAt'],
         updatedAt: decodedBody['data']['user']['updatedAt'],
       );
 
       return user;
-    } on SocketException {
-      throw ServerException(
-        status: 503,
-        message: 'Unable to connect to the server',
-      );
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout) {
+        throw ServerException(
+          status: 503,
+          message: 'Unable to connect to the server',
+        );
+      }
+
+      rethrow;
     } catch (error) {
       rethrow;
     }

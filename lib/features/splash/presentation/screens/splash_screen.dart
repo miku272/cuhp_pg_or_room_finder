@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cuhp_pg_or_room_finder/init_dependencies.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -37,13 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: BlocListener<SplashBloc, SplashState>(
         listener: (context, state) {
           if (state is SplashFailure) {
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //   SnackBar(
-            //     content: Text(state.message),
-            //     backgroundColor: Colors.red,
-            //   ),
-            // );
-
+            log('Error in splash screen: ', error: state.message);
             context.pushReplacement('/login');
           }
 

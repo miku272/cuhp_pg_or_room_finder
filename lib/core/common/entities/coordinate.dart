@@ -1,61 +1,69 @@
 import 'dart:math' as math;
 
 class Coordinate {
-  static const defaultUniversityCoordinate = {
-    'lat': 32.22449,
-    'lng': 76.156601
-  };
+  static const defaultUniversityCoordinate = Coordinate(
+    lat: 32.22449,
+    lng: 76.156601,
+  );
 
-  final double lat;
-  final double lng;
+  final num lat;
+  final num lng;
 
   const Coordinate({
     required this.lat,
     required this.lng,
   });
 
-  factory Coordinate.fromJson(Map<String, dynamic> json) {
+  factory Coordinate.fromJson(Map<String, num> json) {
     return Coordinate(
       lat: json['lat'] ?? 0.0,
       lng: json['lng'] ?? 0.0,
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, num> toJson() {
     return {
       'lat': lat,
       'lng': lng,
     };
   }
 
-  factory Coordinate.fromMap(Map<String, dynamic> map) {
+  factory Coordinate.fromMap(Map<String, num> map) {
     return Coordinate(
       lat: map['lat'] ?? 0.0,
       lng: map['lng'] ?? 0.0,
     );
   }
 
-  Map<String, double> toMap() {
+  Map<String, num> toMap() {
     return {
       'lat': lat,
       'lng': lng,
     };
   }
 
-  double calculateDistanceFromUniversity() {
+  /// Calculates the distance in kilometers between this coordinate and the Central University of Himachal Pradesh default location.
+  ///
+  /// Uses the Haversine formula to calculate the great-circle distance between two points
+  /// on the Earth's surface given their latitude and longitude.
+  ///
+  /// Returns:
+  ///   - A number representing the distance in kilometers, rounded to 2 decimal places.
+  ///   - Returns 0 if an error occurs during calculation.
+  num calculateDistanceFromUniversity() {
     return _calculateDistance(
       lat,
       lng,
-      defaultUniversityCoordinate['lat']!,
-      defaultUniversityCoordinate['lng']!,
+      defaultUniversityCoordinate.lat,
+      defaultUniversityCoordinate.lng,
     );
   }
 
-  static double _calculateDistance(
-    double lat1,
-    double lon1,
-    double lat2,
-    double lon2,
+  static num _calculateDistance(
+    num lat1,
+    num lon1,
+    num lat2,
+    num lon2,
   ) {
     const R = 6371; // Earth's radius in km
     final dLat = _toRad(lat2 - lat1);
@@ -73,5 +81,5 @@ class Coordinate {
     return double.parse(distance.toStringAsFixed(2));
   }
 
-  static double _toRad(double degrees) => degrees * (math.pi / 180);
+  static num _toRad(num degrees) => degrees * (math.pi / 180);
 }

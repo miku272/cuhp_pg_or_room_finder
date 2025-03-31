@@ -12,6 +12,7 @@ class UserModel extends User {
     required super.isPhoneVerified,
     required super.jwtToken,
     required super.expiresIn,
+    super.property,
     super.createdAt,
     super.updatedAt,
   });
@@ -26,6 +27,7 @@ class UserModel extends User {
     bool? isPhoneVerified,
     String? jwtToken,
     String? expiresIn,
+    List<String>? property,
     String? createdAt,
     String? updatedAt,
   }) {
@@ -38,6 +40,7 @@ class UserModel extends User {
       isPhoneVerified: isPhoneVerified ?? this.isPhoneVerified,
       jwtToken: jwtToken ?? this.jwtToken,
       expiresIn: expiresIn ?? this.expiresIn,
+      property: property ?? this.property,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -53,6 +56,7 @@ class UserModel extends User {
       'isPhoneVerified': isPhoneVerified,
       'jwtToken': jwtToken,
       'expiresIn': expiresIn,
+      'property': property,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -68,6 +72,7 @@ class UserModel extends User {
       isPhoneVerified: map['isPhoneVerified'] ?? false,
       jwtToken: map['jwtToken'] ?? '',
       expiresIn: map['expiresIn'] ?? '',
+      property: List<String>.from(map['property'] ?? const []),
       createdAt: map['createdAt'],
       updatedAt: map['updatedAt'],
     );
@@ -80,7 +85,7 @@ class UserModel extends User {
 
   @override
   String toString() {
-    return 'User(id: $id, name: $name, email: $email, phone: $phone, isEmailVerified: $isEmailVerified, isPhoneVerified: $isPhoneVerified, jwtToken: $jwtToken, expiresIn: $expiresIn, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'User(id: $id, name: $name, email: $email, phone: $phone, isEmailVerified: $isEmailVerified, isPhoneVerified: $isPhoneVerified, jwtToken: $jwtToken, expiresIn: $expiresIn, property: ${property.toString()} createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -95,6 +100,7 @@ class UserModel extends User {
         other.isPhoneVerified == isPhoneVerified &&
         other.jwtToken == jwtToken &&
         other.expiresIn == expiresIn &&
+        other.property == property &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
   }
@@ -109,6 +115,7 @@ class UserModel extends User {
         isPhoneVerified.hashCode ^
         jwtToken.hashCode ^
         expiresIn.hashCode ^
+        property.hashCode ^
         createdAt.hashCode ^
         updatedAt.hashCode;
   }

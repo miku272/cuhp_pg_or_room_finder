@@ -17,3 +17,13 @@ class UserException implements Exception {
     this.message = 'Some error occurred on the user side.',
   });
 }
+
+class SupabaseException implements Exception {
+  final int? status;
+  final String message;
+
+  SupabaseException({
+    this.status = 500,
+    this.message = 'Some error occurred on the Supabase side.',
+  });
+}

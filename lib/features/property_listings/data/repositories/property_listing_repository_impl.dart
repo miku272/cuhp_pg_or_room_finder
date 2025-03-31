@@ -1,14 +1,16 @@
+import 'dart:io';
+
 import 'package:fpdart/fpdart.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../../../core/error/exception.dart';
-import '../../../../core/common/entities/property.dart';
 
 import '../models/property_form_data.dart';
 
 import '../../domain/repository/property_listing_repository.dart';
 
 import '../datasources/property_listing_remote_datasource.dart';
+import '../models/property_listing_model.dart';
 
 class PropertyListingRepositoryImpl implements PropertyListingRepository {
   final PropertyListingRemoteDataSource propertyListingRemoteDataSource;
@@ -18,14 +20,17 @@ class PropertyListingRepositoryImpl implements PropertyListingRepository {
   });
 
   @override
-  Future<Either<Failure, Property>> addPropertyListing(
-      {required PropertyFormData propertyFormData,
-      required String token,
-      required String userId,
-      required String username}) async {
+  Future<Either<Failure, PropertyListingModel>> addPropertyListing({
+    required PropertyFormData propertyFormData,
+    required List<File> images,
+    required String token,
+    required String userId,
+    required String username,
+  }) async {
     return _getProperty(
       () async => await propertyListingRemoteDataSource.addPropertyListing(
         propertyFormData,
+        images,
         token,
         userId,
         username,
@@ -33,11 +38,32 @@ class PropertyListingRepositoryImpl implements PropertyListingRepository {
     );
   }
 
-  Future<Either<Failure, Property>> _getProperty(
-    Future<Property> Function() fn,
+  @override
+  Future<Either<Failure, PropertyListingModel>> updatePropertyListing({
+    required String propertyId,
+    required PropertyFormData propertyFormData,
+    required List<File> images,
+    required List<String> imagesToDelete,
+    required String token,
+    required String username,
+  }) async {
+    return _getProperty(
+      () async => await propertyListingRemoteDataSource.updatePropertyListing(
+        propertyId,
+        propertyFormData,
+        images,
+        imagesToDelete,
+        token,
+        username,
+      ),
+    );
+  }
+
+  Future<Either<Failure, PropertyListingModel>> _getProperty(
+    Future<PropertyListingModel> Function() fn,
   ) async {
     try {
-      final Property property = await fn();
+      final PropertyListingModel property = await fn();
 
       return right(property);
     } on ServerException catch (error) {

@@ -1,10 +1,6 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 import '../../../../core/common/entities/user.dart';
-import '../../../../core/constants/constants.dart';
 import '../../../../core/error/exception.dart';
 
 abstract interface class SplashRemoteDataSource {
@@ -12,6 +8,12 @@ abstract interface class SplashRemoteDataSource {
 }
 
 class SplashRemoteDataSourceImpl implements SplashRemoteDataSource {
+  final Dio dio;
+
+  SplashRemoteDataSourceImpl({
+    required this.dio,
+  });
+
   @override
   Future<User> getCurrentUser(String? token, String? id) async {
     if (token == null || token == '' || id == null || id == '') {
@@ -22,37 +24,26 @@ class SplashRemoteDataSourceImpl implements SplashRemoteDataSource {
     }
 
     try {
-      final res = await http
-          .post(
-        Uri.parse('${Constants.backendUri}/auth/token-auth'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode({
-          '_id': id,
-        }),
-      )
-          .timeout(
-        const Duration(seconds: 10),
-        onTimeout: () {
-          throw const SocketException('Connection timed out');
-        },
-      );
-
-      final decodedBody = jsonDecode(res.body) as Map<String, dynamic>;
+      final res = await dio.post('/auth/token-auth',
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          }),
+          data: {
+            '_id': id,
+          });
 
       if (res.statusCode.toString().startsWith('5')) {
         throw ServerException(
           status: res.statusCode,
-          message: decodedBody['message'],
+          message: res.data['message'],
         );
       }
 
       if (res.statusCode.toString().startsWith('4')) {
         throw UserException(
           status: res.statusCode,
-          message: decodedBody['message'],
+          message: res.data['message'],
         );
       }
 
@@ -60,7 +51,7 @@ class SplashRemoteDataSourceImpl implements SplashRemoteDataSource {
         throw Exception('An error occurred');
       }
 
-      print(decodedBody);
+      final decodedBody = res.data;
 
       final User user = User(
         id: decodedBody['data']['user']['_id'],
@@ -71,16 +62,22 @@ class SplashRemoteDataSourceImpl implements SplashRemoteDataSource {
         isPhoneVerified: decodedBody['data']['user']['isPhoneVerified'],
         jwtToken: '',
         expiresIn: '',
+        property: List<String>.from(decodedBody['data']['user']['property']),
         createdAt: decodedBody['data']['user']['createdAt'],
         updatedAt: decodedBody['data']['user']['updatedAt'],
       );
 
       return user;
-    } on SocketException {
-      throw ServerException(
-        status: 503,
-        message: 'Unable to connect to the server',
-      );
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout) {
+        throw ServerException(
+          status: 503,
+          message: 'Unable to connect to the server',
+        );
+      }
+
+      rethrow;
     } catch (error) {
       rethrow;
     }

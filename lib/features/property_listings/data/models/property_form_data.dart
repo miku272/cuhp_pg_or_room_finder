@@ -9,14 +9,15 @@ class PropertyFormData extends Property {
     super.propertyAddressLine1,
     super.propertyAddressLine2,
     super.propertyVillageOrCity,
-    String? propertyPincode,
+    super.propertyPincode,
     super.ownerName,
     super.ownerPhone,
     super.ownerEmail,
+    super.pricePerMonth,
     super.propertyType,
     super.propertyGenderAllowance,
     super.rentAgreementAvailable,
-    Map<String, double>? coordinates,
+    super.coordinates = const Coordinate(lat: 32.1726, lng: 76.3617),
     super.distanceFromUniversity,
     super.services = const {
       'food': false,
@@ -26,20 +27,13 @@ class PropertyFormData extends Property {
       'laundry': false,
       'parking': false,
     },
-    super.images = const [],
     super.roomIds = const [],
+    super.images,
     super.isVerified = false,
     super.isActive = true,
     super.createdAt,
     super.updatedAt,
-  }) : super(
-          coordinates: coordinates != null
-              ? Coordinate(
-                  lat: coordinates['lat'] ?? 32.1726,
-                  lng: coordinates['lng'] ?? 76.3617,
-                )
-              : const Coordinate(lat: 32.1726, lng: 76.3617),
-        );
+  });
 
   factory PropertyFormData.fromJson(Map<String, dynamic> json) {
     return PropertyFormData(
@@ -53,15 +47,19 @@ class PropertyFormData extends Property {
       ownerName: json['ownerName'],
       ownerPhone: json['ownerPhone'],
       ownerEmail: json['ownerEmail'],
+      pricePerMonth: json['pricePerMonth'],
       propertyType: Property.propertyTypeFromString(json['propertyType']),
       propertyGenderAllowance:
           Property.genderAllowanceFromString(json['propertyGenderAllowance']),
       rentAgreementAvailable: json['rentAgreementAvailable'] ?? false,
-      coordinates: Map<String, double>.from(json['coordinates'] ?? {}),
+      coordinates: Coordinate(
+        lat: json['coordinates']['lat'],
+        lng: json['coordinates']['lng'],
+      ),
       distanceFromUniversity: json['distanceFromUniversity']?.toDouble(),
       services: Map<String, bool>.from(json['services'] ?? {}),
-      images: List<String>.from(json['images'] ?? []),
       roomIds: List<String>.from(json['rooms'] ?? []),
+      images: List<String>.from(json['images'] ?? []),
       isVerified: json['isVerified'] ?? false,
       isActive: json['isActive'] ?? true,
       createdAt:
@@ -83,7 +81,8 @@ class PropertyFormData extends Property {
       'ownerName': ownerName,
       'ownerPhone': ownerPhone,
       'ownerEmail': ownerEmail,
-      'propertyType': propertyType?.toString().split('.').last,
+      'pricePerMonth': pricePerMonth,
+      'propertyType': propertyType.toString().split('.').last,
       'propertyGenderAllowance':
           Property.genderAllowanceToString(propertyGenderAllowance!),
       'rentAgreementAvailable': rentAgreementAvailable,
@@ -110,14 +109,15 @@ class PropertyFormData extends Property {
     String? ownerName,
     String? ownerPhone,
     String? ownerEmail,
+    int? pricePerMonth,
     PropertyType? propertyType,
     GenderAllowance? propertyGenderAllowance,
     bool? rentAgreementAvailable,
-    Map<String, double>? coordinates,
+    Coordinate? coordinates,
     double? distanceFromUniversity,
     Map<String, bool>? services,
-    List<String>? images,
     List<String>? roomIds,
+    List<String>? images,
     bool? isVerified,
     bool? isActive,
     DateTime? createdAt,
@@ -135,23 +135,18 @@ class PropertyFormData extends Property {
       ownerName: ownerName ?? this.ownerName,
       ownerPhone: ownerPhone ?? this.ownerPhone,
       ownerEmail: ownerEmail ?? this.ownerEmail,
+      pricePerMonth: pricePerMonth ?? this.pricePerMonth,
       propertyType: propertyType ?? this.propertyType,
       propertyGenderAllowance:
           propertyGenderAllowance ?? this.propertyGenderAllowance,
       rentAgreementAvailable:
           rentAgreementAvailable ?? this.rentAgreementAvailable,
-      coordinates: coordinates ??
-          (this.coordinates != null
-              ? {
-                  'lat': this.coordinates!.lat,
-                  'lng': this.coordinates!.lng,
-                }
-              : null),
+      coordinates: coordinates ?? this.coordinates,
       distanceFromUniversity:
           distanceFromUniversity ?? this.distanceFromUniversity,
       services: services ?? this.services,
-      images: images ?? this.images,
       roomIds: roomIds ?? this.roomIds,
+      images: images ?? this.images,
       isVerified: isVerified ?? this.isVerified,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,

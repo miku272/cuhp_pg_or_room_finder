@@ -58,9 +58,9 @@ class ShellScaffold extends StatelessWidget {
       floatingActionButton: currentIndex == 0 || currentIndex == 2
           ? FloatingActionButton.extended(
               onPressed: () {
-                context.push('/add-property');
+                context.push('/add-property', extra: <String, dynamic>{});
               },
-              tooltip: 'Add Property',
+              tooltip: 'Add new Property',
               label: const Row(
                 spacing: 10.0,
                 children: <Widget>[

@@ -8,7 +8,7 @@ enum GenderAllowance {
   coEd // Note: matches backend 'co-ed'
 }
 
-abstract class Property {
+class Property {
   final String? id;
   final String? ownerId;
   final String? propertyName;
@@ -19,11 +19,12 @@ abstract class Property {
   final String? ownerName;
   final String? ownerPhone;
   final String? ownerEmail;
+  final int? pricePerMonth;
   final PropertyType? propertyType;
   final GenderAllowance? propertyGenderAllowance;
   final bool? rentAgreementAvailable;
   final Coordinate? coordinates;
-  final double? distanceFromUniversity;
+  final num? distanceFromUniversity;
   final Map<String, bool>? services;
   final List<String>? images;
   final List<String>? roomIds;
@@ -34,19 +35,20 @@ abstract class Property {
 
   const Property({
     this.id,
-    this.ownerId,
-    this.propertyName,
-    this.propertyAddressLine1,
+    required this.ownerId,
+    required this.propertyName,
+    required this.propertyAddressLine1,
     this.propertyAddressLine2,
-    this.propertyVillageOrCity,
-    this.propertyPincode,
-    this.ownerName,
-    this.ownerPhone,
-    this.ownerEmail,
-    this.propertyType,
-    this.propertyGenderAllowance,
-    this.rentAgreementAvailable,
-    this.coordinates,
+    required this.propertyVillageOrCity,
+    required this.propertyPincode,
+    required this.ownerName,
+    required this.ownerPhone,
+    required this.ownerEmail,
+    required this.pricePerMonth,
+    required this.propertyType,
+    required this.propertyGenderAllowance,
+    required this.rentAgreementAvailable,
+    required this.coordinates,
     this.distanceFromUniversity,
     this.services,
     this.images,

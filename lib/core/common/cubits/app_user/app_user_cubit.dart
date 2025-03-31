@@ -15,4 +15,11 @@ class AppUserCubit extends Cubit<AppUserState> {
   void removeUser() {
     emit(AppUserInitial());
   }
+
+  User? get user {
+    if (state is AppUserLoggedin) {
+      return (state as AppUserLoggedin).user;
+    }
+    return null;
+  }
 }

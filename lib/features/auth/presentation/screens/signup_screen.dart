@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -17,6 +19,9 @@ class _SignupScreenState extends State<SignupScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   Future<void> signup() async {
     if (!_signupFormKey.currentState!.validate()) {
@@ -40,8 +45,6 @@ class _SignupScreenState extends State<SignupScreen> {
           email: email,
           password: password,
         ));
-
-    print('$name $email $password');
   }
 
   @override
@@ -58,7 +61,7 @@ class _SignupScreenState extends State<SignupScreen> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthFailure) {
-            print(state.message);
+            log('Error in signup screen: ', error: state.message);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
             );
@@ -211,11 +214,22 @@ class _SignupScreenState extends State<SignupScreen> {
                           Icons.lock_outline,
                           color: Theme.of(context).colorScheme.primary,
                         ),
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword =
+                              !_obscurePassword;
+                            });
+                          },
+                          icon: _obscurePassword
+                              ? const Icon(Icons.visibility_rounded)
+                              : const Icon(Icons.visibility_off_rounded),
+                        ),
                         filled: true,
                         fillColor: Theme.of(context).colorScheme.surface,
                       ),
                       keyboardType: TextInputType.text,
-                      obscureText: true,
+                      obscureText: _obscurePassword,
                       validator: (value) => value?.isEmpty ?? true
                           ? 'Please enter password'
                           : null,
@@ -251,11 +265,22 @@ class _SignupScreenState extends State<SignupScreen> {
                           Icons.lock_outlined,
                           color: Theme.of(context).colorScheme.primary,
                         ),
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword;
+                            });
+                          },
+                          icon: _obscureConfirmPassword
+                              ? const Icon(Icons.visibility_rounded)
+                              : const Icon(Icons.visibility_off_rounded),
+                        ),
                         filled: true,
                         fillColor: Theme.of(context).colorScheme.surface,
                       ),
                       keyboardType: TextInputType.text,
-                      obscureText: true,
+                      obscureText: _obscureConfirmPassword,
                       validator: (value) => value?.isEmpty ?? true
                           ? 'Please enter password'
                           : null,
@@ -283,40 +308,6 @@ class _SignupScreenState extends State<SignupScreen> {
                               ),
                             ),
                     ),
-                    // const SizedBox(height: 24),
-                    // Row(
-                    //   children: [
-                    //     Expanded(child: Divider()),
-                    //     Padding(
-                    //       padding: EdgeInsets.symmetric(horizontal: 16),
-                    //       child: Text(
-                    //         'Or continue with',
-                    //         style: TextStyle(
-                    //           color: Theme.of(context)
-                    //               .colorScheme
-                    //               .onSurface
-                    //               .withAlpha(179),
-                    //         ),
-                    //       ),
-                    //     ),
-                    //     Expanded(child: Divider()),
-                    //   ],
-                    // ),
-                    // const SizedBox(height: 24),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.center,
-                    //   children: [
-                    //     _SocialButton(
-                    //       icon: Icons.g_mobiledata,
-                    //       onPressed: () {},
-                    //     ),
-                    //     const SizedBox(width: 16),
-                    //     _SocialButton(
-                    //       icon: Icons.apple,
-                    //       onPressed: () {},
-                    //     ),
-                    //   ],
-                    // ),
                     const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

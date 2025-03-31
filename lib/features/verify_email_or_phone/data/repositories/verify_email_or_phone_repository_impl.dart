@@ -4,7 +4,7 @@ import '../../../../core/error/exception.dart';
 import '../../../../core/error/failures.dart';
 
 import '../../domain/repositories/verify_email_or_phone_repository.dart';
-import '../datasourses/verify_email_or_phone_remote_data_source.dart';
+import '../datasources/verify_email_or_phone_remote_data_source.dart';
 
 class VerifyEmailOrPhoneRepositoryImpl implements VerifyEmailOrPhoneRepository {
   final VerifyEmailOrPhoneRemoteDataSource verifyEmailOrPhoneRemoteDataSource;

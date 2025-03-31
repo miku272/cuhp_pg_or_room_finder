@@ -1,0 +1,37 @@
+import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
+
+class NoPropertySaved extends StatelessWidget {
+  const NoPropertySaved({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(24),
+      children: <Widget>[
+        const SizedBox(height: 40),
+        Lottie.asset(
+          'assets/animations/magnifying_not_found.json',
+          height: 200,
+          width: 200,
+          fit: BoxFit.contain,
+        ),
+        const SizedBox(height: 24),
+        Text(
+          'No Properties Found',
+          textAlign: TextAlign.center,
+          style: theme.textTheme.titleLarge,
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'You haven\'t saved any properties yet. Add your first property to get started.',
+          textAlign: TextAlign.center,
+          style: theme.textTheme.bodyLarge,
+        ),
+      ],
+    );
+  }
+}

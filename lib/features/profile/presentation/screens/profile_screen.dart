@@ -1,15 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/common/cubits/app_theme/theme_cubit.dart';
 import '../../../../core/common/cubits/app_theme/theme_state.dart';
 import '../../../../core/common/cubits/app_user/app_user_cubit.dart';
+import '../../../../core/utils/sf_handler.dart';
+import '../../../../init_dependencies.dart';
 
 import '../widgets/verification_pill.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
+  String _formatPhoneNumber(String phoneNumber) {
+    if (phoneNumber.length <= 3) {
+      return phoneNumber;
+    }
+
+    if (phoneNumber.startsWith('+91') && phoneNumber.length > 3) {
+      return '${phoneNumber.substring(0, 3)} ${phoneNumber.substring(3, 8)} ${phoneNumber.substring(8)}';
+    }
+
+    final buffer = StringBuffer();
+    for (int i = 0; i < phoneNumber.length; i++) {
+      buffer.write(phoneNumber[i]);
+      if ((i + 1) % 5 == 0 && i != phoneNumber.length - 1) {
+        buffer.write(' ');
+      }
+    }
+    return buffer.toString();
+  }
+
+  Future<void> _logoutUser(BuildContext context) async {
+    final sfHandler = serviceLocator<SFHandler>();
+    final appUserCubit = context.read<AppUserCubit>();
+
+    await sfHandler.deleteId();
+    await sfHandler.deleteToken();
+    await sfHandler.deleteExpiresIn();
+
+    appUserCubit.removeUser();
+
+    if (context.mounted) {
+      context.go('/login');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +140,9 @@ class ProfileScreen extends StatelessWidget {
                               ListTile(
                                 leading: const Icon(Icons.phone_outlined),
                                 title: state.user.phone != null
-                                    ? Text(state.user.phone!)
+                                    ? Text(
+                                        _formatPhoneNumber(state.user.phone!),
+                                      )
                                     : TextButton(
                                         onPressed: () {},
                                         child: const Text('Add Phone'),
@@ -161,8 +200,6 @@ class ProfileScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 16),
-
-// Account Actions Card
                         Card(
                           child: Column(
                             children: <Widget>[
@@ -232,8 +269,9 @@ class ProfileScreen extends StatelessWidget {
                                           child: const Text('Cancel'),
                                         ),
                                         TextButton(
-                                          onPressed: () {
-                                            // Handle logout
+                                          onPressed: () async {
+                                            context.pop();
+                                            _logoutUser(context);
                                           },
                                           child: const Text(
                                             'Logout',
