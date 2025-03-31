@@ -170,7 +170,7 @@ class PropertyListingRemoteDataSourceImpl
   ) async {
     try {
       if (imagesToDelete.isNotEmpty) {
-        await SupabaseManager.deleteImages(imagesToDelete);
+        await SupabaseManager.deletePropertyImages(imagesToDelete);
       }
       final newUploadedImages = images.isEmpty
           ? <String>[]

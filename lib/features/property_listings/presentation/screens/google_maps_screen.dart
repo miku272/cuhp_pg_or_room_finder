@@ -256,8 +256,6 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                     final distance =
                         coordinate.calculateDistanceFromUniversity();
 
-                    print('Distance from university: $distance km');
-
                     if (distance <= 0.1 || distance > 30) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(

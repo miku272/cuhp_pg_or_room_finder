@@ -76,16 +76,24 @@ class SupabaseManager {
     }
   }
 
-  static Future<void> deleteImages(List<String> imageUrls) async {
+  static Future<void> deletePropertyImages(List<String> imageUrls) async {
     if (_client == null) {
       throw Exception('Supabase client is not initialized');
     }
 
     try {
       for (final imageUrl in imageUrls) {
-        final fileName = path.basename(imageUrl);
+        final uri = Uri.parse(imageUrl);
+        final pathSegments = uri.pathSegments;
 
-        await _client!.storage.from(_bucketName).remove([fileName]);
+        if (pathSegments.isEmpty) {
+          throw SupabaseException(message: 'Invalid image URL');
+        }
+
+        final fileName = pathSegments.last;
+        await _client!.storage.from('property-listing').remove(
+          ['property-images/$fileName'],
+        );
       }
     } catch (error) {
       log('Error in deleting images: ', error: error);
