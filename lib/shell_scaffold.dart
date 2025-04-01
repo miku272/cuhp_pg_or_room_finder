@@ -13,6 +13,9 @@ class ShellScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final location = GoRouterState.of(context).fullPath;
+    final isPropertyDetailsScreen = location?.contains('/property/') ?? false;
+
     return Scaffold(
       body: child,
       bottomNavigationBar: NavigationBar(
@@ -55,21 +58,22 @@ class ShellScaffold extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: currentIndex == 0 || currentIndex == 2
-          ? FloatingActionButton.extended(
-              onPressed: () {
-                context.push('/add-property', extra: <String, dynamic>{});
-              },
-              tooltip: 'Add new Property',
-              label: const Row(
-                spacing: 10.0,
-                children: <Widget>[
-                  Icon(Icons.add),
-                  Text('Add Property'),
-                ],
-              ),
-            )
-          : null,
+      floatingActionButton:
+          (currentIndex == 0 || currentIndex == 2) && !isPropertyDetailsScreen
+              ? FloatingActionButton.extended(
+                  onPressed: () {
+                    context.push('/add-property', extra: <String, dynamic>{});
+                  },
+                  tooltip: 'Add new Property',
+                  label: const Row(
+                    spacing: 10.0,
+                    children: <Widget>[
+                      Icon(Icons.add),
+                      Text('Add Property'),
+                    ],
+                  ),
+                )
+              : null,
     );
   }
 }

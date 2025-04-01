@@ -1,5 +1,7 @@
 import 'package:go_router/go_router.dart';
 
+import './core/common/entities/property.dart';
+
 import './shell_scaffold.dart';
 import './features/splash/presentation/screens/splash_screen.dart';
 import './features/not_found/presentation/screens/not_found_screen.dart';
@@ -15,13 +17,13 @@ import './features/verify_email_or_phone/presentation/screens/verify_email_or_ph
 import './features/property_listings/presentation/screens/add_property_screen_step_2.dart';
 import './features/property_listings/presentation/screens/add_property_screen_step_3.dart';
 import './features/property_listings/presentation/screens/add_property_success_screen.dart';
-
 import './features/property_listings/presentation/screens/google_maps_screen.dart';
+
+import './features/property_details/presentation/screens/property_details_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/splash',
-    // initialLocation: '/maps',
     errorBuilder: (context, state) => const NotFoundScreen(),
     routes: [
       GoRoute(
@@ -43,23 +45,26 @@ class AppRouter {
             child: child,
           );
         },
-        routes: [
+        routes: <GoRoute>[
           GoRoute(
             path: '/',
             builder: (context, state) => const HomeScreen(),
+            routes: <GoRoute>[_propertyDetails()],
           ),
           GoRoute(
             path: '/saved',
             builder: (context, state) => const NoPropertySaved(),
+            routes: <GoRoute>[_propertyDetails()],
           ),
           GoRoute(
             path: '/my-listings',
             builder: (context, state) => const MyListingsScreen(),
+            routes: <GoRoute>[_propertyDetails()],
           ),
           GoRoute(
             path: '/profile',
             builder: (context, state) => const ProfileScreen(),
-            routes: [
+            routes: <GoRoute>[
               GoRoute(
                 path: 'verify/:verificationType',
                 builder: (context, state) => VerifyEmailOrPhoneScreen(
@@ -92,7 +97,7 @@ class AppRouter {
             property: payLoad?['propertyFormData'] as PropertyFormData?,
           );
         },
-        routes: [
+        routes: <GoRoute>[
           GoRoute(
             path: 'step-2',
             builder: (context, state) {
@@ -131,6 +136,24 @@ class AppRouter {
       ),
     ],
   );
+
+  static GoRoute _propertyDetails() {
+    return GoRoute(
+        path: 'property/:propertyId',
+        builder: (context, state) {
+          final propertyId = state.pathParameters['propertyId'];
+          final property = state.extra as Property?;
+
+          if (propertyId == null || property == null) {
+            throw Exception('Property ID or Property is null');
+          }
+
+          return PropertyDetailsScreen(
+            propertyId: propertyId,
+            property: property,
+          );
+        });
+  }
 
   static int _calculateCurrentIndex(GoRouterState state) {
     final String location = state.matchedLocation;

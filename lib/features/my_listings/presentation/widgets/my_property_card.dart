@@ -24,20 +24,28 @@ class MyPropertyCard extends StatelessWidget {
 
     return Column(
       children: [
-        PropertyCard(
-          showFavouriteButton: false,
-          images: property.images ?? [],
-          propertyName: property.propertyName ?? 'Unnamed Property',
-          address:
-              '${property.propertyAddressLine1}, ${property.propertyVillageOrCity}',
-          price: property.pricePerMonth!,
-          isVerified: property.isVerified ?? false,
-          propertyGenderAllowance: Property.genderAllowanceToString(
-            property.propertyGenderAllowance ?? GenderAllowance.coEd,
+        GestureDetector(
+          onTap: () {
+            context.push(
+              '/my-listings/property/${property.id}',
+              extra: property,
+            );
+          },
+          child: PropertyCard(
+            showFavouriteButton: false,
+            images: property.images ?? [],
+            propertyName: property.propertyName ?? 'Unnamed Property',
+            address:
+                '${property.propertyAddressLine1}, ${property.propertyVillageOrCity}',
+            price: property.pricePerMonth!,
+            isVerified: property.isVerified ?? false,
+            propertyGenderAllowance: Property.genderAllowanceToString(
+              property.propertyGenderAllowance ?? GenderAllowance.coEd,
+            ),
+            services: property.services ?? {},
+            distanceFromUniversity:
+                (property.distanceFromUniversity ?? 0).toDouble(),
           ),
-          services: property.services ?? {},
-          distanceFromUniversity:
-              (property.distanceFromUniversity ?? 0).toDouble(),
         ),
         const SizedBox(height: 8),
         Row(
