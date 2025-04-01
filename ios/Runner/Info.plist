@@ -4,6 +4,15 @@
 	<dict>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>Location required to display on map</string>
+		<key>NSLocationAlwaysUsageDescription</key>
+        <string>Location required to display on map</string>
+        <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+        <string>Location required to display on map</string>
+        <key>LSApplicationQueriesSchemes</key>
+        <array>
+            <string>maps</string>
+            <string>maps.apple.com</string>
+        </array>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
