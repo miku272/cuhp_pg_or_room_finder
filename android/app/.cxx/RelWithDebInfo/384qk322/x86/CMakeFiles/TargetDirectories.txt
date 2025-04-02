@@ -1,0 +1,2 @@
+C:/Practicals/flutter_projects/cuhp_pg_or_room_finder/android/app/.cxx/RelWithDebInfo/384qk322/x86/CMakeFiles/edit_cache.dir
+C:/Practicals/flutter_projects/cuhp_pg_or_room_finder/android/app/.cxx/RelWithDebInfo/384qk322/x86/CMakeFiles/rebuild_cache.dir

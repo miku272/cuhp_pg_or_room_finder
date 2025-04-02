@@ -49,6 +49,12 @@ import './features/my_listings/domain/usecases/get_properties_by_id.dart';
 import 'features/my_listings/domain/usecases/toggle_property_activation.dart';
 import 'features/my_listings/presentation/bloc/my_listings_bloc.dart';
 
+import './features/property_details/data/datasources/property_details_remote_datasource.dart';
+import './features/property_details/data/repositories/property_details_repository_impl.dart';
+import './features/property_details/domain/repository/property_details_repository.dart';
+import './features/property_details/domain/usecases/get_property_details.dart';
+import './features/property_details/presentation/bloc/property_details_bloc.dart';
+
 final serviceLocator = GetIt.instance;
 
 Future<void> initDependencies() async {
@@ -62,6 +68,7 @@ Future<void> initDependencies() async {
   _initVerifyEmailOrPhone();
   _initPropertyListings();
   _initMyListings();
+  _initPropertyDetails();
 
   final prefs = await SharedPreferences.getInstance();
 
@@ -269,6 +276,30 @@ void _initMyListings() {
     () => MyListingsBloc(
       getPropertiesById: serviceLocator(),
       togglePropertyActivation: serviceLocator(),
+    ),
+  );
+}
+
+void _initPropertyDetails() {
+  serviceLocator.registerFactory<PropertyDetailsRemoteDatasource>(
+    () => PropertyDetailsRemoteDataSourceImpl(dio: serviceLocator()),
+  );
+
+  serviceLocator.registerFactory<PropertyDetailsRepository>(
+    () => PropertyDetailsRepositoryImpl(
+      propertyDetailsRemoteDatasource: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<GetPropertyDetails>(
+    () => GetPropertyDetails(
+      propertyDetailsRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerLazySingleton<PropertyDetailsBloc>(
+    () => PropertyDetailsBloc(
+      getPropertyDetails: serviceLocator(),
     ),
   );
 }
