@@ -170,7 +170,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String password,
   ) async {
     try {
-      final res = await dio.post('/auth/signup',
+      final res = await dio.post('/auth/signup-using-email-and-password',
           options: Options(headers: {
             'Content-Type': 'application/json',
           }),

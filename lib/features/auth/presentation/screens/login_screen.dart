@@ -31,8 +31,6 @@ class _LoginScreenState extends State<LoginScreen> {
     context.read<AuthBloc>().add(
           AuthLogin(email: email, password: password),
         );
-
-    // print('$email: $password');
   }
 
   @override
