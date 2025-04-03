@@ -136,6 +136,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         phone: decodedBody['data']['user']['phone'],
         isEmailVerified: decodedBody['data']['user']['isEmailVerified'],
         isPhoneVerified: decodedBody['data']['user']['isPhoneVerified'],
+        property: List<String>.from(decodedBody['data']['user']['property']),
         jwtToken: decodedBody['data']['tokenData']['token'],
         expiresIn: decodedBody['data']['tokenData']['expiresIn'],
         createdAt: decodedBody['data']['user']['createdAt'],
@@ -209,7 +210,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         isPhoneVerified: decodedBody['data']['user']['isPhoneVerified'],
         jwtToken: decodedBody['data']['tokenData']['token'],
         expiresIn: decodedBody['data']['tokenData']['expiresIn'],
-        property: decodedBody['data']['tokenData']['property'] ?? const <String>[],
+        property: List<String>.from(decodedBody['data']['user']['property']),
         createdAt: decodedBody['data']['user']['createdAt'],
         updatedAt: decodedBody['data']['user']['updatedAt'],
       );
