@@ -45,24 +45,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             '_id': id,
           });
 
-      if (res.statusCode.toString().startsWith('5')) {
-        throw ServerException(
-          status: res.statusCode,
-          message: res.data['message'],
-        );
-      }
-
-      if (res.statusCode.toString().startsWith('4')) {
-        throw UserException(
-          status: res.statusCode,
-          message: res.data['message'],
-        );
-      }
-
-      if (!res.statusCode.toString().startsWith('2')) {
-        throw Exception('An error occurred');
-      }
-
       final decodedBody = res.data;
 
       final UserModel user = UserModel(
@@ -109,24 +91,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             'password': password,
           });
 
-      if (res.statusCode.toString().startsWith('5')) {
-        throw ServerException(
-          status: res.statusCode,
-          message: res.data['message'],
-        );
-      }
-
-      if (res.statusCode.toString().startsWith('4')) {
-        throw UserException(
-          status: res.statusCode,
-          message: res.data['message'],
-        );
-      }
-
-      if (!res.statusCode.toString().startsWith('2')) {
-        throw Exception('An error occurred');
-      }
-
       final decodedBody = res.data;
 
       final UserModel user = UserModel(
@@ -151,6 +115,28 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           status: 503,
           message: 'Unable to connect to the server',
         );
+      }
+
+      final errors = error.response;
+
+      if (errors != null) {
+        if (errors.statusCode.toString().startsWith('5')) {
+          throw ServerException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (errors.statusCode.toString().startsWith('4')) {
+          throw UserException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (!errors.statusCode.toString().startsWith('2')) {
+          throw Exception('An error occurred');
+        }
       }
 
       rethrow;
@@ -181,24 +167,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             'password': password,
           });
 
-      if (res.statusCode.toString().startsWith('5')) {
-        throw ServerException(
-          status: res.statusCode,
-          message: res.data['message'],
-        );
-      }
-
-      if (res.statusCode.toString().startsWith('4')) {
-        throw UserException(
-          status: res.statusCode,
-          message: res.data['message'],
-        );
-      }
-
-      if (!res.statusCode.toString().startsWith('2')) {
-        throw Exception('An error occurred');
-      }
-
       final decodedBody = res.data;
 
       final UserModel user = UserModel(
@@ -225,7 +193,36 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         );
       }
 
+      final errors = error.response;
+
+      if (errors != null) {
+        print('Error in auth: ${errors.statusCode}, ${errors.data}');
+
+        if (errors.statusCode.toString().startsWith('5')) {
+          throw ServerException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (errors.statusCode.toString().startsWith('4')) {
+          throw UserException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (!errors.statusCode.toString().startsWith('2')) {
+          throw Exception('An error occurred');
+        }
+      }
+
       rethrow;
+    } on SocketException catch (_) {
+      throw ServerException(
+        status: 503,
+        message: 'Unable to connect to the server',
+      );
     } catch (error) {
       rethrow;
     }

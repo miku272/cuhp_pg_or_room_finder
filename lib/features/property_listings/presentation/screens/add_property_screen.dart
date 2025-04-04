@@ -1,9 +1,8 @@
-import 'dart:typed_data';
-
-import 'package:cuhp_pg_or_room_finder/core/common/entities/coordinate.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../../../core/common/entities/coordinate.dart';
 import '../../../../core/common/entities/property.dart';
 
 import '../../data/models/property_form_data.dart';
@@ -32,8 +31,6 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
   final _propertyPincodeController = TextEditingController();
   PropertyType _selectedPropertyType = PropertyType.pg;
   GenderAllowance _selectedGenderAllowance = GenderAllowance.coEd;
-
-  Uint8List? mapSnapshot;
 
   num? chosenLng;
   num? chosenLat;
@@ -89,7 +86,7 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
 
   void _onNext() {
     if (!_formKey.currentState!.validate() ||
-        (mapSnapshot == null && !widget.isEditing) ||
+        (!widget.isEditing) ||
         chosenLat == null ||
         chosenLng == null) {
       return;
@@ -152,7 +149,7 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
       ),
       body: SingleChildScrollView(
         child: Column(
-          children: [
+          children: <Widget>[
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -194,13 +191,13 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
+                  children: <Widget>[
                     Card(
                       elevation: 2,
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
-                          children: [
+                          children: <Widget>[
                             TextFormField(
                               controller: _propertyNameController,
                               decoration: InputDecoration(
@@ -286,43 +283,166 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
                                 ),
                               ],
                             ),
-                            Card(
-                              elevation: 2,
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Property Location',
-                                      style:
-                                          theme.textTheme.titleMedium?.copyWith(
-                                        fontWeight: FontWeight.bold,
+                            const SizedBox(height: 5),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 16, horizontal: 5),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    'Property Location',
+                                    style:
+                                        theme.textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Container(
+                                    height: 200,
+                                    decoration: BoxDecoration(
+                                      border: chosenLat == null
+                                          ? Border.all(
+                                              color: theme.colorScheme.outline)
+                                          : null,
+                                      borderRadius: chosenLat == null
+                                          ? BorderRadius.circular(12)
+                                          : null,
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Stack(
+                                        children: <Widget>[
+                                          if (chosenLat != null &&
+                                              chosenLng != null)
+                                            GoogleMap(
+                                              initialCameraPosition:
+                                                  CameraPosition(
+                                                target: LatLng(
+                                                  chosenLat!.toDouble(),
+                                                  chosenLng!.toDouble(),
+                                                ),
+                                                zoom: 15,
+                                              ),
+                                              mapToolbarEnabled: false,
+                                              myLocationButtonEnabled: false,
+                                              markers: {
+                                                Marker(
+                                                  markerId: const MarkerId(
+                                                      'property-location'),
+                                                  position: LatLng(
+                                                    chosenLat!.toDouble(),
+                                                    chosenLng!.toDouble(),
+                                                  ),
+                                                  infoWindow: InfoWindow(
+                                                    title: _propertyNameController
+                                                            .text.isNotEmpty
+                                                        ? _propertyNameController
+                                                            .text
+                                                        : 'Property Location',
+                                                  ),
+                                                  icon: BitmapDescriptor
+                                                      .defaultMarkerWithHue(
+                                                    BitmapDescriptor.hueGreen,
+                                                  ),
+                                                ),
+                                              },
+                                            )
+                                          else
+                                            GestureDetector(
+                                              onTap: () async {
+                                                Map<String, dynamic>?
+                                                    locationData =
+                                                    await context.push<
+                                                        Map<String, dynamic>?>(
+                                                  '/maps',
+                                                  extra: {
+                                                    'lat': chosenLat,
+                                                    'lng': chosenLng
+                                                  },
+                                                );
+
+                                                if (locationData != null) {
+                                                  setState(() {
+                                                    chosenLat =
+                                                        locationData['lat'];
+                                                    chosenLng =
+                                                        locationData['lng'];
+                                                  });
+                                                }
+                                              },
+                                              child: Center(
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: <Widget>[
+                                                    Icon(
+                                                      Icons.location_on,
+                                                      size: 48,
+                                                      color: theme
+                                                          .colorScheme.primary
+                                                          .withValues(
+                                                              alpha: 0.5),
+                                                    ),
+                                                    const SizedBox(height: 8),
+                                                    Text(
+                                                      'Select a location',
+                                                      style: theme
+                                                          .textTheme.bodyLarge,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                        ],
                                       ),
                                     ),
-                                    const SizedBox(height: 16),
-                                    Container(
-                                      height: 200,
-                                      decoration: BoxDecoration(
-                                        border: mapSnapshot != null
-                                            ? null
-                                            : Border.all(
-                                                color:
-                                                    theme.colorScheme.outline,
+                                  ),
+                                  if (chosenLat != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 16),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          ElevatedButton.icon(
+                                            onPressed: () {
+                                              setState(() {
+                                                chosenLat = null;
+                                                chosenLng = null;
+                                              });
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  theme.colorScheme.error,
+                                              foregroundColor:
+                                                  theme.colorScheme.onError,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 16,
+                                                vertical: 12,
                                               ),
-                                        borderRadius: mapSnapshot != null
-                                            ? null
-                                            : BorderRadius.circular(12),
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: mapSnapshot != null
-                                            ? BorderRadius.zero
-                                            : BorderRadius.circular(12),
-                                        child: Center(
-                                          child: TextButton(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                            ),
+                                            icon: const Icon(
+                                              Icons.delete_outline,
+                                              color: Colors.white,
+                                            ),
+                                            label: const Text(
+                                              'Remove Location',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                          TextButton.icon(
                                             onPressed: () async {
                                               Map<String, dynamic>?
-                                                  snapshotData =
+                                                  locationData =
                                                   await context.push<
                                                       Map<String, dynamic>?>(
                                                 '/maps',
@@ -332,67 +452,46 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
                                                 },
                                               );
 
-                                              if (snapshotData != null) {
+                                              if (locationData != null) {
                                                 setState(() {
-                                                  mapSnapshot =
-                                                      snapshotData['snap'];
-
                                                   chosenLat =
-                                                      snapshotData['lat'];
+                                                      locationData['lat'];
                                                   chosenLng =
-                                                      snapshotData['lng'];
+                                                      locationData['lng'];
                                                 });
                                               }
                                             },
-                                            child: mapSnapshot == null
-                                                ? const Text('Show map')
-                                                : Image.memory(
-                                                    mapSnapshot!,
-                                                    fit: BoxFit.cover,
-                                                    height: 200,
-                                                    width: 350,
-                                                  ),
+                                            style: TextButton.styleFrom(
+                                              backgroundColor:
+                                                  theme.colorScheme.primary,
+                                              foregroundColor:
+                                                  theme.colorScheme.onPrimary,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 16,
+                                                vertical: 12,
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                            ),
+                                            icon: const Icon(
+                                              Icons.edit_location_alt,
+                                              color: Colors.white,
+                                            ),
+                                            label: const Text(
+                                              'Update Location',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
                                           ),
-                                        ),
+                                        ],
                                       ),
                                     ),
-                                    if (mapSnapshot != null)
-                                      const SizedBox(height: 16),
-                                    if (mapSnapshot != null)
-                                      Center(
-                                        child: ElevatedButton.icon(
-                                          onPressed: () {
-                                            setState(() {
-                                              mapSnapshot = null;
-                                            });
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                theme.colorScheme.error,
-                                            foregroundColor:
-                                                theme.colorScheme.onError,
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 16,
-                                              vertical: 12,
-                                            ),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                          ),
-                                          icon:
-                                              const Icon(Icons.delete_outline),
-                                          label: const Text(
-                                            'Remove Location',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
+                                ],
                               ),
                             ),
                           ],
@@ -406,7 +505,7 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+                          children: <Widget>[
                             Text(
                               'Property Specifications',
                               style: theme.textTheme.titleMedium?.copyWith(

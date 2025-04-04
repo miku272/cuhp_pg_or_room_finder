@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -643,7 +644,6 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
 
   Widget _buildLocationSection(BuildContext context, Property property) {
     final theme = Theme.of(context);
-    final hasCoordinates = property.coordinates != null;
 
     return Card(
       elevation: 2,
@@ -686,27 +686,56 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
                 bottomRight: Radius.circular(12),
               ),
             ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.map,
-                    size: 64,
-                    color: theme.colorScheme.primary.withValues(alpha: 0.5),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12),
+              ),
+              child: Stack(
+                children: <Widget>[
+                  GoogleMap(
+                    initialCameraPosition: CameraPosition(
+                      target: LatLng(
+                        property.coordinates!.lat.toDouble(),
+                        property.coordinates!.lng.toDouble(),
+                      ),
+                      zoom: 15,
+                    ),
+                    mapToolbarEnabled: false,
+                    myLocationButtonEnabled: false,
+                    markers: {
+                      Marker(
+                        markerId: const MarkerId('property-location'),
+                        position: LatLng(
+                          property.coordinates!.lat.toDouble(),
+                          property.coordinates!.lng.toDouble(),
+                        ),
+                        infoWindow: InfoWindow(
+                          title: property.propertyName ?? 'Property Location',
+                        ),
+                        icon: BitmapDescriptor.defaultMarkerWithHue(
+                          BitmapDescriptor.hueGreen,
+                        ),
+                      ),
+                    },
                   ),
-                  const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    onPressed: hasCoordinates
-                        ? () => _launchMapsDirections(context, property)
-                        : null,
-                    icon: const Icon(Icons.directions, color: Colors.white),
-                    label: const Text('Get Directions'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  Positioned(
+                    bottom: 16,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: ElevatedButton.icon(
+                        onPressed: () =>
+                            _launchMapsDirections(context, property),
+                        icon: const Icon(Icons.directions, color: Colors.white),
+                        label: const Text('Get Directions'),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -849,7 +878,6 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
                       }
                     }
                   } catch (error) {
-                    print(error);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(

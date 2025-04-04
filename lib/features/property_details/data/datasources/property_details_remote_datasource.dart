@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 
 import '../../../../core/common/entities/coordinate.dart';
@@ -33,24 +35,6 @@ class PropertyDetailsRemoteDataSourceImpl
           },
         ),
       );
-
-      if (res.statusCode.toString().startsWith('5')) {
-        throw ServerException(
-          status: res.statusCode,
-          message: res.data['message'],
-        );
-      }
-
-      if (res.statusCode.toString().startsWith('4')) {
-        throw UserException(
-          status: res.statusCode,
-          message: res.data['message'],
-        );
-      }
-
-      if (!res.statusCode.toString().startsWith('2')) {
-        throw Exception('An error occurred');
-      }
 
       final decodedBody = res.data;
 
@@ -103,7 +87,34 @@ class PropertyDetailsRemoteDataSourceImpl
         );
       }
 
+      final errors = error.response;
+
+      if (errors != null) {
+        if (errors.statusCode.toString().startsWith('5')) {
+          throw ServerException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (errors.statusCode.toString().startsWith('4')) {
+          throw UserException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (!errors.statusCode.toString().startsWith('2')) {
+          throw Exception('An error occurred');
+        }
+      }
+
       rethrow;
+    } on SocketException catch (_) {
+      throw ServerException(
+        status: 503,
+        message: 'Unable to connect to the server',
+      );
     } catch (error) {
       rethrow;
     }
