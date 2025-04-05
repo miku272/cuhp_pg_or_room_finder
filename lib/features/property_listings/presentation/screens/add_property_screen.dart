@@ -140,217 +140,311 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          '${widget.isEditing ? 'Update' : 'Add'} Your Property',
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            '${widget.isEditing ? 'Update' : 'Add'} Your Property',
+          ),
+          elevation: 0,
         ),
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(32),
-                  bottomRight: Radius.circular(32),
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(32),
+                    bottomRight: Radius.circular(32),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.home_work_rounded,
+                      size: 64,
+                      color: theme.colorScheme.onPrimary,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Property Details',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: theme.colorScheme.onPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Step 1 of 3',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onPrimary.withValues(alpha: 0.8),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.home_work_rounded,
-                    size: 64,
-                    color: theme.colorScheme.onPrimary,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Property Details',
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      color: theme.colorScheme.onPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Step 1 of 3',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onPrimary.withValues(alpha: 0.8),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Form(
-              key: _formKey,
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Card(
-                      elevation: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          children: <Widget>[
-                            TextFormField(
-                              controller: _propertyNameController,
-                              decoration: InputDecoration(
-                                labelText: 'Property Name',
-                                prefixIcon: const Icon(Icons.house),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
+              Form(
+                key: _formKey,
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Card(
+                        elevation: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            children: <Widget>[
+                              TextFormField(
+                                controller: _propertyNameController,
+                                decoration: InputDecoration(
+                                  labelText: 'Property Name',
+                                  prefixIcon: const Icon(Icons.house),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                validator: (value) => value?.isEmpty ?? true
+                                    ? 'Please enter property name'
+                                    : null,
+                              ),
+                              const SizedBox(height: 20),
+                              TextFormField(
+                                controller: _propertyAddressLine1Controller,
+                                decoration: InputDecoration(
+                                  labelText: 'Address Line 1',
+                                  prefixIcon: const Icon(Icons.location_on),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                validator: (value) => value?.isEmpty ?? true
+                                    ? 'Please enter address line 1'
+                                    : null,
+                              ),
+                              const SizedBox(height: 16),
+                              TextFormField(
+                                controller: _propertyAddressLine2Controller,
+                                decoration: InputDecoration(
+                                  labelText: 'Address Line 2 (Optional)',
+                                  prefixIcon: const Icon(Icons.location_on),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                 ),
                               ),
-                              validator: (value) => value?.isEmpty ?? true
-                                  ? 'Please enter property name'
-                                  : null,
-                            ),
-                            const SizedBox(height: 20),
-                            TextFormField(
-                              controller: _propertyAddressLine1Controller,
-                              decoration: InputDecoration(
-                                labelText: 'Address Line 1',
-                                prefixIcon: const Icon(Icons.location_on),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              validator: (value) => value?.isEmpty ?? true
-                                  ? 'Please enter address line 1'
-                                  : null,
-                            ),
-                            const SizedBox(height: 16),
-                            TextFormField(
-                              controller: _propertyAddressLine2Controller,
-                              decoration: InputDecoration(
-                                labelText: 'Address Line 2 (Optional)',
-                                prefixIcon: const Icon(Icons.location_on),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  flex: 3,
-                                  child: TextFormField(
-                                    controller:
-                                        _propertyVillageOrCityController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Village/City',
-                                      prefixIcon:
-                                          const Icon(Icons.location_city),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
+                              const SizedBox(height: 16),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: TextFormField(
+                                      controller:
+                                          _propertyVillageOrCityController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Village/City',
+                                        prefixIcon:
+                                            const Icon(Icons.location_city),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
                                       ),
-                                    ),
-                                    validator: (value) => value?.isEmpty ?? true
-                                        ? 'Please enter village or city'
-                                        : null,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  flex: 2,
-                                  child: TextFormField(
-                                    controller: _propertyPincodeController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Pincode',
-                                      prefixIcon: const Icon(Icons.pin_drop),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
-                                    keyboardType: TextInputType.number,
-                                    validator: (value) {
-                                      if (value?.isEmpty ?? true) {
-                                        return 'Please enter pincode';
-                                      }
-                                      if (value!.length != 6) {
-                                        return 'Pincode must be 6 digits';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 5),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 16, horizontal: 5),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(
-                                    'Property Location',
-                                    style:
-                                        theme.textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Container(
-                                    height: 200,
-                                    decoration: BoxDecoration(
-                                      border: chosenLat == null
-                                          ? Border.all(
-                                              color: theme.colorScheme.outline)
-                                          : null,
-                                      borderRadius: chosenLat == null
-                                          ? BorderRadius.circular(12)
+                                      validator: (value) => value?.isEmpty ?? true
+                                          ? 'Please enter village or city'
                                           : null,
                                     ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Stack(
-                                        children: <Widget>[
-                                          if (chosenLat != null &&
-                                              chosenLng != null)
-                                            GoogleMap(
-                                              initialCameraPosition:
-                                                  CameraPosition(
-                                                target: LatLng(
-                                                  chosenLat!.toDouble(),
-                                                  chosenLng!.toDouble(),
-                                                ),
-                                                zoom: 15,
-                                              ),
-                                              mapToolbarEnabled: false,
-                                              myLocationButtonEnabled: false,
-                                              markers: {
-                                                Marker(
-                                                  markerId: const MarkerId(
-                                                      'property-location'),
-                                                  position: LatLng(
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    flex: 2,
+                                    child: TextFormField(
+                                      controller: _propertyPincodeController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Pincode',
+                                        prefixIcon: const Icon(Icons.pin_drop),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                      validator: (value) {
+                                        if (value?.isEmpty ?? true) {
+                                          return 'Please enter pincode';
+                                        }
+                                        if (value!.length != 6) {
+                                          return 'Pincode must be 6 digits';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 16, horizontal: 5),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      'Property Location',
+                                      style:
+                                          theme.textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Container(
+                                      height: 200,
+                                      decoration: BoxDecoration(
+                                        border: chosenLat == null
+                                            ? Border.all(
+                                                color: theme.colorScheme.outline)
+                                            : null,
+                                        borderRadius: chosenLat == null
+                                            ? BorderRadius.circular(12)
+                                            : null,
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Stack(
+                                          children: <Widget>[
+                                            if (chosenLat != null &&
+                                                chosenLng != null)
+                                              GoogleMap(
+                                                initialCameraPosition:
+                                                    CameraPosition(
+                                                  target: LatLng(
                                                     chosenLat!.toDouble(),
                                                     chosenLng!.toDouble(),
                                                   ),
-                                                  infoWindow: InfoWindow(
-                                                    title: _propertyNameController
-                                                            .text.isNotEmpty
-                                                        ? _propertyNameController
-                                                            .text
-                                                        : 'Property Location',
+                                                  zoom: 15,
+                                                ),
+                                                mapToolbarEnabled: false,
+                                                myLocationButtonEnabled: false,
+                                                markers: {
+                                                  Marker(
+                                                    markerId: const MarkerId(
+                                                        'property-location'),
+                                                    position: LatLng(
+                                                      chosenLat!.toDouble(),
+                                                      chosenLng!.toDouble(),
+                                                    ),
+                                                    infoWindow: InfoWindow(
+                                                      title: _propertyNameController
+                                                              .text.isNotEmpty
+                                                          ? _propertyNameController
+                                                              .text
+                                                          : 'Property Location',
+                                                    ),
+                                                    icon: BitmapDescriptor
+                                                        .defaultMarkerWithHue(
+                                                      BitmapDescriptor.hueGreen,
+                                                    ),
                                                   ),
-                                                  icon: BitmapDescriptor
-                                                      .defaultMarkerWithHue(
-                                                    BitmapDescriptor.hueGreen,
+                                                },
+                                              )
+                                            else
+                                              GestureDetector(
+                                                onTap: () async {
+                                                  Map<String, dynamic>?
+                                                      locationData =
+                                                      await context.push<
+                                                          Map<String, dynamic>?>(
+                                                    '/maps',
+                                                    extra: {
+                                                      'lat': chosenLat,
+                                                      'lng': chosenLng
+                                                    },
+                                                  );
+
+                                                  if (locationData != null) {
+                                                    setState(() {
+                                                      chosenLat =
+                                                          locationData['lat'];
+                                                      chosenLng =
+                                                          locationData['lng'];
+                                                    });
+                                                  }
+                                                },
+                                                child: Center(
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.center,
+                                                    children: <Widget>[
+                                                      Icon(
+                                                        Icons.location_on,
+                                                        size: 48,
+                                                        color: theme
+                                                            .colorScheme.primary
+                                                            .withValues(
+                                                                alpha: 0.5),
+                                                      ),
+                                                      const SizedBox(height: 8),
+                                                      Text(
+                                                        'Select a location',
+                                                        style: theme
+                                                            .textTheme.bodyLarge,
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    if (chosenLat != null)
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 16),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            ElevatedButton.icon(
+                                              onPressed: () {
+                                                setState(() {
+                                                  chosenLat = null;
+                                                  chosenLng = null;
+                                                });
                                               },
-                                            )
-                                          else
-                                            GestureDetector(
-                                              onTap: () async {
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    theme.colorScheme.error,
+                                                foregroundColor:
+                                                    theme.colorScheme.onError,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 16,
+                                                  vertical: 12,
+                                                ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
+                                              ),
+                                              icon: const Icon(
+                                                Icons.delete_outline,
+                                                color: Colors.white,
+                                              ),
+                                              label: const Text(
+                                                'Remove Location',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                            TextButton.icon(
+                                              onPressed: () async {
                                                 Map<String, dynamic>?
                                                     locationData =
                                                     await context.push<
@@ -371,218 +465,129 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
                                                   });
                                                 }
                                               },
-                                              child: Center(
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: <Widget>[
-                                                    Icon(
-                                                      Icons.location_on,
-                                                      size: 48,
-                                                      color: theme
-                                                          .colorScheme.primary
-                                                          .withValues(
-                                                              alpha: 0.5),
-                                                    ),
-                                                    const SizedBox(height: 8),
-                                                    Text(
-                                                      'Select a location',
-                                                      style: theme
-                                                          .textTheme.bodyLarge,
-                                                    ),
-                                                  ],
+                                              style: TextButton.styleFrom(
+                                                backgroundColor:
+                                                    theme.colorScheme.primary,
+                                                foregroundColor:
+                                                    theme.colorScheme.onPrimary,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 16,
+                                                  vertical: 12,
+                                                ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
+                                              ),
+                                              icon: const Icon(
+                                                Icons.edit_location_alt,
+                                                color: Colors.white,
+                                              ),
+                                              label: const Text(
+                                                'Update Location',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
                                                 ),
                                               ),
                                             ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Card(
+                        elevation: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                'Property Specifications',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              DropdownButtonFormField<PropertyType>(
+                                value: _selectedPropertyType,
+                                decoration: InputDecoration(
+                                  labelText: 'Property Type',
+                                  prefixIcon: const Icon(Icons.category),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                  if (chosenLat != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 16),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          ElevatedButton.icon(
-                                            onPressed: () {
-                                              setState(() {
-                                                chosenLat = null;
-                                                chosenLng = null;
-                                              });
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  theme.colorScheme.error,
-                                              foregroundColor:
-                                                  theme.colorScheme.onError,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 16,
-                                                vertical: 12,
-                                              ),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                              ),
-                                            ),
-                                            icon: const Icon(
-                                              Icons.delete_outline,
-                                              color: Colors.white,
-                                            ),
-                                            label: const Text(
-                                              'Remove Location',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ),
-                                          TextButton.icon(
-                                            onPressed: () async {
-                                              Map<String, dynamic>?
-                                                  locationData =
-                                                  await context.push<
-                                                      Map<String, dynamic>?>(
-                                                '/maps',
-                                                extra: {
-                                                  'lat': chosenLat,
-                                                  'lng': chosenLng
-                                                },
-                                              );
-
-                                              if (locationData != null) {
-                                                setState(() {
-                                                  chosenLat =
-                                                      locationData['lat'];
-                                                  chosenLng =
-                                                      locationData['lng'];
-                                                });
-                                              }
-                                            },
-                                            style: TextButton.styleFrom(
-                                              backgroundColor:
-                                                  theme.colorScheme.primary,
-                                              foregroundColor:
-                                                  theme.colorScheme.onPrimary,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 16,
-                                                vertical: 12,
-                                              ),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                              ),
-                                            ),
-                                            icon: const Icon(
-                                              Icons.edit_location_alt,
-                                              color: Colors.white,
-                                            ),
-                                            label: const Text(
-                                              'Update Location',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Card(
-                      elevation: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              'Property Specifications',
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            DropdownButtonFormField<PropertyType>(
-                              value: _selectedPropertyType,
-                              decoration: InputDecoration(
-                                labelText: 'Property Type',
-                                prefixIcon: const Icon(Icons.category),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                              ),
-                              items: PropertyType.values.map((type) {
-                                return DropdownMenuItem(
-                                  value: type,
-                                  child: Text(type.name),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                if (value != null) {
-                                  setState(() => _selectedPropertyType = value);
-                                }
-                              },
-                            ),
-                            const SizedBox(height: 20),
-                            DropdownButtonFormField<GenderAllowance>(
-                              value: _selectedGenderAllowance,
-                              decoration: InputDecoration(
-                                labelText: 'Gender Allowance',
-                                prefixIcon: const Icon(Icons.people),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              items: GenderAllowance.values.map((type) {
-                                return DropdownMenuItem(
-                                  value: type,
-                                  child: Text(type.name == 'coEd'
-                                      ? 'co-ed'
-                                      : type.name),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                if (value != null) {
-                                  setState(
-                                    () => _selectedGenderAllowance = value,
+                                items: PropertyType.values.map((type) {
+                                  return DropdownMenuItem(
+                                    value: type,
+                                    child: Text(type.name),
                                   );
-                                }
-                              },
-                            ),
-                          ],
+                                }).toList(),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    setState(() => _selectedPropertyType = value);
+                                  }
+                                },
+                              ),
+                              const SizedBox(height: 20),
+                              DropdownButtonFormField<GenderAllowance>(
+                                value: _selectedGenderAllowance,
+                                decoration: InputDecoration(
+                                  labelText: 'Gender Allowance',
+                                  prefixIcon: const Icon(Icons.people),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                items: GenderAllowance.values.map((type) {
+                                  return DropdownMenuItem(
+                                    value: type,
+                                    child: Text(type.name == 'coEd'
+                                        ? 'co-ed'
+                                        : type.name),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    setState(
+                                      () => _selectedGenderAllowance = value,
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: _onNext,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                      const SizedBox(height: 32),
+                      ElevatedButton(
+                        onPressed: _onNext,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Next Step',
+                          style: TextStyle(fontSize: 16),
                         ),
                       ),
-                      child: const Text(
-                        'Next Step',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
