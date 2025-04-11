@@ -6,8 +6,6 @@ import 'package:intl/intl.dart';
 import '../../../../core/common/cubits/app_theme/theme_cubit.dart';
 import '../../../../core/common/cubits/app_theme/theme_state.dart';
 import '../../../../core/common/cubits/app_user/app_user_cubit.dart';
-import '../../../../core/utils/sf_handler.dart';
-import '../../../../init_dependencies.dart';
 
 import '../widgets/verification_pill.dart';
 
