@@ -171,6 +171,16 @@ class _VerifyEmailOrPhoneScreenState extends State<VerifyEmailOrPhoneScreen> {
               }
 
               if (state is VerifyEmailOrPhoneFailureState) {
+                if (state.status == 401) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(state.message)),
+                  );
+
+                  context.read<AppUserCubit>().logoutUser(context);
+
+                  return;
+                }
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(state.message),

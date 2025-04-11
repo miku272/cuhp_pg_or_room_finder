@@ -113,7 +113,19 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<MyListingsBloc, MyListingsState>(
+    return BlocConsumer<MyListingsBloc, MyListingsState>(
+      listener: (context, state) {
+        if (state is MyListingsFailure) {
+          if (state.status == 401) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+            context.read<AppUserCubit>().logoutUser(context);
+
+            return;
+          }
+        }
+      },
       builder: (context, state) {
         return Column(
           children: <Widget>[

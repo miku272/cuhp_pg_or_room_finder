@@ -138,7 +138,19 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
   @override
   Widget build(BuildContext context) {
     Property property;
-    return BlocBuilder<PropertyDetailsBloc, PropertyDetailsState>(
+    return BlocConsumer<PropertyDetailsBloc, PropertyDetailsState>(
+      listener: (context, state) {
+        if (state is PropertyDetailsFailure) {
+          if (state.status == 401) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+            context.read<AppUserCubit>().logoutUser(context);
+
+            return;
+          }
+        }
+      },
       builder: (context, state) {
         property = state.property ?? widget.property;
 

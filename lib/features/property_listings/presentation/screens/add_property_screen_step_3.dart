@@ -224,12 +224,24 @@ class _AddPropertyScreenStep3State extends State<AddPropertyScreenStep3> {
 
               if (state is AddPropertyListingsFailure ||
                   state is UpdatePropertyListingsFailure) {
+                int? status = 0;
                 var message = '';
 
                 if (state is AddPropertyListingsFailure) {
+                  status = state.status;
                   message = state.message;
                 } else if (state is UpdatePropertyListingsFailure) {
+                  status = state.status;
                   message = state.message;
+                }
+
+                if (status == 401) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(message)),
+                  );
+                  context.read<AppUserCubit>().logoutUser(context);
+
+                  return;
                 }
 
                 ScaffoldMessenger.of(context).showSnackBar(

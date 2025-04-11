@@ -82,7 +82,9 @@ Future<void> initDependencies() async {
   serviceLocator.registerLazySingleton(() => prefs);
   serviceLocator.registerLazySingleton(() => dio);
 
-  serviceLocator.registerLazySingleton(() => AppUserCubit());
+  serviceLocator.registerLazySingleton(
+    () => AppUserCubit(sfHandler: serviceLocator()),
+  );
 }
 
 Future<void> _loadEnv() async {

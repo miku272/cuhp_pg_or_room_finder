@@ -34,18 +34,7 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Future<void> _logoutUser(BuildContext context) async {
-    final sfHandler = serviceLocator<SFHandler>();
-    final appUserCubit = context.read<AppUserCubit>();
-
-    await sfHandler.deleteId();
-    await sfHandler.deleteToken();
-    await sfHandler.deleteExpiresIn();
-
-    appUserCubit.removeUser();
-
-    if (context.mounted) {
-      context.go('/login');
-    }
+    await context.read<AppUserCubit>().logoutUser(context);
   }
 
   @override
@@ -271,7 +260,7 @@ class ProfileScreen extends StatelessWidget {
                                         TextButton(
                                           onPressed: () async {
                                             context.pop();
-                                            _logoutUser(context);
+                                            await _logoutUser(context);
                                           },
                                           child: const Text(
                                             'Logout',
@@ -295,7 +284,18 @@ class ProfileScreen extends StatelessWidget {
               ],
             );
           }
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+              child: Column(
+            children: <Widget>[
+              const CircularProgressIndicator(),
+              TextButton(
+                onPressed: () {
+                  context.go('/login');
+                },
+                child: const Text('Return to login page'),
+              ),
+            ],
+          ));
         },
       ),
     );
