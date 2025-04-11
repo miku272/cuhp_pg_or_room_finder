@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/widgets/custom_app_bar.dart';
+import '../../../../core/common/widgets/property_card.dart';
 
 import '../widgets/category_card.dart';
 import '../widgets/filter_bottom_sheet.dart';
-import '../../../../core/common/widgets/property_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,7 +19,17 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        const CustomAppBar(appBarTitle: 'CUHP PG or Room Finder'),
+        CustomAppBar(
+          appBarTitle: 'CUHP PG or Room Finder',
+          actions: <Widget>[
+            IconButton(
+              onPressed: () {
+                context.push('/chat');
+              },
+              icon: const Icon(Icons.chat_bubble_outline_rounded),
+            ),
+          ],
+        ),
         Expanded(
           child: SingleChildScrollView(
             child: Padding(

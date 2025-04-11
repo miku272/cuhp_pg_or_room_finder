@@ -18,8 +18,8 @@ import './features/property_listings/presentation/screens/add_property_screen_st
 import './features/property_listings/presentation/screens/add_property_screen_step_3.dart';
 import './features/property_listings/presentation/screens/add_property_success_screen.dart';
 import './features/property_listings/presentation/screens/google_maps_screen.dart';
-
 import './features/property_details/presentation/screens/property_details_screen.dart';
+import './features/chat/presentation/screens/chat_list_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -132,6 +132,12 @@ class AppRouter {
           return AddPropertySuccessScreen(
             isEditing: payLoad['isEditing'] as bool,
           );
+        },
+      ),
+      GoRoute(
+        path: '/chat',
+        builder: (context, state) {
+          return const ChatListScreen();
         },
       ),
     ],
