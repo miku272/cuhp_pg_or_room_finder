@@ -35,6 +35,13 @@ import './features/verify_email_or_phone/domain/usecases/verify_email_otp.dart';
 // import './features/verify_email_or_phone/domain/usecases/verify_phone_otp.dart';
 import './features/verify_email_or_phone/presentation/bloc/verify_email_or_phone_bloc.dart';
 
+import './features/profile/data/datasources/profile_remote_datasource.dart';
+import './features/profile/data/repositories/profile_repository_impl.dart';
+import './features/profile/domain/repository/profile_repository.dart';
+import './features/profile/domain/usecases/get_current_user.dart'
+    as profile_current_user;
+import './features/profile/presentation/bloc/profile_bloc.dart';
+
 import './features/property_listings/data/datasources/property_listing_remote_datasource.dart';
 import './features/property_listings/data/repositories/property_listing_repository_impl.dart';
 import './features/property_listings/domain/repository/property_listing_repository.dart';
@@ -46,8 +53,8 @@ import './features/my_listings/data/datasources/my_listings_remote_data_source.d
 import './features/my_listings/data/repositories/my_listings_repository_impl.dart';
 import './features/my_listings/domain/repository/my_listings_repository.dart';
 import './features/my_listings/domain/usecases/get_properties_by_id.dart';
-import 'features/my_listings/domain/usecases/toggle_property_activation.dart';
-import 'features/my_listings/presentation/bloc/my_listings_bloc.dart';
+import './features/my_listings/domain/usecases/toggle_property_activation.dart';
+import './features/my_listings/presentation/bloc/my_listings_bloc.dart';
 
 import './features/property_details/data/datasources/property_details_remote_datasource.dart';
 import './features/property_details/data/repositories/property_details_repository_impl.dart';
@@ -66,6 +73,7 @@ Future<void> initDependencies() async {
   _initSplash();
   _initAuth();
   _initVerifyEmailOrPhone();
+  _initProfile();
   _initPropertyListings();
   _initMyListings();
   _initPropertyDetails();
@@ -218,6 +226,31 @@ void _initVerifyEmailOrPhone() {
       // sendPhoneOtp: serviceLocator(),
       verifyEmailOtp: serviceLocator(),
       // verifyPhoneOtp: serviceLocator(),
+      appUserCubit: serviceLocator(),
+    ),
+  );
+}
+
+void _initProfile() {
+  serviceLocator.registerFactory<ProfileRemoteDatasource>(
+    () => ProfileRemoteDatasourceImpl(dio: serviceLocator()),
+  );
+
+  serviceLocator.registerFactory<ProfileRepository>(
+    () => ProfileRepositoryImpl(
+      profileRemoteDatasource: serviceLocator(),
+    ),
+  );
+  serviceLocator.registerFactory<profile_current_user.GetCurrentUser>(
+    () => profile_current_user.GetCurrentUser(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerLazySingleton<ProfileBloc>(
+    () => ProfileBloc(
+      getCurrentUser: serviceLocator(),
+      sfHandler: serviceLocator(),
       appUserCubit: serviceLocator(),
     ),
   );
