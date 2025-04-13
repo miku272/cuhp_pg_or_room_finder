@@ -130,7 +130,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         if (errors.statusCode.toString().startsWith('4')) {
           throw UserException(
             status: errors.statusCode,
-            message: errors.statusCode == 429 ? errors.data : errors.data['message'],
+            message:
+                errors.statusCode == 429 ? errors.data : errors.data['message'],
           );
         }
 
@@ -196,8 +197,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final errors = error.response;
 
       if (errors != null) {
-        print('Error in auth: ${errors.statusCode}, ${errors.data}');
-
         if (errors.statusCode.toString().startsWith('5')) {
           throw ServerException(
             status: errors.statusCode,
@@ -208,7 +207,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         if (errors.statusCode.toString().startsWith('4')) {
           throw UserException(
             status: errors.statusCode,
-            message: errors.statusCode == 429 ? errors.data : errors.data['message'],
+            message:
+                errors.statusCode == 429 ? errors.data : errors.data['message'],
           );
         }
 

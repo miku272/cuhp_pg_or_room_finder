@@ -10,8 +10,9 @@ part 'app_user_state.dart';
 class AppUserCubit extends Cubit<AppUserState> {
   final SFHandler _sfHandler;
 
-  AppUserCubit({required SFHandler sfHandler})
-      : _sfHandler = sfHandler,
+  AppUserCubit({
+    required SFHandler sfHandler,
+  })  : _sfHandler = sfHandler,
         super(AppUserInitial());
 
   void setUser(User user) {

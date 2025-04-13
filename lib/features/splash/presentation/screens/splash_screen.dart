@@ -1,13 +1,14 @@
 import 'dart:developer';
 
-import 'package:cuhp_pg_or_room_finder/init_dependencies.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../../../core/utils/jwt_expiration_handler.dart';
 import '../../../../core/utils/sf_handler.dart';
 
+import '../../../../init_dependencies.dart';
 import '../bloc/splash_bloc.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -18,9 +19,12 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  late JwtExpirationHandler _jwtExpirationHandler;
+
   @override
   void initState() {
     super.initState();
+    _jwtExpirationHandler = serviceLocator<JwtExpirationHandler>();
     _loadResources();
   }
 
@@ -47,6 +51,8 @@ class _SplashScreenState extends State<SplashScreen> {
             if (state.user == null) {
               context.pushReplacement('/login');
             } else {
+              _jwtExpirationHandler.startExpiryCheck(context);
+
               context.pushReplacement('/');
             }
           }

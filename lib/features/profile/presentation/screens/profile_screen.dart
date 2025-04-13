@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/utils/jwt_expiration_handler.dart';
+import '../../../../init_dependencies.dart';
+
 import '../../../../core/common/cubits/app_theme/theme_cubit.dart';
 import '../../../../core/common/cubits/app_theme/theme_state.dart';
 import '../../../../core/common/cubits/app_user/app_user_cubit.dart';
@@ -73,6 +76,7 @@ class ProfileScreen extends StatelessWidget {
             );
         } else if (state is ProfileFailure) {
           if (state.status == 401) {
+            serviceLocator<JwtExpirationHandler>().stopExpiryCheck();
             context.read<AppUserCubit>().logoutUser(context);
           }
 
@@ -325,6 +329,10 @@ class ProfileScreen extends StatelessWidget {
                                             TextButton(
                                               onPressed: () async {
                                                 context.pop();
+
+                                                serviceLocator<
+                                                        JwtExpirationHandler>()
+                                                    .stopExpiryCheck();
                                                 await _logoutUser(context);
                                               },
                                               child: const Text(

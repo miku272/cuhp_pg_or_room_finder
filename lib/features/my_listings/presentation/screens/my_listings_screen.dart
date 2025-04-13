@@ -6,6 +6,8 @@ import '../../../../core/common/cubits/app_user/app_user_cubit.dart';
 import '../../../../core/common/entities/user.dart';
 import '../../../../core/common/widgets/custom_app_bar.dart';
 
+import '../../../../core/utils/jwt_expiration_handler.dart';
+import '../../../../init_dependencies.dart';
 import '../bloc/my_listings_bloc.dart';
 
 import '../widgets/my_property_card.dart';
@@ -120,6 +122,8 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
             );
+
+            serviceLocator<JwtExpirationHandler>().stopExpiryCheck();
             context.read<AppUserCubit>().logoutUser(context);
 
             return;

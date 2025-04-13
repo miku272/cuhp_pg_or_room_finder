@@ -8,7 +8,9 @@ import './core/common/cubits/app_theme/theme_cubit.dart';
 import './core/utils/theme_preference.dart';
 import './core/utils/sf_handler.dart';
 import './core/utils/supabase_manager.dart';
+import './core/utils/jwt_expiration_handler.dart';
 import './core/common/cubits/app_user/app_user_cubit.dart';
+import './core/socket/socket_manager.dart';
 
 import './features/splash/data/datasources/splash_remote_data_source.dart';
 import './features/splash/domain/repository/splash_repository.dart';
@@ -62,21 +64,22 @@ import './features/property_details/domain/repository/property_details_repositor
 import './features/property_details/domain/usecases/get_property_details.dart';
 import './features/property_details/presentation/bloc/property_details_bloc.dart';
 
+import './features/chat/data/datasources/chat_socket_datasource.dart';
+import './features/chat/data/repositories/chat_socket_repository_impl.dart';
+import './features/chat/domain/repository/chat_socket_repository.dart';
+import './features/chat/data/datasources/chat_remote_datasource.dart';
+import './features/chat/data/repositories/chat_remote_repository_impl.dart';
+import './features/chat/domain/repository/chat_remote_repository.dart';
+import './features/chat/domain/usecase/get_chat_by_id.dart';
+import './features/chat/domain/usecase/get_user_chats.dart';
+import './features/chat/domain/usecase/initialize_chat.dart';
+import './features/chat/domain/usecase/send_message.dart';
+import './features/chat/presentation/bloc/chat_bloc.dart';
+
 final serviceLocator = GetIt.instance;
 
 Future<void> initDependencies() async {
   await _loadEnv();
-
-  await _initSupabase();
-  _initTheme();
-  _initTokenHandler();
-  _initSplash();
-  _initAuth();
-  _initVerifyEmailOrPhone();
-  _initProfile();
-  _initPropertyListings();
-  _initMyListings();
-  _initPropertyDetails();
 
   final prefs = await SharedPreferences.getInstance();
 
@@ -91,8 +94,33 @@ Future<void> initDependencies() async {
   serviceLocator.registerLazySingleton(() => dio);
 
   serviceLocator.registerLazySingleton(
-    () => AppUserCubit(sfHandler: serviceLocator()),
+    () => AppUserCubit(
+      sfHandler: serviceLocator(),
+    ),
   );
+
+  serviceLocator.registerLazySingleton(
+    () => SocketManager(),
+  );
+
+  serviceLocator.registerLazySingleton<JwtExpirationHandler>(
+    () => JwtExpirationHandler(
+      sfHandler: serviceLocator(),
+      appUserCubit: serviceLocator(),
+    ),
+  );
+
+  await _initSupabase();
+  _initTheme();
+  _initTokenHandler();
+  _initSplash();
+  _initAuth();
+  _initVerifyEmailOrPhone();
+  _initProfile();
+  _initPropertyListings();
+  _initMyListings();
+  _initPropertyDetails();
+  _initChat();
 }
 
 Future<void> _loadEnv() async {
@@ -335,6 +363,67 @@ void _initPropertyDetails() {
   serviceLocator.registerLazySingleton<PropertyDetailsBloc>(
     () => PropertyDetailsBloc(
       getPropertyDetails: serviceLocator(),
+    ),
+  );
+}
+
+void _initChat() {
+  serviceLocator.registerLazySingleton<ChatSocketRepository>(
+    () => ChatSocketRepositoryImpl(
+      baseUrl: Constants.backendUri,
+      socketManager: serviceLocator<SocketManager>(),
+    ),
+  );
+
+  serviceLocator.registerLazySingleton(
+    () => ChatSocketDataSource(
+      repository: serviceLocator<ChatSocketRepository>(),
+      baseUrl: Constants.backendUri,
+    ),
+  );
+
+  serviceLocator.registerFactory<ChatRemoteDatasource>(
+    () => ChatRemoteDatasourceImpl(dio: serviceLocator<Dio>()),
+  );
+
+  serviceLocator.registerFactory<ChatRemoteRepository>(
+    () => ChatRemoteRepositoryImpl(
+      chatRemoteDatasource: serviceLocator<ChatRemoteDatasource>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<GetChatById>(
+    () => GetChatById(
+      chatRemoteRepository: serviceLocator<ChatRemoteRepository>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<GetUserChats>(
+    () => GetUserChats(
+      chatRemoteRepository: serviceLocator<ChatRemoteRepository>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<InitializeChat>(
+    () => InitializeChat(
+      chatRemoteRepository: serviceLocator<ChatRemoteRepository>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<SendMessage>(
+    () => SendMessage(
+      chatRemoteRepository: serviceLocator<ChatRemoteRepository>(),
+    ),
+  );
+
+  serviceLocator.registerLazySingleton(
+    () => ChatBloc(
+      appUserCubit: serviceLocator<AppUserCubit>(),
+      chatSocketDataSource: serviceLocator<ChatSocketDataSource>(),
+      getChatById: serviceLocator<GetChatById>(),
+      getUserChats: serviceLocator<GetUserChats>(),
+      initializeChat: serviceLocator<InitializeChat>(),
+      sendMessage: serviceLocator<SendMessage>(),
     ),
   );
 }

@@ -13,6 +13,8 @@ import '../../../../core/common/cubits/app_user/app_user_cubit.dart';
 import '../../../../core/common/entities/property.dart';
 import '../../../../core/common/widgets/custom_app_bar.dart';
 
+import '../../../../core/utils/jwt_expiration_handler.dart';
+import '../../../../init_dependencies.dart';
 import '../bloc/property_details_bloc.dart';
 
 class PropertyDetailsScreen extends StatefulWidget {
@@ -145,6 +147,8 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
             );
+
+            serviceLocator<JwtExpirationHandler>().stopExpiryCheck();
             context.read<AppUserCubit>().logoutUser(context);
 
             return;

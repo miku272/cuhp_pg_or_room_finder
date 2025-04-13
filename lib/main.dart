@@ -8,7 +8,7 @@ import './router.dart';
 import './core/styles/themes.dart';
 import './core/common/cubits/app_theme/theme_state.dart';
 import './core/common/cubits/app_theme/theme_cubit.dart';
-import 'core/common/cubits/app_user/app_user_cubit.dart';
+import './core/common/cubits/app_user/app_user_cubit.dart';
 
 import './features/splash/presentation/bloc/splash_bloc.dart';
 import './features/auth/presentation/bloc/auth_bloc.dart';
@@ -17,6 +17,7 @@ import './features/profile/presentation/bloc/profile_bloc.dart';
 import './features/property_listings/presentation/bloc/property_listings_bloc.dart';
 import './features/my_listings/presentation/bloc/my_listings_bloc.dart';
 import './features/property_details/presentation/bloc/property_details_bloc.dart';
+import './features/chat/presentation/bloc/chat_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,6 +58,9 @@ Future<void> main() async {
         ),
         BlocProvider(
           create: (context) => serviceLocator<PropertyDetailsBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => serviceLocator<ChatBloc>(),
         ),
       ],
       child: const MyApp(),
