@@ -18,6 +18,7 @@ import './features/property_listings/presentation/bloc/property_listings_bloc.da
 import './features/my_listings/presentation/bloc/my_listings_bloc.dart';
 import './features/property_details/presentation/bloc/property_details_bloc.dart';
 import './features/chat/presentation/bloc/chat_bloc.dart';
+import './features/chat/presentation/bloc/messages_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -61,6 +62,9 @@ Future<void> main() async {
         ),
         BlocProvider(
           create: (context) => serviceLocator<ChatBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => serviceLocator<MessagesBloc>(),
         ),
       ],
       child: const MyApp(),

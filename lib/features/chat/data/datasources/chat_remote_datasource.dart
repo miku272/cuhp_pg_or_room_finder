@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 
 import '../../../../core/error/exception.dart';
 
-import '../models/chat.dart';
-import '../models/message.dart';
+import '../../../../core/common/entities/chat.dart';
+import '../../../../core/common/entities/message.dart';
 
 abstract interface class ChatRemoteDatasource {
   Future<Chat> initializeChat(String propertyId, String token);
@@ -48,7 +50,35 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
         );
       }
 
+      final errors = error.response;
+
+      if (errors != null) {
+        if (errors.statusCode.toString().startsWith('5')) {
+          throw ServerException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (errors.statusCode.toString().startsWith('4')) {
+          throw UserException(
+            status: errors.statusCode,
+            message:
+                errors.statusCode == 429 ? errors.data : errors.data['message'],
+          );
+        }
+
+        if (!errors.statusCode.toString().startsWith('2')) {
+          throw Exception('An error occurred');
+        }
+      }
+
       rethrow;
+    } on SocketException catch (_) {
+      throw ServerException(
+        status: 503,
+        message: 'Unable to connect to the server',
+      );
     } catch (error) {
       rethrow;
     }
@@ -116,7 +146,35 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
         );
       }
 
+      final errors = error.response;
+
+      if (errors != null) {
+        if (errors.statusCode.toString().startsWith('5')) {
+          throw ServerException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (errors.statusCode.toString().startsWith('4')) {
+          throw UserException(
+            status: errors.statusCode,
+            message:
+                errors.statusCode == 429 ? errors.data : errors.data['message'],
+          );
+        }
+
+        if (!errors.statusCode.toString().startsWith('2')) {
+          throw Exception('An error occurred');
+        }
+      }
+
       rethrow;
+    } on SocketException catch (_) {
+      throw ServerException(
+        status: 503,
+        message: 'Unable to connect to the server',
+      );
     } catch (error) {
       rethrow;
     }
@@ -160,7 +218,35 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
         );
       }
 
+      final errors = error.response;
+
+      if (errors != null) {
+        if (errors.statusCode.toString().startsWith('5')) {
+          throw ServerException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (errors.statusCode.toString().startsWith('4')) {
+          throw UserException(
+            status: errors.statusCode,
+            message:
+                errors.statusCode == 429 ? errors.data : errors.data['message'],
+          );
+        }
+
+        if (!errors.statusCode.toString().startsWith('2')) {
+          throw Exception('An error occurred');
+        }
+      }
+
       rethrow;
+    } on SocketException catch (_) {
+      throw ServerException(
+        status: 503,
+        message: 'Unable to connect to the server',
+      );
     } catch (error) {
       rethrow;
     }

@@ -1,4 +1,4 @@
-import './message.dart';
+import 'message.dart';
 
 class Chat {
   final String id;

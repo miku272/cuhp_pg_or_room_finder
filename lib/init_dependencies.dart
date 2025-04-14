@@ -75,6 +75,11 @@ import './features/chat/domain/usecase/get_user_chats.dart';
 import './features/chat/domain/usecase/initialize_chat.dart';
 import './features/chat/domain/usecase/send_message.dart';
 import './features/chat/presentation/bloc/chat_bloc.dart';
+import './features/chat/data/datasources/messages_remote_datasource.dart';
+import './features/chat/data/repositories/messages_remote_repository_impl.dart';
+import './features/chat/domain/repository/messages_remote_repository.dart';
+import './features/chat/domain/usecase/get_messages.dart';
+import './features/chat/presentation/bloc/messages_bloc.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -424,6 +429,28 @@ void _initChat() {
       getUserChats: serviceLocator<GetUserChats>(),
       initializeChat: serviceLocator<InitializeChat>(),
       sendMessage: serviceLocator<SendMessage>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<MessagesRemoteDatasource>(
+    () => MessagesRemoteDatasourceImpl(dio: serviceLocator<Dio>()),
+  );
+
+  serviceLocator.registerFactory<MessagesRemoteRepository>(
+    () => MessagesRemoteRepositoryImpl(
+      messagesRemoteDatasource: serviceLocator<MessagesRemoteDatasource>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<GetMessages>(
+    () => GetMessages(
+      messagesRemoteRepository: serviceLocator<MessagesRemoteRepository>(),
+    ),
+  );
+
+  serviceLocator.registerLazySingleton(
+    () => MessagesBloc(
+      getMessages: serviceLocator<GetMessages>(),
     ),
   );
 }

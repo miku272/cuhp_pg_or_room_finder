@@ -1,5 +1,5 @@
-import '../../data/models/chat.dart';
-import '../../data/models/message.dart';
+import '../../../../core/common/entities/chat.dart';
+import '../../../../core/common/entities/message.dart';
 
 abstract class ChatSocketRepository {
   Future<void> connectSocket();

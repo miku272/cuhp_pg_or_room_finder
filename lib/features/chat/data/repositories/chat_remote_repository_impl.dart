@@ -4,8 +4,8 @@ import '../../../../core/error/exception.dart';
 import '../../../../core/error/failures.dart';
 import '../../domain/repository/chat_remote_repository.dart';
 import '../datasources/chat_remote_datasource.dart';
-import '../models/chat.dart';
-import '../models/message.dart';
+import '../../../../core/common/entities/chat.dart';
+import '../../../../core/common/entities/message.dart';
 
 class ChatRemoteRepositoryImpl implements ChatRemoteRepository {
   final ChatRemoteDatasource chatRemoteDatasource;

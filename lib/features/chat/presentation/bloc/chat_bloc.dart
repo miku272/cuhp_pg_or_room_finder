@@ -1,4 +1,3 @@
-// filepath: lib/features/chat/presentation/bloc/chat_bloc.dart
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -7,8 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/common/cubits/app_user/app_user_cubit.dart';
 import '../../../../core/common/entities/user.dart';
 import '../../data/datasources/chat_socket_datasource.dart';
-import '../../data/models/chat.dart';
-import '../../data/models/message.dart';
+import '../../../../core/common/entities/chat.dart';
+import '../../../../core/common/entities/message.dart';
 import '../../domain/usecase/get_chat_by_id.dart';
 import '../../domain/usecase/get_user_chats.dart';
 import '../../domain/usecase/initialize_chat.dart';

@@ -2,8 +2,8 @@ import 'package:fpdart/fpdart.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../../../core/usecase/usecase.dart';
-import '../../data/models/chat.dart';
-import '../../data/models/message.dart';
+import '../../../../core/common/entities/chat.dart';
+import '../../../../core/common/entities/message.dart';
 import '../repository/chat_remote_repository.dart';
 
 class SendMessage implements Usecase<(Chat, Message), SendMessageParams> {

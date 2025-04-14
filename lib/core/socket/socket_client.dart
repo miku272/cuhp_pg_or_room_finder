@@ -73,10 +73,6 @@ class SocketClient {
       debugPrint('Socket error: $data');
       _connectivityStreamController.add(false);
     });
-
-    _socket?.onAny((event, data) {
-      debugPrint('🔵 Socket received event: $event with data: $data');
-    });
   }
 
   void emit(String event, dynamic data) {

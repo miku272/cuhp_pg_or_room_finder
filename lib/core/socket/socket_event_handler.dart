@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import '../../features/chat/data/models/chat.dart';
-import '../../features/chat/data/models/message.dart';
+import '../common/entities/chat.dart';
+import '../common/entities/message.dart';
 
 import './socket_client.dart';
 

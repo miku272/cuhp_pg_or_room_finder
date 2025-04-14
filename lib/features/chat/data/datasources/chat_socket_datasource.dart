@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import '../models/chat.dart';
-import '../models/message.dart';
+import '../../../../core/common/entities/chat.dart';
+import '../../../../core/common/entities/message.dart';
 
 import '../../domain/repository/chat_socket_repository.dart';
 import '../repositories/chat_socket_repository_impl.dart';

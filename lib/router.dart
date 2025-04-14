@@ -21,6 +21,9 @@ import './features/property_listings/presentation/screens/google_maps_screen.dar
 import './features/property_details/presentation/screens/property_details_screen.dart';
 import './features/chat/presentation/screens/chat_list_screen.dart';
 
+import 'core/common/entities/chat.dart';
+import './features/chat/presentation/screens/messages_screen.dart';
+
 class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/splash',
@@ -139,6 +142,20 @@ class AppRouter {
         builder: (context, state) {
           return const ChatListScreen();
         },
+        routes: <GoRoute>[
+          GoRoute(
+            path: 'messages/:chatId',
+            builder: (context, state) {
+              final chatId = state.pathParameters['chatId'];
+              final chat = state.extra as Chat;
+
+              return MessagesScreen(
+                chatId: chatId!,
+                chatData: chat,
+              );
+            },
+          ),
+        ],
       ),
     ],
   );

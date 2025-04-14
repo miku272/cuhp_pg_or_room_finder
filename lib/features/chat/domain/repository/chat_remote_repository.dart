@@ -2,8 +2,8 @@ import 'package:fpdart/fpdart.dart';
 
 import '../../../../core/error/failures.dart';
 
-import '../../data/models/chat.dart';
-import '../../data/models/message.dart';
+import '../../../../core/common/entities/chat.dart';
+import '../../../../core/common/entities/message.dart';
 
 abstract interface class ChatRemoteRepository {
   Future<Either<Failure, Chat>> initializeChat({

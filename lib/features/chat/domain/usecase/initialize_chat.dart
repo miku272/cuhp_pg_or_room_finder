@@ -3,7 +3,7 @@ import 'package:fpdart/fpdart.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/usecase/usecase.dart';
 
-import '../../data/models/chat.dart';
+import '../../../../core/common/entities/chat.dart';
 import '../repository/chat_remote_repository.dart';
 
 class InitializeChat implements Usecase<Chat, InitializeChatParams> {
