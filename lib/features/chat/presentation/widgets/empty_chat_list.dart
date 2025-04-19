@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class EmptyChatsList extends StatelessWidget {
   const EmptyChatsList({super.key});
@@ -53,7 +54,7 @@ class EmptyChatsList extends StatelessWidget {
                 textStyle: theme.textTheme.titleMedium,
               ),
               onPressed: () {
-                // TODO: Navigate to the property search/listing screen
+                context.go('/');
               },
             ),
             const SizedBox(height: 16),

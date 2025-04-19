@@ -1,9 +1,9 @@
 import '../../../../core/common/entities/chat.dart';
 import '../../../../core/common/entities/message.dart';
 
-abstract class ChatSocketRepository {
-  Future<void> connectSocket();
-  void disconnectSocket();
+abstract interface class MessagesSocketRepository {
+  Future<void> connect();
+  void disconnect();
   void joinChat(String chatId);
   void sendMessage({
     required String chatId,
@@ -12,6 +12,7 @@ abstract class ChatSocketRepository {
   });
   void sendTypingIndicator(String chatId);
   void markMessagesAsRead(String chatId);
+
   Stream<(Chat, Message)> get messageStream;
   Stream<Map<String, dynamic>> get typingStream;
   Stream<Map<String, dynamic>> get readReceiptStream;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/common/cubits/app_socket/app_socket_cubit.dart';
 import '../../../../core/common/cubits/app_user/app_user_cubit.dart';
 import '../../../../core/common/entities/user.dart';
 import '../../../../core/utils/jwt_expiration_handler.dart';
@@ -29,19 +30,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
     _currentUser = _getCurrentUser();
     _fetchInitialData();
-
-    if (!context.read<ChatBloc>().state.isSocketConnected) {
-      context.read<ChatBloc>().add(ChatConnectSocket());
-    }
   }
 
   User? _getCurrentUser() {
     final user = context.read<AppUserCubit>().user;
 
-    if (user != null) {
-      return user;
-    }
-    return null;
+    return user;
   }
 
   void _fetchInitialData() {
@@ -75,7 +69,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
     }
 
     context.read<ChatBloc>().add(ChatFetchUserChats(token: token));
-    context.read<ChatBloc>().add(ChatConnectSocket());
   }
 
   @override
@@ -97,81 +90,107 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ),
         ],
       ),
-      body: BlocListener<ChatBloc, ChatState>(
-        listenWhen: (previous, current) =>
-            previous.status != current.status &&
-            current.status == ChatStatus.chatsLoaded,
-        listener: (context, state) {
-          if (state.isSocketConnected && state.chats.isNotEmpty) {
-            for (final chat in state.chats) {
-              context.read<ChatBloc>().add(ChatJoinRoom(chatId: chat.id));
-            }
+      body: BlocListener<AppSocketCubit, AppSocketState>(
+        listener: (context, socketState) {
+          if (socketState is AppSocketError) {
+            // Show persistent error if needed, ChatBloc handles action failures
+            // ScaffoldMessenger.of(context)
+            //   ..clearSnackBars()
+            //   ..showSnackBar(SnackBar(content: Text('Connection Error: ${socketState.message}')));
+            debugPrint(
+                "AppSocket Error in ChatListScreen: ${socketState.message}");
+          } else if (socketState is AppSocketDisconnected) {
+            // Optionally show a disconnected message
+            debugPrint(
+                "AppSocket Disconnected in ChatListScreen: ${socketState.reason}");
           }
         },
-        child: Column(
-          children: <Widget>[
-            _buildSearchBar(context),
-            Expanded(
-              child: BlocConsumer<ChatBloc, ChatState>(
-                listener: (context, state) {
-                  if (state.status == ChatStatus.failure &&
-                      state.errorMessage != null &&
-                      state.errorMessage != _lastShownErrorMessage) {
-                    ScaffoldMessenger.of(context)
-                      ..clearSnackBars()
-                      ..showSnackBar(
-                        SnackBar(
-                          content: Text(state.errorMessage!),
+        child: BlocListener<ChatBloc, ChatState>(
+          listenWhen: (previous, current) =>
+              previous.status != current.status &&
+              current.status == ChatStatus.chatsLoaded,
+          listener: (context, state) {
+            if (context.read<AppSocketCubit>().isConnected &&
+                state.chats.isNotEmpty) {
+              for (final chat in state.chats) {
+                context.read<ChatBloc>().add(ChatJoinRoom(chatId: chat.id));
+              }
+            }
+          },
+          child: Column(
+            children: <Widget>[
+              _buildSearchBar(context),
+              Expanded(
+                child: BlocConsumer<ChatBloc, ChatState>(
+                  listener: (context, state) {
+                    if (state.status == ChatStatus.failure &&
+                        state.errorMessage != null &&
+                        state.errorMessage != _lastShownErrorMessage) {
+                      ScaffoldMessenger.of(context)
+                        ..clearSnackBars()
+                        ..showSnackBar(
+                          SnackBar(
+                            content: Text(state.errorMessage!),
+                          ),
+                        );
+
+                      _lastShownErrorMessage = state.errorMessage;
+                    } else if (state.status != ChatStatus.failure) {
+                      _lastShownErrorMessage =
+                          null; // Reset when not in failure state
+                    }
+                  },
+                  builder: (context, state) {
+                    if (state.status == ChatStatus.loadingChats &&
+                        state.chats.isEmpty) {
+                      return const CircularProgressIndicator();
+                    }
+
+                    if (state.status == ChatStatus.failure &&
+                        state.chats.isEmpty) {
+                      return Center(
+                        child: Text(
+                          state.errorMessage ?? 'Failed to load chats.',
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.error),
                         ),
                       );
+                    }
 
-                    _lastShownErrorMessage = state.errorMessage;
-                  } else if (state.status != ChatStatus.failure) {
-                    _lastShownErrorMessage =
-                        null; // Reset when not in failure state
-                  }
-                },
-                builder: (context, state) {
-                  if (state.status == ChatStatus.loadingChats &&
-                      state.chats.isEmpty) {
-                    return const CircularProgressIndicator();
-                  }
+                    if (state.chats.isEmpty &&
+                        state.status != ChatStatus.loadingChats) {
+                      return const EmptyChatsList();
+                    }
 
-                  if (state.status == ChatStatus.failure &&
-                      state.chats.isEmpty) {
-                    return Center(
-                      child: Text(
-                        state.errorMessage ?? 'Failed to load chats.',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.error),
+                    final typingStatusMap = state.typingUserIdByChatId;
+
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        _fetchInitialData();
+                      },
+                      child: ListView.builder(
+                        itemCount: state.chats.length,
+                        itemBuilder: (context, index) {
+                          final chat = state.chats[index];
+
+                          final typinguserId = typingStatusMap[chat.id];
+
+                          final isOtherUserTyping = typinguserId != null &&
+                              typinguserId != _currentUser!.id;
+
+                          return ChatListItem(
+                            chat: chat,
+                            currentuser: _currentUser!,
+                            isTyping: isOtherUserTyping,
+                          );
+                        },
                       ),
                     );
-                  }
-
-                  if (state.chats.isEmpty &&
-                      state.status != ChatStatus.loadingChats) {
-                    return const EmptyChatsList();
-                  }
-
-                  return RefreshIndicator(
-                    onRefresh: () async {
-                      _fetchInitialData();
-                    },
-                    child: ListView.builder(
-                      itemCount: state.chats.length,
-                      itemBuilder: (context, index) {
-                        final chat = state.chats[index];
-                        return ChatListItem(
-                          chat: chat,
-                          currentuser: _currentUser!,
-                        );
-                      },
-                    ),
-                  );
-                },
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

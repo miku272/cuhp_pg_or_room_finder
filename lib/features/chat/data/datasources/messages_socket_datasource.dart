@@ -1,10 +1,8 @@
-import 'dart:async';
-
 import '../../../../core/common/entities/chat.dart';
 import '../../../../core/common/entities/message.dart';
 import '../../../../core/socket/socket_manager.dart';
 
-abstract interface class ChatSocketDataSource {
+abstract interface class MessagesSocketDatasource {
   Future<void> connectSocket();
   void disconnectSocket();
   void joinChat(String chatId);
@@ -23,11 +21,11 @@ abstract interface class ChatSocketDataSource {
   bool get isConnected;
 }
 
-class ChatSocketDataSourceImpl implements ChatSocketDataSource {
+class MessagesSocketDatasourceImpl implements MessagesSocketDatasource {
   final SocketManager _socketManager;
   final String _baseUrl;
 
-  ChatSocketDataSourceImpl({
+  MessagesSocketDatasourceImpl({
     required SocketManager socketManager,
     required String baseUrl,
   })  : _socketManager = socketManager,
@@ -35,7 +33,6 @@ class ChatSocketDataSourceImpl implements ChatSocketDataSource {
 
   @override
   Future<void> connectSocket() async {
-    // Initialize socket manager if not already done
     await _socketManager.initialize(_baseUrl);
   }
 

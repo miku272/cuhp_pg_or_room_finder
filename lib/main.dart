@@ -9,6 +9,7 @@ import './core/styles/themes.dart';
 import './core/common/cubits/app_theme/theme_state.dart';
 import './core/common/cubits/app_theme/theme_cubit.dart';
 import './core/common/cubits/app_user/app_user_cubit.dart';
+import './core/common/cubits/app_socket/app_socket_cubit.dart';
 
 import './features/splash/presentation/bloc/splash_bloc.dart';
 import './features/auth/presentation/bloc/auth_bloc.dart';
@@ -38,6 +39,9 @@ Future<void> main() async {
         ),
         BlocProvider.value(
           value: serviceLocator<AppUserCubit>(),
+        ),
+        BlocProvider.value(
+          value: serviceLocator<AppSocketCubit>(),
         ),
         BlocProvider(
           create: (context) => serviceLocator<SplashBloc>(),

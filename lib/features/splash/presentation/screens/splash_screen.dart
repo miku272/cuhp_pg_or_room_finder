@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../../../core/common/cubits/app_socket/app_socket_cubit.dart';
+import '../../../../core/constants/constants.dart';
 import '../../../../core/utils/jwt_expiration_handler.dart';
 import '../../../../core/utils/sf_handler.dart';
 
@@ -35,6 +37,7 @@ class _SplashScreenState extends State<SplashScreen> {
     final token = sfHandler.getToken();
 
     context.read<SplashBloc>().add(SplashGetCurrentUser(id: id, token: token));
+    context.read<AppSocketCubit>().connectSocket(Constants.backendUri);
   }
 
   @override

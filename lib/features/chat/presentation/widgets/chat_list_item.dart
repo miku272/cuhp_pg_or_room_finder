@@ -10,10 +10,12 @@ import '../../../../core/common/entities/message.dart';
 class ChatListItem extends StatelessWidget {
   final Chat chat;
   final User currentuser;
+  final bool isTyping;
 
   const ChatListItem({
     required this.chat,
     required this.currentuser,
+    this.isTyping = false,
     super.key,
   });
 
@@ -150,31 +152,41 @@ class ChatListItem extends StatelessWidget {
                           ],
                         ),
                       ),
-                    // Last message with indicators
-                    Row(
-                      children: <Widget>[
-                        if (chat.lastMessage?.type != MessageType.text)
-                          _buildMessageTypeIcon(chat.lastMessage?.type, theme),
-                        Expanded(
-                          child: Text(
-                            _getMessagePreview(chat.lastMessage),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                    // Last message or typing indicator
+                    isTyping
+                        ? Text(
+                            'Typing...',
                             style: TextStyle(
                               fontSize: 14,
-                              height: 1.3,
-                              color: isUnread
-                                  ? theme.textTheme.bodyLarge?.color
-                                  : theme.textTheme.bodyLarge?.color
-                                      ?.withValues(alpha: 0.7),
-                              fontWeight: isUnread
-                                  ? FontWeight.w500
-                                  : FontWeight.normal,
+                              fontStyle: FontStyle.italic,
+                              color: theme.colorScheme.primary,
                             ),
+                          )
+                        : Row(
+                            children: <Widget>[
+                              if (chat.lastMessage?.type != MessageType.text)
+                                _buildMessageTypeIcon(
+                                    chat.lastMessage?.type, theme),
+                              Expanded(
+                                child: Text(
+                                  _getMessagePreview(chat.lastMessage),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    height: 1.3,
+                                    color: isUnread
+                                        ? theme.textTheme.bodyLarge?.color
+                                        : theme.textTheme.bodyLarge?.color
+                                            ?.withValues(alpha: 0.7),
+                                    fontWeight: isUnread
+                                        ? FontWeight.w500
+                                        : FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
               ),

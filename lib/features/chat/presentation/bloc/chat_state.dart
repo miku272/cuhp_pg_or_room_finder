@@ -3,9 +3,9 @@ part of 'chat_bloc.dart';
 enum ChatStatus {
   initial,
   loading,
-  loadingChats, // Specific loading for chat list
-  success, // General success or socket connected
-  chatsLoaded, // Specific success for chat list loaded/updated
+  loadingChats,
+  success, // General success
+  chatsLoaded,
   failure,
 }
 
@@ -13,51 +13,46 @@ enum ChatStatus {
 final class ChatState {
   final ChatStatus status;
   final List<Chat> chats;
-  final bool isSocketConnected;
   final String? errorMessage;
   final int? errorStatus;
-  final Chat? newlyInitializedChat; // For InitializeChat result
-  final Chat? newlyFetchedChat; // For GetChatById result
-  final Message? newlySentMessage; // For SendMessage result
-  final Map<String, dynamic>? typingData; // { chatId: string, userId: string }
-  final Map<String, dynamic>?
-      readReceiptData; // { chatId: string, userId: string }
+  final Chat? newlyInitializedChat;
+  final Chat? newlyFetchedChat;
+  final Message? newlySentMessage;
+  final Map<String, String>
+      typingUserIdByChatId; // Key: ChatID, Value: UserID of typer
+  final Map<String, dynamic>? readReceiptData;
 
   const ChatState({
     this.status = ChatStatus.initial,
     this.chats = const [],
-    this.isSocketConnected = false,
     this.errorMessage,
     this.errorStatus,
     this.newlyInitializedChat,
     this.newlyFetchedChat,
     this.newlySentMessage,
-    this.typingData,
+    this.typingUserIdByChatId = const {},
     this.readReceiptData,
   });
 
   ChatState copyWith({
     ChatStatus? status,
     List<Chat>? chats,
-    bool? isSocketConnected,
     String? errorMessage,
     int? errorStatus,
     Chat? newlyInitializedChat,
     Chat? newlyFetchedChat,
     Message? newlySentMessage,
-    Map<String, dynamic>? typingData,
+    Map<String, String>? typingUserIdByChatId,
     Map<String, dynamic>? readReceiptData,
-    bool clearError = false, // Helper to clear error message easily
+    bool clearError = false,
     bool clearNewlyInitializedChat = false,
     bool clearNewlyFetchedChat = false,
     bool clearNewlySentMessage = false,
-    bool clearTypingData = false,
     bool clearReadReceiptData = false,
   }) {
     return ChatState(
       status: status ?? this.status,
       chats: chats ?? this.chats,
-      isSocketConnected: isSocketConnected ?? this.isSocketConnected,
       errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
       errorStatus: clearError ? null : errorStatus ?? this.errorStatus,
       newlyInitializedChat: clearNewlyInitializedChat
@@ -69,7 +64,7 @@ final class ChatState {
       newlySentMessage: clearNewlySentMessage
           ? null
           : newlySentMessage ?? this.newlySentMessage,
-      typingData: clearTypingData ? null : typingData ?? this.typingData,
+      typingUserIdByChatId: typingUserIdByChatId ?? this.typingUserIdByChatId,
       readReceiptData:
           clearReadReceiptData ? null : readReceiptData ?? this.readReceiptData,
     );

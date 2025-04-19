@@ -4,7 +4,6 @@ part of 'chat_bloc.dart';
 sealed class ChatEvent {}
 
 // --- Remote/REST Events ---
-
 final class ChatFetchUserChats extends ChatEvent {
   final String token;
   ChatFetchUserChats({required this.token});
@@ -22,7 +21,6 @@ final class ChatInitializeChat extends ChatEvent {
   ChatInitializeChat({required this.propertyId, required this.token});
 }
 
-// Renamed from ChatRemoteSendMessage to avoid conflict with socket send
 final class ChatSendMessageViaApi extends ChatEvent {
   final String content;
   final MessageType type;
@@ -36,22 +34,16 @@ final class ChatSendMessageViaApi extends ChatEvent {
   });
 }
 
-// --- Socket Events ---
-
-final class ChatConnectSocket extends ChatEvent {}
-
-final class ChatDisconnectSocket extends ChatEvent {}
-
+// --- Socket Action Events (Sent TO SocketManager) ---
 final class ChatJoinRoom extends ChatEvent {
   final String chatId;
   ChatJoinRoom({required this.chatId});
 }
 
-// Renamed from ChatSocketSendMessage
 final class ChatSendMessageViaSocket extends ChatEvent {
   final String chatId;
   final String content;
-  final String type; // Assuming type is string for socket emission
+  final String type;
   ChatSendMessageViaSocket({
     required this.chatId,
     required this.content,
@@ -69,29 +61,24 @@ final class ChatMarkMessagesAsRead extends ChatEvent {
   ChatMarkMessagesAsRead({required this.chatId});
 }
 
-// --- Internal Bloc Events (from Socket Listeners) ---
-
+// --- Internal Bloc Events (FROM AppSocketCubit Listeners) ---
 final class _ChatMessageReceived extends ChatEvent {
   final (Chat, Message) chatMessageTuple;
   _ChatMessageReceived({required this.chatMessageTuple});
 }
 
 final class _ChatTypingReceived extends ChatEvent {
+  // Expecting { chatId: string, userId: string, isTyping: bool }
   final Map<String, dynamic> data;
   _ChatTypingReceived({required this.data});
 }
 
+final class _ChatTypingTimedOut extends ChatEvent {
+  final String chatId;
+  _ChatTypingTimedOut({required this.chatId});
+}
+
 final class _ChatReadReceiptReceived extends ChatEvent {
-  final Map<String, dynamic> data; // { chatId: string, userId: string }
+  final Map<String, dynamic> data; // Expect { chatId: string, chat: Chat }
   _ChatReadReceiptReceived({required this.data});
-}
-
-final class _ChatErrorReceived extends ChatEvent {
-  final String message;
-  _ChatErrorReceived({required this.message});
-}
-
-final class _ChatConnectionChanged extends ChatEvent {
-  final bool isConnected;
-  _ChatConnectionChanged({required this.isConnected});
 }

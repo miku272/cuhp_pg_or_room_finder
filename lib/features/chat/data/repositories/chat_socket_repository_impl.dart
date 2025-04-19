@@ -2,33 +2,29 @@ import 'dart:async';
 
 import '../../../../core/common/entities/chat.dart';
 import '../../../../core/common/entities/message.dart';
-
-import '../../../../core/socket/socket_manager.dart';
 import '../../domain/repository/chat_socket_repository.dart';
+import '../datasources/chat_socket_datasource.dart';
 
 class ChatSocketRepositoryImpl implements ChatSocketRepository {
-  final SocketManager _socketManager;
-  final String _baseUrl;
+  final ChatSocketDataSource _chatSocketDataSource;
 
   ChatSocketRepositoryImpl({
-    SocketManager? socketManager,
-    required String baseUrl,
-  })  : _socketManager = socketManager ?? SocketManager(),
-        _baseUrl = baseUrl;
+    required ChatSocketDataSource chatSocketDataSource,
+  }) : _chatSocketDataSource = chatSocketDataSource;
 
   @override
   Future<void> connectSocket() async {
-    await _socketManager.initialize(_baseUrl);
+    await _chatSocketDataSource.connectSocket();
   }
 
   @override
   void disconnectSocket() {
-    _socketManager.disconnect();
+    _chatSocketDataSource.disconnectSocket();
   }
 
   @override
   void joinChat(String chatId) {
-    _socketManager.client.joinChat(chatId);
+    _chatSocketDataSource.joinChat(chatId);
   }
 
   @override
@@ -37,7 +33,7 @@ class ChatSocketRepositoryImpl implements ChatSocketRepository {
     required String content,
     required String type,
   }) {
-    _socketManager.client.sendMessage(
+    _chatSocketDataSource.sendMessage(
       chatId: chatId,
       content: content,
       type: type,
@@ -46,32 +42,32 @@ class ChatSocketRepositoryImpl implements ChatSocketRepository {
 
   @override
   void sendTypingIndicator(String chatId) {
-    _socketManager.client.sendTypingIndicator(chatId);
+    _chatSocketDataSource.sendTypingIndicator(chatId);
   }
 
   @override
   void markMessagesAsRead(String chatId) {
-    _socketManager.client.markMessageAsRead(chatId);
+    _chatSocketDataSource.markMessagesAsRead(chatId);
   }
 
   @override
   Stream<(Chat, Message)> get messageStream =>
-      _socketManager.eventHandler.messageStream;
+      _chatSocketDataSource.messageStream;
 
   @override
   Stream<Map<String, dynamic>> get typingStream =>
-      _socketManager.eventHandler.typingStream;
+      _chatSocketDataSource.typingStream;
 
   @override
   Stream<Map<String, dynamic>> get readReceiptStream =>
-      _socketManager.eventHandler.readReceiptStream;
+      _chatSocketDataSource.readReceiptStream;
 
   @override
-  Stream<String> get errorStream => _socketManager.eventHandler.errorStream;
+  Stream<String> get errorStream => _chatSocketDataSource.errorStream;
 
   @override
-  Stream<bool> get connectionStream => _socketManager.client.connectionStream;
+  Stream<bool> get connectionStream => _chatSocketDataSource.connectionStream;
 
   @override
-  bool get isConnected => _socketManager.isConnected;
+  bool get isConnected => _chatSocketDataSource.isConnected;
 }

@@ -80,6 +80,10 @@ import './features/chat/data/repositories/messages_remote_repository_impl.dart';
 import './features/chat/domain/repository/messages_remote_repository.dart';
 import './features/chat/domain/usecase/get_messages.dart';
 import './features/chat/presentation/bloc/messages_bloc.dart';
+import './features/chat/data/datasources/messages_socket_datasource.dart';
+import './features/chat/data/repositories/messages_socket_repository_impl.dart';
+import './features/chat/domain/repository/messages_socket_repository.dart';
+import 'core/common/cubits/app_socket/app_socket_cubit.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -106,6 +110,12 @@ Future<void> initDependencies() async {
 
   serviceLocator.registerLazySingleton(
     () => SocketManager(),
+  );
+
+  serviceLocator.registerLazySingleton(
+    () => AppSocketCubit(
+      socketManager: serviceLocator<SocketManager>(),
+    ),
   );
 
   serviceLocator.registerLazySingleton<JwtExpirationHandler>(
@@ -373,17 +383,16 @@ void _initPropertyDetails() {
 }
 
 void _initChat() {
-  serviceLocator.registerLazySingleton<ChatSocketRepository>(
-    () => ChatSocketRepositoryImpl(
+  serviceLocator.registerLazySingleton<ChatSocketDataSource>(
+    () => ChatSocketDataSourceImpl(
       baseUrl: Constants.backendUri,
       socketManager: serviceLocator<SocketManager>(),
     ),
   );
 
-  serviceLocator.registerLazySingleton(
-    () => ChatSocketDataSource(
-      repository: serviceLocator<ChatSocketRepository>(),
-      baseUrl: Constants.backendUri,
+  serviceLocator.registerLazySingleton<ChatSocketRepository>(
+    () => ChatSocketRepositoryImpl(
+      chatSocketDataSource: serviceLocator<ChatSocketDataSource>(),
     ),
   );
 
@@ -424,7 +433,8 @@ void _initChat() {
   serviceLocator.registerLazySingleton(
     () => ChatBloc(
       appUserCubit: serviceLocator<AppUserCubit>(),
-      chatSocketDataSource: serviceLocator<ChatSocketDataSource>(),
+      socketManager: serviceLocator<SocketManager>(),
+      appSocketCubit: serviceLocator<AppSocketCubit>(),
       getChatById: serviceLocator<GetChatById>(),
       getUserChats: serviceLocator<GetUserChats>(),
       initializeChat: serviceLocator<InitializeChat>(),
@@ -448,9 +458,25 @@ void _initChat() {
     ),
   );
 
+  serviceLocator.registerFactory<MessagesSocketDatasource>(
+    () => MessagesSocketDatasourceImpl(
+      baseUrl: Constants.backendUri,
+      socketManager: serviceLocator<SocketManager>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<MessagesSocketRepository>(
+    () => MessagesSocketRepositoryImpl(
+      messagesSocketDatasource: serviceLocator<MessagesSocketDatasource>(),
+    ),
+  );
+
   serviceLocator.registerLazySingleton(
     () => MessagesBloc(
+      socketManager: serviceLocator<SocketManager>(),
+      appSocketCubit: serviceLocator<AppSocketCubit>(),
       getMessages: serviceLocator<GetMessages>(),
+      appUserCubit: serviceLocator<AppUserCubit>(),
     ),
   );
 }

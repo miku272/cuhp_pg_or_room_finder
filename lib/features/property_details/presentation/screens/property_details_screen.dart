@@ -34,6 +34,7 @@ class PropertyDetailsScreen extends StatefulWidget {
 class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
     with SingleTickerProviderStateMixin {
   late String userToken;
+  late String userId;
 
   late AnimationController _animationController;
   late Animation<Offset> _slideAnimation;
@@ -51,6 +52,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
     }
 
     userToken = user.jwtToken;
+    userId = user.id;
 
     context.read<PropertyDetailsBloc>().add(
           UpdateProperty(property: widget.property),
@@ -204,7 +206,8 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
                           _buildOwnerSection(context, property),
 
                           // Add some padding at the bottom to ensure content isn't hidden by the bottom buttons
-                          const SizedBox(height: 100),
+                          if (property.ownerId != userId)
+                            const SizedBox(height: 100),
                         ],
                       ),
                     ),
@@ -834,117 +837,120 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
 
-    return SlideTransition(
-      position: _slideAnimation,
-      child: Container(
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          boxShadow: [
-            BoxShadow(
-              color: isDarkMode
-                  ? Colors.black.withValues(alpha: 0.8)
-                  : Colors.black.withValues(alpha: 0.25),
-              blurRadius: 25,
-              spreadRadius: isDarkMode ? 1 : -5,
-              offset: const Offset(0, -10),
-            ),
-            if (isDarkMode)
-              BoxShadow(
-                color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                blurRadius: 15,
-                spreadRadius: 0,
-                offset: const Offset(0, -8),
+    return property.ownerId == userId
+        ? const SizedBox()
+        : SlideTransition(
+            position: _slideAnimation,
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                boxShadow: [
+                  BoxShadow(
+                    color: isDarkMode
+                        ? Colors.black.withValues(alpha: 0.8)
+                        : Colors.black.withValues(alpha: 0.25),
+                    blurRadius: 25,
+                    spreadRadius: isDarkMode ? 1 : -5,
+                    offset: const Offset(0, -10),
+                  ),
+                  if (isDarkMode)
+                    BoxShadow(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                      blurRadius: 15,
+                      spreadRadius: 0,
+                      offset: const Offset(0, -8),
+                    ),
+                ],
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
               ),
-          ],
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
-          ),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: () async {
-                  try {
-                    var formattedNumber = property.ownerPhone!;
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        try {
+                          var formattedNumber = property.ownerPhone!;
 
-                    if (!formattedNumber.startsWith('+91')) {
-                      formattedNumber = '+91$formattedNumber';
-                    }
+                          if (!formattedNumber.startsWith('+91')) {
+                            formattedNumber = '+91$formattedNumber';
+                          }
 
-                    final Uri callUri = Uri(
-                      scheme: 'tel',
-                      path: formattedNumber,
-                    );
+                          final Uri callUri = Uri(
+                            scheme: 'tel',
+                            path: formattedNumber,
+                          );
 
-                    if (await canLaunchUrl(callUri)) {
-                      await launchUrl(
-                        callUri,
-                        mode: LaunchMode.externalApplication,
-                      );
-                    } else {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Could not launch phone dialer'),
-                          ),
-                        );
-                      }
-                    }
-                  } catch (error) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Could not make the call'),
+                          if (await canLaunchUrl(callUri)) {
+                            await launchUrl(
+                              callUri,
+                              mode: LaunchMode.externalApplication,
+                            );
+                          } else {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content:
+                                      Text('Could not launch phone dialer'),
+                                ),
+                              );
+                            }
+                          }
+                        } catch (error) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Could not make the call'),
+                              ),
+                            );
+                          }
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.phone,
+                        color: Colors.white,
+                      ),
+                      label: Text(
+                        'Call ${property.propertyName}',
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.colorScheme.primary,
+                        foregroundColor: theme.colorScheme.onPrimary,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      );
-                    }
-                  }
-                },
-                icon: const Icon(
-                  Icons.phone,
-                  color: Colors.white,
-                ),
-                label: Text(
-                  'Call ${property.propertyName}',
-                  overflow: TextOverflow.ellipsis,
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: theme.colorScheme.onPrimary,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        // TODO: Implement chat functionality
+                      },
+                      icon: const Icon(Icons.chat),
+                      label: Text(
+                        'Chat with ${property.propertyName}',
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  // TODO: Implement chat functionality
-                },
-                icon: const Icon(Icons.chat),
-                label: Text(
-                  'Chat with ${property.propertyName}',
-                  overflow: TextOverflow.ellipsis,
-                ),
-                style: OutlinedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+          );
   }
 }
