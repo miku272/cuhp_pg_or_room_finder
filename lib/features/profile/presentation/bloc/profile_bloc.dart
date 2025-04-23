@@ -38,14 +38,26 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     // on<ProfileEvent>((event, emit) => emit(const ProfileLoading()));
 
     on<ProfileGetCurrentUser>((event, emit) async {
-      emit(const ProfileLoading());
+      emit(ProfileLoading(
+        activeCount: state.activeCount,
+        inactiveCount: state.inactiveCount,
+        user: state.user,
+        totalCount: state.totalCount,
+      ));
 
       final res =
           await _getCurrentUser(GetCurrentUserParams(token: event.token));
 
       res.fold(
         (failure) => emit(
-          ProfileFailure(status: failure.status, message: failure.message),
+          ProfileFailure(
+            status: failure.status,
+            message: failure.message,
+            activeCount: state.activeCount,
+            inactiveCount: state.inactiveCount,
+            user: state.user,
+            totalCount: state.totalCount,
+          ),
         ),
         (user) {
           final token = _sfHandler.getToken()!;
@@ -57,13 +69,23 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           );
 
           _appUserCubit.setUser(updatedUser);
-          emit(ProfileSuccess(user: updatedUser));
+          emit(ProfileSuccess(
+            user: updatedUser,
+            activeCount: state.activeCount,
+            inactiveCount: state.inactiveCount,
+            totalCount: state.totalCount,
+          ));
         },
       );
     });
 
     on<ProfileGetTotalPropertiesCount>((event, emit) async {
-      emit(const PropertyMetadataLoading());
+      emit(PropertyMetadataLoading(
+        activeCount: state.activeCount,
+        inactiveCount: state.inactiveCount,
+        user: state.user,
+        totalCount: state.totalCount,
+      ));
 
       final res = await _getTotalPropertiesCount(
         GetTotalPropertiesCountParams(token: event.token),
@@ -73,12 +95,18 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         (failure) => emit(PropertyMetadataFailure(
           status: failure.status,
           message: failure.message,
+          activeCount: state.activeCount,
+          inactiveCount: state.inactiveCount,
+          user: state.user,
+          totalCount: state.totalCount,
         )),
         (totalCount) {
           emit(
             TotalPropertyCountSuccess(
               totalCount: totalCount,
               user: state.user,
+              activeCount: state.activeCount,
+              inactiveCount: state.inactiveCount,
             ),
           );
         },
@@ -86,7 +114,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     });
 
     on<ProfileGetPropertiesActiveAndInactiveCount>((event, emit) async {
-      emit(const PropertyMetadataLoading());
+      emit(PropertyMetadataLoading(
+        activeCount: state.activeCount,
+        inactiveCount: state.inactiveCount,
+        user: state.user,
+        totalCount: state.totalCount,
+      ));
 
       final res = await _getPropertiesActiveAndInactiveCount(
         GetPropertiesActiveAndInactiveCountParams(token: event.token),
@@ -96,6 +129,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         (failure) => emit(PropertyMetadataFailure(
           status: failure.status,
           message: failure.message,
+          activeCount: state.activeCount,
+          inactiveCount: state.inactiveCount,
+          user: state.user,
+          totalCount: state.totalCount,
         )),
         (counts) {
           emit(
@@ -103,6 +140,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
               activeCount: counts.activePropertyCount,
               inactiveCount: counts.inactivePropertyCount,
               user: state.user,
+              totalCount: state.totalCount,
             ),
           );
         },
