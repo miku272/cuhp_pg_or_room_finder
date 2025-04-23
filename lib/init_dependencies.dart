@@ -10,6 +10,7 @@ import './core/utils/sf_handler.dart';
 import './core/utils/supabase_manager.dart';
 import './core/utils/jwt_expiration_handler.dart';
 import './core/common/cubits/app_user/app_user_cubit.dart';
+import './core/common/cubits/app_socket/app_socket_cubit.dart';
 import './core/socket/socket_manager.dart';
 
 import './features/splash/data/datasources/splash_remote_data_source.dart';
@@ -42,6 +43,9 @@ import './features/profile/data/repositories/profile_repository_impl.dart';
 import './features/profile/domain/repository/profile_repository.dart';
 import './features/profile/domain/usecases/get_current_user.dart'
     as profile_current_user;
+import './features/profile/domain/usecases/get_properties_active_and_inactive_count.dart';
+import './features/profile/domain/usecases/get_total_properties_count.dart';
+
 import './features/profile/presentation/bloc/profile_bloc.dart';
 
 import './features/property_listings/data/datasources/property_listing_remote_datasource.dart';
@@ -83,7 +87,6 @@ import './features/chat/presentation/bloc/messages_bloc.dart';
 import './features/chat/data/datasources/messages_socket_datasource.dart';
 import './features/chat/data/repositories/messages_socket_repository_impl.dart';
 import './features/chat/domain/repository/messages_socket_repository.dart';
-import 'core/common/cubits/app_socket/app_socket_cubit.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -290,9 +293,23 @@ void _initProfile() {
     ),
   );
 
+  serviceLocator.registerFactory<GetTotalPropertiesCount>(
+    () => GetTotalPropertiesCount(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<GetPropertiesActiveAndInactiveCount>(
+    () => GetPropertiesActiveAndInactiveCount(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
   serviceLocator.registerLazySingleton<ProfileBloc>(
     () => ProfileBloc(
       getCurrentUser: serviceLocator(),
+      getTotalPropertiesCount: serviceLocator(),
+      getPropertiesActiveAndInactiveCount: serviceLocator(),
       sfHandler: serviceLocator(),
       appUserCubit: serviceLocator(),
     ),

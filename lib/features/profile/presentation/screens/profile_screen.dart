@@ -14,8 +14,32 @@ import '../bloc/profile_bloc.dart';
 
 import '../widgets/verification_pill.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final token = context.read<AppUserCubit>().user?.jwtToken;
+      if (token == null) {
+        return;
+      }
+
+      context.read<ProfileBloc>().add(
+            ProfileGetTotalPropertiesCount(token: token),
+          );
+      context.read<ProfileBloc>().add(
+            ProfileGetPropertiesActiveAndInactiveCount(token: token),
+          );
+    });
+  }
 
   String _formatPhoneNumber(String phoneNumber) {
     if (phoneNumber.length <= 3) {
@@ -41,6 +65,12 @@ class ProfileScreen extends StatelessWidget {
 
     if (context.mounted) {
       context.read<ProfileBloc>().add(ProfileGetCurrentUser(token: token));
+      context.read<ProfileBloc>().add(
+            ProfileGetTotalPropertiesCount(token: token),
+          );
+      context.read<ProfileBloc>().add(
+            ProfileGetPropertiesActiveAndInactiveCount(token: token),
+          );
     }
   }
 
@@ -218,25 +248,88 @@ class ProfileScreen extends StatelessWidget {
                             const SizedBox(height: 16),
 
                             // Listings Card
-                            const Card(
-                              child: Column(
-                                children: [
-                                  ListTile(
-                                    leading: Icon(Icons.home_outlined),
-                                    title: Text('My Listings'),
-                                    trailing: Text('2 Active'),
+                            BlocBuilder<ProfileBloc, ProfileState>(
+                              builder: (context, profileState) {
+                                int? totalCount = profileState.totalCount;
+                                int? activeCount = profileState.activeCount;
+                                int? inactiveCount = profileState.inactiveCount;
+
+                                final bool isLoadingMetadata =
+                                    profileState is PropertyMetadataLoading;
+
+                                final bool didMetadataFail =
+                                    profileState is PropertyMetadataFailure;
+
+                                return Card(
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                        leading:
+                                            const Icon(Icons.home_outlined),
+                                        title: const Text('My Listings'),
+                                        trailing: isLoadingMetadata &&
+                                                activeCount == null
+                                            ? const SizedBox(
+                                                height: 16,
+                                                width: 16,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                        strokeWidth: 2),
+                                              )
+                                            : Text(
+                                                '${activeCount ?? (didMetadataFail ? 'Error' : '-')} Active',
+                                              ),
+                                      ),
+                                      const Divider(),
+                                      ListTile(
+                                        title: const Text('Total Listings'),
+                                        trailing: isLoadingMetadata &&
+                                                totalCount == null
+                                            ? const SizedBox(
+                                                height: 16,
+                                                width: 16,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                        strokeWidth: 2),
+                                              )
+                                            : Text(
+                                                '${totalCount ?? (didMetadataFail ? 'Error' : '-')}',
+                                              ),
+                                      ),
+                                      ListTile(
+                                        title: const Text('Active Listings'),
+                                        trailing: isLoadingMetadata &&
+                                                activeCount == null
+                                            ? const SizedBox(
+                                                height: 16,
+                                                width: 16,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                        strokeWidth: 2),
+                                              )
+                                            : Text(
+                                                '${activeCount ?? (didMetadataFail ? 'Error' : '-')}',
+                                              ),
+                                      ),
+                                      ListTile(
+                                        title: const Text('Inactive Listings'),
+                                        trailing: isLoadingMetadata &&
+                                                inactiveCount == null
+                                            ? const SizedBox(
+                                                height: 16,
+                                                width: 16,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                        strokeWidth: 2),
+                                              )
+                                            : Text(
+                                                '${inactiveCount ?? (didMetadataFail ? 'Error' : '-')}',
+                                              ),
+                                      ),
+                                    ],
                                   ),
-                                  Divider(),
-                                  ListTile(
-                                    title: Text('Total Listings'),
-                                    trailing: Text('5'),
-                                  ),
-                                  ListTile(
-                                    title: Text('Active Listings'),
-                                    trailing: Text('2'),
-                                  ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
                             const SizedBox(height: 16),
 
