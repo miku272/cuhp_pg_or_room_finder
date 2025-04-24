@@ -27,7 +27,6 @@ class Property {
   final num? distanceFromUniversity;
   final Map<String, bool>? services;
   final List<String>? images;
-  final List<String>? roomIds;
   final bool? isVerified;
   final bool? isActive;
   final DateTime? createdAt;
@@ -52,7 +51,6 @@ class Property {
     this.distanceFromUniversity,
     this.services,
     this.images,
-    this.roomIds,
     this.isVerified,
     this.isActive,
     this.createdAt,

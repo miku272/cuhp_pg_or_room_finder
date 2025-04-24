@@ -21,7 +21,6 @@ class PropertyListingModel extends Property {
     required num super.distanceFromUniversity,
     required Map<String, bool> super.services,
     required List<String> super.images,
-    required List<String> super.roomIds,
     required bool super.isVerified,
     required bool super.isActive,
     required DateTime super.createdAt,
@@ -45,12 +44,11 @@ class PropertyListingModel extends Property {
       propertyGenderAllowance:
           Property.genderAllowanceFromString(json['propertyGenderAllowance']),
       rentAgreementAvailable: json['rentAgreementAvailable'] ?? false,
-      coordinates: Coordinate.fromJson(
-          Map<String, num>.from(json['coordinates'] ?? {})),
+      coordinates:
+          Coordinate.fromJson(Map<String, num>.from(json['coordinates'] ?? {})),
       distanceFromUniversity: json['distanceFromUniversity'] ?? 0.0,
       services: Map<String, bool>.from(json['services'] ?? {}),
       images: List<String>.from(json['images'] ?? []),
-      roomIds: List<String>.from(json['rooms'] ?? []),
       isVerified: json['isVerified'] ?? false,
       isActive: json['isActive'] ?? true,
       createdAt:
@@ -81,7 +79,6 @@ class PropertyListingModel extends Property {
       'distanceFromUniversity': distanceFromUniversity,
       'services': services,
       'images': images,
-      'rooms': roomIds,
       'isVerified': isVerified,
       'isActive': isActive,
       'createdAt': createdAt?.toIso8601String(),

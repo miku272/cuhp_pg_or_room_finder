@@ -69,7 +69,6 @@ class MyListingsRemoteDataSourceImpl implements MyListingsRemoteDataSource {
           distanceFromUniversity: propertyData['distanceFromUniversity'],
           services: Map<String, bool>.from(propertyData['services']),
           images: List<String>.from(propertyData['images']),
-          roomIds: List<String>.from(propertyData['rooms']),
           isVerified: propertyData['isVerified'],
           isActive: propertyData['isActive'],
           createdAt: DateTime.parse(propertyData['createdAt']),
@@ -172,7 +171,6 @@ class MyListingsRemoteDataSourceImpl implements MyListingsRemoteDataSource {
         services:
             Map<String, bool>.from(decodedBody['data']['property']['services']),
         images: List<String>.from(decodedBody['data']['property']['images']),
-        roomIds: List<String>.from(decodedBody['data']['property']['rooms']),
         isVerified: decodedBody['data']['property']['isVerified'],
         isActive: decodedBody['data']['property']['isActive'],
         createdAt: DateTime.parse(decodedBody['data']['property']['createdAt']),

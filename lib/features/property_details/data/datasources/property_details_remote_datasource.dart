@@ -70,7 +70,6 @@ class PropertyDetailsRemoteDataSourceImpl
         services:
             Map<String, bool>.from(decodedBody['data']['property']['services']),
         images: List<String>.from(decodedBody['data']['property']['images']),
-        roomIds: List<String>.from(decodedBody['data']['property']['rooms']),
         isVerified: decodedBody['data']['property']['isVerified'],
         isActive: decodedBody['data']['property']['isActive'],
         createdAt: DateTime.parse(decodedBody['data']['property']['createdAt']),

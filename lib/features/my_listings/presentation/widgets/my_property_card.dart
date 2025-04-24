@@ -71,7 +71,6 @@ class MyPropertyCard extends StatelessWidget {
                     coordinates: property.coordinates,
                     distanceFromUniversity: property.distanceFromUniversity,
                     services: property.services,
-                    roomIds: property.roomIds,
                     images: property.images,
                     isVerified: property.isVerified,
                     isActive: property.isActive,
