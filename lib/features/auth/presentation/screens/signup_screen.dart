@@ -1,8 +1,9 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../../../core/constants/constants.dart';
+import '../../../../core/common/cubits/app_socket/app_socket_cubit.dart';
 
 import '../bloc/auth_bloc.dart';
 
@@ -65,14 +66,14 @@ class _SignupScreenState extends State<SignupScreen> {
         body: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
             if (state is AuthFailure) {
-              log('Error in signup screen: ', error: state.message);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(state.message)),
               );
             } else if (state is AuthSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Signup successful')),
-              );
+              context.read<AppSocketCubit>().connectSocket(
+                    Constants.backendUri,
+                  );
+
               context.pushReplacement('/');
             }
           },
@@ -94,10 +95,12 @@ class _SignupScreenState extends State<SignupScreen> {
                       const SizedBox(height: 24),
                       Text(
                         'Create Account',
-                        style:
-                            Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
@@ -221,8 +224,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           suffixIcon: IconButton(
                             onPressed: () {
                               setState(() {
-                                _obscurePassword =
-                                !_obscurePassword;
+                                _obscurePassword = !_obscurePassword;
                               });
                             },
                             icon: _obscurePassword
@@ -294,7 +296,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         onPressed: state is AuthLoading ? null : signup,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
                           foregroundColor:
                               Theme.of(context).colorScheme.onPrimary,
                           shape: RoundedRectangleBorder(

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/constants/constants.dart';
+import '../../../../core/common/cubits/app_socket/app_socket_cubit.dart';
+
 import '../bloc/auth_bloc.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -52,9 +55,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 SnackBar(content: Text(state.message)),
               );
             } else if (state is AuthSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Login successful')),
-              );
+              context.read<AppSocketCubit>().connectSocket(
+                    Constants.backendUri,
+                  );
+
               context.pushReplacement('/');
             }
           },
@@ -78,10 +82,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 24),
                       Text(
                         'Welcome back',
-                        style:
-                            Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 32),
@@ -178,7 +184,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: state is AuthLoading ? null : login,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
                           foregroundColor:
                               Theme.of(context).colorScheme.onPrimary,
                           shape: RoundedRectangleBorder(

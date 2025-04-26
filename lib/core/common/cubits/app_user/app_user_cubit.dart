@@ -4,15 +4,19 @@ import 'package:go_router/go_router.dart';
 
 import '../../../utils/sf_handler.dart';
 import '../../entities/user.dart';
+import '../app_socket/app_socket_cubit.dart';
 
 part 'app_user_state.dart';
 
 class AppUserCubit extends Cubit<AppUserState> {
   final SFHandler _sfHandler;
+  final AppSocketCubit _appSocketCubit;
 
   AppUserCubit({
     required SFHandler sfHandler,
+    required AppSocketCubit appSocketCubit,
   })  : _sfHandler = sfHandler,
+        _appSocketCubit = appSocketCubit,
         super(AppUserInitial());
 
   void setUser(User user) {
@@ -31,6 +35,8 @@ class AppUserCubit extends Cubit<AppUserState> {
   }
 
   Future<void> logoutUser(BuildContext context) async {
+    _appSocketCubit.disconnectSocket();
+
     await _sfHandler.deleteId();
     await _sfHandler.deleteToken();
     await _sfHandler.deleteExpiresIn();

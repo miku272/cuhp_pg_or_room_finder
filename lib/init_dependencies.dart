@@ -108,6 +108,7 @@ Future<void> initDependencies() async {
   serviceLocator.registerLazySingleton(
     () => AppUserCubit(
       sfHandler: serviceLocator(),
+      appSocketCubit: serviceLocator(),
     ),
   );
 
