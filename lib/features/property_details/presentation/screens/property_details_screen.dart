@@ -11,6 +11,7 @@ import 'package:shimmer/shimmer.dart';
 
 import '../../../../core/common/cubits/app_user/app_user_cubit.dart';
 import '../../../../core/common/entities/property.dart';
+import '../../../../core/common/entities/review.dart';
 import '../../../../core/common/widgets/custom_app_bar.dart';
 
 import '../../../../core/utils/jwt_expiration_handler.dart';
@@ -38,6 +39,27 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
 
   late AnimationController _animationController;
   late Animation<Offset> _slideAnimation;
+
+  final List<Review> _dummyReviews = List.generate(
+    7, // Generate 7 dummy reviews
+    (index) => Review(
+      id: 'review_$index',
+      property: PropertyInfo(
+        id: 'prop_1',
+        propertyName: 'Dummy Property',
+      ),
+      user: index % 3 != 0 // Make some anonymous
+          ? UserInfo(id: 'user_$index', name: 'User ${index + 1}')
+          : null,
+      rating: (index % 5) + 1, // Ratings from 1 to 5
+      review: index % 2 == 0
+          ? 'This is a great place to stay! Highly recommended. Amenities were good and the owner was helpful.'
+          : 'Decent place, good value for money.',
+      isAnonymous: index % 3 == 0,
+      createdAt: DateTime.now().subtract(Duration(days: index * 2)),
+      updatedAt: DateTime.now().subtract(Duration(days: index * 2)),
+    ),
+  );
 
   @override
   void initState() {
@@ -74,6 +96,19 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _animationController.forward();
     });
+  }
+
+  // TODO: Delete this method when the backend is ready
+  Review? _findUserReview(List<Review> reviews, String currentUserId) {
+    try {
+      // Find the first review that is not anonymous and matches the current user's ID
+      return reviews.firstWhere(
+        (review) => review.user?.id == 'user_1',
+      );
+    } catch (e) {
+      // Return null if no review is found for the current user
+      return null;
+    }
   }
 
   Future<void> _launchMapsDirections(
@@ -142,6 +177,8 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
   @override
   Widget build(BuildContext context) {
     Property property;
+    Review? userReview;
+
     return BlocConsumer<PropertyDetailsBloc, PropertyDetailsState>(
       listener: (context, state) {
         if (state is PropertyDetailsFailure) {
@@ -159,6 +196,8 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
       },
       builder: (context, state) {
         property = state.property ?? widget.property;
+
+        userReview = _findUserReview(_dummyReviews, userId);
 
         if (state is PropertyDetailsLoading) {
           return const Center(
@@ -198,6 +237,17 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
 
                           // Property Amenities
                           _buildAmenitiesSection(context, property),
+
+                          // Add/Edit user reviews section
+                          // if (property.ownerId != userId)
+                          _buildAddOrEditReviewSection(
+                            context,
+                            property,
+                            userReview,
+                          ),
+
+                          // Reviews Section
+                          _buildReviewsSection(context, _dummyReviews),
 
                           // Property Location
                           _buildLocationSection(context, property),
@@ -658,6 +708,202 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildAddOrEditReviewSection(
+      BuildContext context, Property property, Review? userReview) {
+    final theme = Theme.of(context);
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: theme.dividerColor),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              userReview == null ? 'Add Your Review' : 'Your Review',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            if (userReview == null)
+              // Show "Add Review" button if user hasn't reviewed yet
+              Center(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    // TODO: Implement navigation to Add Review Screen or show a dialog
+                  },
+                  icon: const Icon(Icons.add_comment_outlined),
+                  label: const Text('Write a Review'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                  ),
+                ),
+              )
+            else
+              // Show the user's existing review with edit/delete options
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildReviewItem(
+                      context, userReview), // Reuse existing item builder
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton.icon(
+                        icon: const Icon(Icons.edit, size: 18),
+                        label: const Text('Edit'),
+                        onPressed: () {
+                          // TODO: Implement navigation to Edit Review Screen or show a dialog
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      TextButton.icon(
+                        icon: Icon(Icons.delete_outline,
+                            size: 18, color: theme.colorScheme.error),
+                        label: Text('Delete',
+                            style: TextStyle(color: theme.colorScheme.error)),
+                        onPressed: () {
+                          // TODO: Show confirmation dialog and implement delete logic
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Implement Delete Review'),
+                            ),
+                          );
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          foregroundColor: theme.colorScheme.error,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReviewsSection(BuildContext context, List<Review> reviews) {
+    final theme = Theme.of(context);
+    final reviewsToShow = reviews.take(5).toList(); // Take only the first 5
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: theme.dividerColor),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Reviews (${reviews.length})', // Show total review count
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (reviews.length > 5)
+                  TextButton(
+                    onPressed: () {
+                      // TODO: Navigate to the full reviews screen
+                    },
+                    child: const Text('View All'),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (reviews.isEmpty)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24.0),
+                  child: Text(
+                    'No reviews yet.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
+                ),
+              )
+            else
+              ListView.separated(
+                shrinkWrap: true, // Important inside SingleChildScrollView
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: reviewsToShow.length,
+                itemBuilder: (context, index) {
+                  final review = reviewsToShow[index];
+                  return _buildReviewItem(context, review);
+                },
+                separatorBuilder: (context, index) => Divider(
+                  height: 24,
+                  color: theme.dividerColor.withValues(alpha: 0.5),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReviewItem(BuildContext context, Review review) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            // Rating Stars
+            Row(
+              children: List.generate(
+                5,
+                (i) => Icon(
+                  i < review.rating ? Icons.star : Icons.star_border,
+                  color: Colors.amber,
+                  size: 18,
+                ),
+              ),
+            ),
+            const Spacer(),
+            // User Name (or Anonymous)
+            Text(
+              review.isAnonymous ? 'Anonymous' : review.user?.name ?? 'User',
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        // Review Text
+        if (review.review != null && review.review!.isNotEmpty)
+          Text(
+            review.review!,
+            style: theme.textTheme.bodyMedium,
+          ),
+      ],
     );
   }
 
