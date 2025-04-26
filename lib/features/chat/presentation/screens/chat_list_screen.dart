@@ -35,7 +35,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchText = '';
 
-  ChatSortCriteria? _currentSortCriteria;
+  ChatSortCriteria _currentSortCriteria = ChatSortCriteria.lastActivity;
 
   @override
   void initState() {
@@ -68,7 +68,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     return timeB.compareTo(timeA);
   }
 
-  List<Chat> _sortChats(List<Chat> chats, ChatSortCriteria? chatSortCriteria) {
+  List<Chat> _sortChats(List<Chat> chats, ChatSortCriteria chatSortCriteria) {
     final List<Chat> sortedList = List.from(chats);
     final currentUserId = _currentUser?.id;
 
@@ -106,8 +106,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
           return _compareChatTimestamps(a, b); // Secondary sort by time
 
         case ChatSortCriteria.lastActivity:
-          return _compareChatTimestamps(a, b);
-        case null:
           return _compareChatTimestamps(a, b);
       }
     });
