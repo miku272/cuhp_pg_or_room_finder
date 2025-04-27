@@ -65,10 +65,25 @@ class PropertyDetailsRepositoryImpl implements PropertyDetailsRepository {
   }
 
   @override
-  Future<Either<Failure, bool>> deletePropertyReview(
-      {required String reviewId, required String token}) {
-    // TODO: implement deletePropertyReview
-    throw UnimplementedError();
+  Future<Either<Failure, bool>> deletePropertyReview({
+    required String reviewId,
+    required String token,
+  }) async {
+    try {
+      final isDeleted =
+          await propertyDetailsRemoteDatasource.deletePropertyReview(
+        reviewId,
+        token,
+      );
+
+      return right(isDeleted);
+    } on ServerException catch (error) {
+      return left(Failure(status: error.status, message: error.message));
+    } on UserException catch (error) {
+      return left(Failure(status: error.status, message: error.message));
+    } catch (error) {
+      return left(Failure(message: error.toString()));
+    }
   }
 
   @override

@@ -66,6 +66,9 @@ import './features/property_details/data/datasources/property_details_remote_dat
 import './features/property_details/data/repositories/property_details_repository_impl.dart';
 import './features/property_details/domain/repository/property_details_repository.dart';
 import './features/property_details/domain/usecases/get_property_details.dart';
+import './features/property_details/domain/usecases/add_property_review.dart';
+import './features/property_details/domain/usecases/update_property_review.dart';
+import './features/property_details/domain/usecases/delete_property_review.dart';
 import './features/property_details/presentation/bloc/property_details_bloc.dart';
 
 import './features/chat/data/datasources/chat_socket_datasource.dart';
@@ -393,9 +396,30 @@ void _initPropertyDetails() {
     ),
   );
 
+  serviceLocator.registerFactory<AddPropertyReview>(
+    () => AddPropertyReview(
+      propertyDetailsRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<UpdatePropertyReview>(
+    () => UpdatePropertyReview(
+      propertyDetailsRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<DeletePropertyReview>(
+    () => DeletePropertyReview(
+      propertyDetailsRepository: serviceLocator(),
+    ),
+  );
+
   serviceLocator.registerLazySingleton<PropertyDetailsBloc>(
     () => PropertyDetailsBloc(
       getPropertyDetails: serviceLocator(),
+      addPropertyReview: serviceLocator(),
+      updatePropertyReview: serviceLocator(),
+      deletePropertyReview: serviceLocator(),
     ),
   );
 }
