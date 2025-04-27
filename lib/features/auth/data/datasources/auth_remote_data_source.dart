@@ -63,7 +63,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return user;
     } on DioException catch (error) {
       if (error.type == DioExceptionType.connectionTimeout ||
-          error.type == DioExceptionType.receiveTimeout) {
+          error.type == DioExceptionType.receiveTimeout ||
+          error.type == DioExceptionType.sendTimeout ||
+          error.type == DioExceptionType.connectionError) {
         throw ServerException(
           status: 503,
           message: 'Unable to connect to the server',
@@ -110,7 +112,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return user;
     } on DioException catch (error) {
       if (error.type == DioExceptionType.connectionTimeout ||
-          error.type == DioExceptionType.receiveTimeout) {
+          error.type == DioExceptionType.receiveTimeout ||
+          error.type == DioExceptionType.sendTimeout ||
+          error.type == DioExceptionType.connectionError) {
         throw ServerException(
           status: 503,
           message: 'Unable to connect to the server',
@@ -187,7 +191,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return user;
     } on DioException catch (error) {
       if (error.type == DioExceptionType.connectionTimeout ||
-          error.type == DioExceptionType.receiveTimeout) {
+          error.type == DioExceptionType.receiveTimeout ||
+          error.type == DioExceptionType.sendTimeout ||
+          error.type == DioExceptionType.connectionError) {
         throw ServerException(
           status: 503,
           message: 'Unable to connect to the server',

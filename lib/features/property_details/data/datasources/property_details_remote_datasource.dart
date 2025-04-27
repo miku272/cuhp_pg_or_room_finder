@@ -4,10 +4,31 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/common/entities/coordinate.dart';
 import '../../../../core/common/entities/property.dart';
+import '../../../../core/common/entities/review.dart';
 import '../../../../core/error/exception.dart';
 
 abstract interface class PropertyDetailsRemoteDatasource {
   Future<Property> getPropertyDetails(String propertyId, String token);
+  Future<Review> addPropertyReview(
+    String propertyId,
+    int rating,
+    String? review,
+    bool isAnonymous,
+    String token,
+  );
+
+  Future<Review> updatePropertyReview(
+    String reviewId,
+    int rating,
+    String? review,
+    bool isAnonymous,
+    String token,
+  );
+
+  Future<bool> deletePropertyReview(
+    String reviewId,
+    String token,
+  );
 }
 
 class PropertyDetailsRemoteDataSourceImpl
@@ -77,6 +98,211 @@ class PropertyDetailsRemoteDataSourceImpl
       );
 
       return property;
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout) {
+        throw ServerException(
+          status: 503,
+          message: 'Unable to connect to the server',
+        );
+      }
+
+      final errors = error.response;
+
+      if (errors != null) {
+        if (errors.statusCode.toString().startsWith('5')) {
+          throw ServerException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (errors.statusCode.toString().startsWith('4')) {
+          throw UserException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (!errors.statusCode.toString().startsWith('2')) {
+          throw Exception('An error occurred');
+        }
+      }
+
+      rethrow;
+    } on SocketException catch (_) {
+      throw ServerException(
+        status: 503,
+        message: 'Unable to connect to the server',
+      );
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Review> addPropertyReview(
+    String propertyId,
+    int rating,
+    String? review,
+    bool isAnonymous,
+    String token,
+  ) async {
+    try {
+      final res = await dio.post(
+        '/review/add-review',
+        options: Options(headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        }),
+        data: {
+          'property': propertyId,
+          'rating': rating,
+          'review': review,
+          'isAnonymous': isAnonymous,
+        },
+      );
+
+      final decodedBody = res.data;
+
+      final reviewData = Review.fromJson(decodedBody['data']['review']);
+
+      return reviewData;
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout) {
+        throw ServerException(
+          status: 503,
+          message: 'Unable to connect to the server',
+        );
+      }
+
+      final errors = error.response;
+
+      if (errors != null) {
+        if (errors.statusCode.toString().startsWith('5')) {
+          throw ServerException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (errors.statusCode.toString().startsWith('4')) {
+          throw UserException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (!errors.statusCode.toString().startsWith('2')) {
+          throw Exception('An error occurred');
+        }
+      }
+
+      rethrow;
+    } on SocketException catch (_) {
+      throw ServerException(
+        status: 503,
+        message: 'Unable to connect to the server',
+      );
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> deletePropertyReview(
+    String reviewId,
+    String token,
+  ) async {
+    try {
+      final res = await dio.delete(
+        '/review/$reviewId',
+        options: Options(headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        }),
+      );
+
+      if (res.statusCode == 204 || res.statusCode == 200) {
+        return true;
+      } else {
+        throw ServerException(
+          status: res.statusCode,
+          message: 'Failed to delete review',
+        );
+      }
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout ||
+          error.type == DioExceptionType.sendTimeout ||
+          error.type == DioExceptionType.connectionError) {
+        throw ServerException(
+          status: 503,
+          message: 'Unable to connect to the server',
+        );
+      }
+
+      final errors = error.response;
+
+      if (errors != null) {
+        if (errors.statusCode.toString().startsWith('5')) {
+          throw ServerException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (errors.statusCode.toString().startsWith('4')) {
+          throw UserException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (!errors.statusCode.toString().startsWith('2')) {
+          throw Exception('An error occurred');
+        }
+      }
+
+      rethrow;
+    } on SocketException catch (_) {
+      throw ServerException(
+        status: 503,
+        message: 'Unable to connect to the server',
+      );
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Review> updatePropertyReview(
+    String reviewId,
+    int rating,
+    String? review,
+    bool isAnonymous,
+    String token,
+  ) async {
+    try {
+      final res = await dio.patch(
+        '/review/$reviewId',
+        options: Options(headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        }),
+        data: {
+          'rating': rating,
+          'review': review,
+          'isAnonymous': isAnonymous,
+        },
+      );
+
+      final decodedBody = res.data;
+
+      final reviewData = Review.fromJson(decodedBody['data']['review']);
+
+      return reviewData;
     } on DioException catch (error) {
       if (error.type == DioExceptionType.connectionTimeout ||
           error.type == DioExceptionType.receiveTimeout) {

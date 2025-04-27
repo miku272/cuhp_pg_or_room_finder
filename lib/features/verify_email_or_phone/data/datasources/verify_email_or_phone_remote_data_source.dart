@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -34,14 +33,11 @@ class VerifyEmailOrPhoneRemoteDataSourceImpl
           });
 
       final decodedBody = res.data;
-
-      log(
-        'verify email or phone remote error in send email otp: ',
-        error: decodedBody,
-      );
     } on DioException catch (error) {
       if (error.type == DioExceptionType.connectionTimeout ||
-          error.type == DioExceptionType.receiveTimeout) {
+          error.type == DioExceptionType.receiveTimeout ||
+          error.type == DioExceptionType.sendTimeout ||
+          error.type == DioExceptionType.connectionError) {
         throw ServerException(
           status: 503,
           message: 'Unable to connect to the server',
@@ -102,15 +98,12 @@ class VerifyEmailOrPhoneRemoteDataSourceImpl
 
       final decodedBody = res.data;
 
-      log(
-        'verify email or phone remote error in verify email otp: ',
-        error: decodedBody,
-      );
-
       return true;
     } on DioException catch (error) {
       if (error.type == DioExceptionType.connectionTimeout ||
-          error.type == DioExceptionType.receiveTimeout) {
+          error.type == DioExceptionType.receiveTimeout ||
+          error.type == DioExceptionType.sendTimeout ||
+          error.type == DioExceptionType.connectionError) {
         throw ServerException(
           status: 503,
           message: 'Unable to connect to the server',
