@@ -17,6 +17,7 @@ import '../../../../core/common/widgets/custom_app_bar.dart';
 import '../../../../core/utils/jwt_expiration_handler.dart';
 import '../../../../init_dependencies.dart';
 import '../bloc/property_details_bloc.dart';
+import '../widgets/review_editor.dart';
 
 class PropertyDetailsScreen extends StatefulWidget {
   final String propertyId;
@@ -77,7 +78,9 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
     userId = user.id;
 
     context.read<PropertyDetailsBloc>().add(
-          UpdateProperty(property: widget.property),
+          UpdatePropertyEvent(
+            property: widget.property,
+          ),
         );
 
     _animationController = AnimationController(
@@ -96,6 +99,29 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _animationController.forward();
     });
+  }
+
+  void _showAddOrUpdateReviewSheet(
+    BuildContext context,
+    Property property,
+    Review? review,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        // Optional: Adds rounded corners
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (bottomSheetContext) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(bottomSheetContext).viewInsets.bottom,
+          ),
+          child: ReviewEditor(propertyId: property.id!, review: review),
+        );
+      },
+    );
   }
 
   // TODO: Delete this method when the backend is ready
@@ -712,7 +738,10 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
   }
 
   Widget _buildAddOrEditReviewSection(
-      BuildContext context, Property property, Review? userReview) {
+    BuildContext context,
+    Property property,
+    Review? userReview,
+  ) {
     final theme = Theme.of(context);
 
     return Card(
@@ -739,7 +768,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
               Center(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    // TODO: Implement navigation to Add Review Screen or show a dialog
+                    _showAddOrUpdateReviewSheet(context, property, userReview);
                   },
                   icon: const Icon(Icons.add_comment_outlined),
                   label: const Text('Write a Review'),
@@ -755,7 +784,9 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildReviewItem(
-                      context, userReview), // Reuse existing item builder
+                    context,
+                    userReview,
+                  ), // Reuse existing item builder
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -764,7 +795,11 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
                         icon: const Icon(Icons.edit, size: 18),
                         label: const Text('Edit'),
                         onPressed: () {
-                          // TODO: Implement navigation to Edit Review Screen or show a dialog
+                          _showAddOrUpdateReviewSheet(
+                            context,
+                            property,
+                            userReview,
+                          );
                         },
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
@@ -779,11 +814,6 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
                             style: TextStyle(color: theme.colorScheme.error)),
                         onPressed: () {
                           // TODO: Show confirmation dialog and implement delete logic
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Implement Delete Review'),
-                            ),
-                          );
                         },
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(

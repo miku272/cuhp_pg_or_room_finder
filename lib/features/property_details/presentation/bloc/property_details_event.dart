@@ -21,6 +21,16 @@ final class UpdatePropertyEvent extends PropertyDetailsEvent {
   });
 }
 
+final class GetPropertyReviewForCurrentUserEvent extends PropertyDetailsEvent {
+  final String propertyId;
+  final String token;
+
+  GetPropertyReviewForCurrentUserEvent({
+    required this.propertyId,
+    required this.token,
+  });
+}
+
 final class AddPropertyReviewEvent extends PropertyDetailsEvent {
   final String propertyId;
   final int rating;
