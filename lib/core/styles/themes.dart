@@ -73,6 +73,56 @@ class AppThemes {
         ),
       ),
     ),
+    chipTheme: ChipThemeData(
+      backgroundColor: AppColors.lightSurface,
+      disabledColor: Colors.grey.withValues(alpha: 0.5),
+      selectedColor: AppColors.lightPrimary,
+      secondarySelectedColor: AppColors.lightSecondary,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      labelStyle: GoogleFonts.roboto(color: AppColors.lightOnSurface),
+      secondaryLabelStyle: GoogleFonts.roboto(color: AppColors.lightOnPrimary),
+      brightness: Brightness.light,
+      shape: const StadiumBorder(),
+      side: const BorderSide(color: AppColors.lightDivider),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: AppColors.lightSurface,
+      hintStyle: GoogleFonts.roboto(
+          color: AppColors.lightOnSurface.withValues(
+        alpha: 0.6,
+      )),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.lightDivider),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.lightDivider),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.lightPrimary, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.lightError),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.lightError, width: 2),
+      ),
+    ),
+    sliderTheme: SliderThemeData(
+      activeTrackColor: AppColors.lightPrimary,
+      inactiveTrackColor: AppColors.lightPrimary.withValues(alpha: 0.3),
+      thumbColor: AppColors.lightPrimary,
+      overlayColor: AppColors.lightPrimary.withValues(alpha: 0.2),
+      valueIndicatorColor: AppColors.lightPrimary,
+      valueIndicatorTextStyle:
+          GoogleFonts.roboto(color: AppColors.lightOnPrimary),
+    ),
     dividerColor: AppColors.lightDivider,
   );
 
@@ -144,6 +194,54 @@ class AppThemes {
           borderRadius: BorderRadius.circular(8),
         ),
       ),
+    ),
+    chipTheme: ChipThemeData(
+      backgroundColor: AppColors.darkSurface,
+      disabledColor: Colors.grey.withValues(alpha: 0.5),
+      selectedColor: AppColors.darkPrimary,
+      secondarySelectedColor: AppColors.darkSecondary,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      labelStyle: GoogleFonts.roboto(color: AppColors.darkOnSurface),
+      secondaryLabelStyle: GoogleFonts.roboto(color: AppColors.darkOnPrimary),
+      brightness: Brightness.dark,
+      shape: const StadiumBorder(),
+      side: const BorderSide(color: AppColors.darkDivider),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: AppColors.darkSurface,
+      hintStyle: GoogleFonts.roboto(
+          color: AppColors.darkOnSurface.withValues(alpha: 0.6)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.darkDivider),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.darkDivider),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.darkPrimary, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.darkError),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.darkError, width: 2),
+      ),
+    ),
+    sliderTheme: SliderThemeData(
+      activeTrackColor: AppColors.darkPrimary,
+      inactiveTrackColor: AppColors.darkPrimary.withValues(alpha: 0.3),
+      thumbColor: AppColors.darkPrimary,
+      overlayColor: AppColors.darkPrimary.withValues(alpha: 0.2),
+      valueIndicatorColor: AppColors.darkPrimary,
+      valueIndicatorTextStyle:
+          GoogleFonts.roboto(color: AppColors.darkOnPrimary),
     ),
     dividerColor: AppColors.darkDivider,
   );
