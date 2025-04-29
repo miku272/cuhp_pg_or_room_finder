@@ -63,8 +63,8 @@ class MyListingsRemoteDataSourceImpl implements MyListingsRemoteDataSource {
           ),
           rentAgreementAvailable: propertyData['rentAgreementAvailable'],
           coordinates: Coordinate(
-            lat: propertyData['coordinates']['lat'],
-            lng: propertyData['coordinates']['lng'],
+            coordinates:
+                List<num>.from(propertyData['coordinates']['coordinates']),
           ),
           distanceFromUniversity: propertyData['distanceFromUniversity'],
           services: Map<String, bool>.from(propertyData['services']),
@@ -165,8 +165,8 @@ class MyListingsRemoteDataSourceImpl implements MyListingsRemoteDataSource {
         rentAgreementAvailable: decodedBody['data']['property']
             ['rentAgreementAvailable'],
         coordinates: Coordinate(
-          lat: decodedBody['data']['property']['coordinates']['lat'],
-          lng: decodedBody['data']['property']['coordinates']['lng'],
+          coordinates: decodedBody['data']['property']['coordinates']
+              ['coordinates'],
         ),
         distanceFromUniversity: decodedBody['data']['property']
             ['distanceFromUniversity'],

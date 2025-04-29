@@ -419,6 +419,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 decoration: InputDecoration(
                   hintText: 'Search chats...',
                   border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
                   hintStyle: TextStyle(color: theme.hintColor),
                 ),
               ),

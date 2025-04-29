@@ -2,43 +2,39 @@ import 'dart:math' as math;
 
 class Coordinate {
   static const defaultUniversityCoordinate = Coordinate(
-    lat: 32.22449,
-    lng: 76.156601,
+    coordinates: [76.156601, 32.22449],
   );
 
-  final num lat;
-  final num lng;
+  final String type;
+  final List<num> coordinates; // [lng, lat]
 
   const Coordinate({
-    required this.lat,
-    required this.lng,
+    this.type = 'Point',
+    required this.coordinates,
   });
 
-  factory Coordinate.fromJson(Map<String, num> json) {
-    return Coordinate(
-      lat: json['lat'] ?? 0.0,
-      lng: json['lng'] ?? 0.0,
-    );
+  factory Coordinate.fromJson(Map<String, dynamic> json) {
+    return Coordinate(type: 'Point', coordinates: json['coordinates']);
   }
 
-  Map<String, num> toJson() {
+  Map<String, dynamic> toJson() {
     return {
-      'lat': lat,
-      'lng': lng,
+      'type': 'Point',
+      'coordinates': coordinates,
     };
   }
 
-  factory Coordinate.fromMap(Map<String, num> map) {
+  factory Coordinate.fromMap(Map<String, dynamic> map) {
     return Coordinate(
-      lat: map['lat'] ?? 0.0,
-      lng: map['lng'] ?? 0.0,
+      type: 'Point',
+      coordinates: List<num>.from(map['coordinates']),
     );
   }
 
-  Map<String, num> toMap() {
+  Map<String, dynamic> toMap() {
     return {
-      'lat': lat,
-      'lng': lng,
+      'type': 'Point',
+      'coordinates': coordinates,
     };
   }
 
@@ -52,10 +48,10 @@ class Coordinate {
   ///   - Returns 0 if an error occurs during calculation.
   num calculateDistanceFromUniversity() {
     return _calculateDistance(
-      lat,
-      lng,
-      defaultUniversityCoordinate.lat,
-      defaultUniversityCoordinate.lng,
+      coordinates[1],
+      coordinates[0],
+      defaultUniversityCoordinate.coordinates[1],
+      defaultUniversityCoordinate.coordinates[0],
     );
   }
 

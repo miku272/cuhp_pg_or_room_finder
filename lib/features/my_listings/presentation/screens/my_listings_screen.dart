@@ -55,6 +55,9 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
         .take(_itemsPerPage)
         .toList();
 
+    print(propertiesToFetch.length);
+    print(user!.property);
+
     if (propertiesToFetch.isNotEmpty) {
       context.read<MyListingsBloc>().add(GetPropertiesByIdEvent(
             propertyIds: propertiesToFetch,

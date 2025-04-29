@@ -17,7 +17,7 @@ class PropertyFormData extends Property {
     super.propertyType,
     super.propertyGenderAllowance,
     super.rentAgreementAvailable,
-    super.coordinates = const Coordinate(lat: 32.1726, lng: 76.3617),
+    super.coordinates = const Coordinate(coordinates: [76.3617, 32.1726]),
     super.distanceFromUniversity,
     super.services = const {
       'food': false,
@@ -52,8 +52,7 @@ class PropertyFormData extends Property {
           Property.genderAllowanceFromString(json['propertyGenderAllowance']),
       rentAgreementAvailable: json['rentAgreementAvailable'] ?? false,
       coordinates: Coordinate(
-        lat: json['coordinates']['lat'],
-        lng: json['coordinates']['lng'],
+        coordinates: json['coordinates']['coordinates'],
       ),
       distanceFromUniversity: json['distanceFromUniversity']?.toDouble(),
       services: Map<String, bool>.from(json['services'] ?? {}),

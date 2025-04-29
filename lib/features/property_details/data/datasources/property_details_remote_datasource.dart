@@ -83,8 +83,8 @@ class PropertyDetailsRemoteDataSourceImpl
         rentAgreementAvailable: decodedBody['data']['property']
             ['rentAgreementAvailable'],
         coordinates: Coordinate(
-          lat: decodedBody['data']['property']['coordinates']['lat'],
-          lng: decodedBody['data']['property']['coordinates']['lng'],
+          coordinates: decodedBody['data']['property']['coordinates']
+              ['coordinates'],
         ),
         distanceFromUniversity: decodedBody['data']['property']
             ['distanceFromUniversity'],

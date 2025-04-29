@@ -149,8 +149,8 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
       return;
     }
 
-    final lat = property.coordinates!.lat;
-    final lng = property.coordinates!.lng;
+    final lng = property.coordinates!.coordinates[0];
+    final lat = property.coordinates!.coordinates[1];
 
     late Uri mapUrl;
 
@@ -991,8 +991,8 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
                   GoogleMap(
                     initialCameraPosition: CameraPosition(
                       target: LatLng(
-                        property.coordinates!.lat.toDouble(),
-                        property.coordinates!.lng.toDouble(),
+                        property.coordinates!.coordinates[1].toDouble(),
+                        property.coordinates!.coordinates[0].toDouble(),
                       ),
                       zoom: 15,
                     ),
@@ -1002,8 +1002,8 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
                       Marker(
                         markerId: const MarkerId('property-location'),
                         position: LatLng(
-                          property.coordinates!.lat.toDouble(),
-                          property.coordinates!.lng.toDouble(),
+                          property.coordinates!.coordinates[1].toDouble(),
+                          property.coordinates!.coordinates[0].toDouble(),
                         ),
                         infoWindow: InfoWindow(
                           title: property.propertyName ?? 'Property Location',

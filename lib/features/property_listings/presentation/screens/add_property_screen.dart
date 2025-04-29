@@ -79,14 +79,13 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
       _selectedPropertyType = widget.property!.propertyType!;
       _selectedGenderAllowance = widget.property!.propertyGenderAllowance!;
 
-      chosenLat = widget.property!.coordinates!.lat;
-      chosenLng = widget.property!.coordinates!.lng;
+      chosenLat = widget.property!.coordinates!.coordinates[1];
+      chosenLng = widget.property!.coordinates!.coordinates[0];
     }
   }
 
   void _onNext() {
     if (!_formKey.currentState!.validate() ||
-        (!widget.isEditing) ||
         chosenLat == null ||
         chosenLng == null) {
       return;
@@ -102,8 +101,7 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
             propertyType: _selectedPropertyType,
             propertyGenderAllowance: _selectedGenderAllowance,
             coordinates: Coordinate(
-              lat: chosenLat!,
-              lng: chosenLng!,
+              coordinates: [chosenLng!, chosenLat!],
             ),
           )
         : PropertyFormData(
@@ -115,8 +113,7 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
             propertyType: _selectedPropertyType,
             propertyGenderAllowance: _selectedGenderAllowance,
             coordinates: Coordinate(
-              lat: chosenLat!,
-              lng: chosenLng!,
+              coordinates: [chosenLng!, chosenLat!],
             ),
           );
 
@@ -183,7 +180,8 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
                     Text(
                       'Step 1 of 3',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onPrimary.withValues(alpha: 0.8),
+                        color:
+                            theme.colorScheme.onPrimary.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -253,12 +251,14 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
                                         prefixIcon:
                                             const Icon(Icons.location_city),
                                         border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                         ),
                                       ),
-                                      validator: (value) => value?.isEmpty ?? true
-                                          ? 'Please enter village or city'
-                                          : null,
+                                      validator: (value) =>
+                                          value?.isEmpty ?? true
+                                              ? 'Please enter village or city'
+                                              : null,
                                     ),
                                   ),
                                   const SizedBox(width: 16),
@@ -270,7 +270,8 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
                                         labelText: 'Pincode',
                                         prefixIcon: const Icon(Icons.pin_drop),
                                         border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                         ),
                                       ),
                                       keyboardType: TextInputType.number,
@@ -307,7 +308,8 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
                                       decoration: BoxDecoration(
                                         border: chosenLat == null
                                             ? Border.all(
-                                                color: theme.colorScheme.outline)
+                                                color:
+                                                    theme.colorScheme.outline)
                                             : null,
                                         borderRadius: chosenLat == null
                                             ? BorderRadius.circular(12)
@@ -358,7 +360,8 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
                                                   Map<String, dynamic>?
                                                       locationData =
                                                       await context.push<
-                                                          Map<String, dynamic>?>(
+                                                          Map<String,
+                                                              dynamic>?>(
                                                     '/maps',
                                                     extra: {
                                                       'lat': chosenLat,
@@ -378,7 +381,8 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
                                                 child: Center(
                                                   child: Column(
                                                     mainAxisAlignment:
-                                                        MainAxisAlignment.center,
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: <Widget>[
                                                       Icon(
                                                         Icons.location_on,
@@ -391,8 +395,8 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
                                                       const SizedBox(height: 8),
                                                       Text(
                                                         'Select a location',
-                                                        style: theme
-                                                            .textTheme.bodyLarge,
+                                                        style: theme.textTheme
+                                                            .bodyLarge,
                                                       ),
                                                     ],
                                                   ),
@@ -534,7 +538,8 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
                                 }).toList(),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    setState(() => _selectedPropertyType = value);
+                                    setState(
+                                        () => _selectedPropertyType = value);
                                   }
                                 },
                               ),

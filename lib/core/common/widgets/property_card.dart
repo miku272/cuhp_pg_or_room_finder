@@ -31,6 +31,19 @@ class PropertyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    IconData getGenderIcon(String gender) {
+      switch (gender.toLowerCase()) {
+        case 'boys':
+          return Icons.male;
+        case 'girls':
+          return Icons.female;
+        case 'co-ed':
+        default:
+          return Icons.wc;
+      }
+    }
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
@@ -95,8 +108,8 @@ class PropertyCard extends StatelessWidget {
                     onPressed: () {},
                     icon: const Icon(Icons.favorite_border),
                     style: IconButton.styleFrom(
-                      backgroundColor: theme.colorScheme.surface,
-                      foregroundColor: theme.colorScheme.primary,
+                      backgroundColor: colorScheme.surface,
+                      foregroundColor: colorScheme.primary,
                     ),
                   ),
                 ),
@@ -120,7 +133,7 @@ class PropertyCard extends StatelessWidget {
                     if (isVerified)
                       Icon(
                         Icons.verified,
-                        color: theme.colorScheme.primary,
+                        color: colorScheme.primary,
                         size: 20,
                       ),
                   ],
@@ -131,36 +144,51 @@ class PropertyCard extends StatelessWidget {
                     Icon(
                       Icons.location_on,
                       size: 16,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      color: colorScheme.onSurface.withOpacity(0.6),
                     ),
                     const SizedBox(width: 4),
-                    Text(
-                      '$address • ${distanceFromUniversity}km from CUHP',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    Expanded(
+                      child: Text(
+                        '$address • ${distanceFromUniversity}km from CUHP',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface.withOpacity(0.6),
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                Row(
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
                   children: [
                     Chip(
+                      avatar: Icon(
+                        getGenderIcon(propertyGenderAllowance),
+                        size: 16,
+                        color: colorScheme.primary,
+                      ),
                       label: Text(propertyGenderAllowance.toUpperCase()),
-                      backgroundColor:
-                          theme.colorScheme.primary.withValues(alpha: 0.1),
+                      backgroundColor: colorScheme.primary.withOpacity(0.1),
                       side: BorderSide.none,
-                      padding: EdgeInsets.zero,
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      labelPadding: const EdgeInsets.only(left: 4, right: 8),
                     ),
-                    const SizedBox(width: 8),
                     if (services['food'] == true)
                       Chip(
+                        avatar: Icon(
+                          Icons.food_bank_outlined,
+                          size: 16,
+                          color: colorScheme.secondary,
+                        ),
                         label: const Text('FOOD'),
-                        backgroundColor:
-                            theme.colorScheme.secondary.withValues(alpha: 0.1),
+                        backgroundColor: colorScheme.secondary.withOpacity(0.1),
                         side: BorderSide.none,
-                        padding: EdgeInsets.zero,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        labelPadding: const EdgeInsets.only(left: 4, right: 8),
                       ),
                   ],
                 ),
@@ -168,7 +196,7 @@ class PropertyCard extends StatelessWidget {
                 Text(
                   '₹$price / month',
                   style: theme.textTheme.titleLarge?.copyWith(
-                    color: theme.colorScheme.primary,
+                    color: colorScheme.primary,
                     fontSize: 20,
                   ),
                 ),

@@ -252,7 +252,9 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                 alignment: Alignment.bottomCenter,
                 child: ElevatedButton(
                   onPressed: () async {
-                    final coordinate = Coordinate(lat: lat!, lng: lng!);
+                    final coordinate = Coordinate(
+                      coordinates: [lng!, lat!],
+                    );
                     final distance =
                         coordinate.calculateDistanceFromUniversity();
 

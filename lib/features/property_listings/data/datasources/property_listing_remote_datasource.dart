@@ -46,6 +46,8 @@ class PropertyListingRemoteDataSourceImpl
     String userName,
   ) async {
     try {
+      print(propertyFormData.coordinates!.toJson());
+
       final List<String> imageUrls = await SupabaseManager.uploadImages(images);
 
       final res = await dio.post('/add-property',
@@ -110,8 +112,8 @@ class PropertyListingRemoteDataSourceImpl
         rentAgreementAvailable: decodedBody['data']['property']
             ['rentAgreementAvailable'],
         coordinates: Coordinate(
-          lat: decodedBody['data']['property']['coordinates']['lat'],
-          lng: decodedBody['data']['property']['coordinates']['lng'],
+          coordinates: List<num>.from(
+              decodedBody['data']['property']['coordinates']['coordinates']),
         ),
         distanceFromUniversity: decodedBody['data']['property']
             ['distanceFromUniversity'],
@@ -251,8 +253,8 @@ class PropertyListingRemoteDataSourceImpl
         rentAgreementAvailable: decodedBody['data']['property']
             ['rentAgreementAvailable'],
         coordinates: Coordinate(
-          lat: decodedBody['data']['property']['coordinates']['lat'],
-          lng: decodedBody['data']['property']['coordinates']['lng'],
+          coordinates: List<num>.from(
+              decodedBody['data']['property']['coordinates']['coordinates']),
         ),
         distanceFromUniversity: decodedBody['data']['property']
             ['distanceFromUniversity'],
