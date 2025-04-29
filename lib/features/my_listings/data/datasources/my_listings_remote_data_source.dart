@@ -71,6 +71,8 @@ class MyListingsRemoteDataSourceImpl implements MyListingsRemoteDataSource {
           images: List<String>.from(propertyData['images']),
           isVerified: propertyData['isVerified'],
           isActive: propertyData['isActive'],
+          numberOfReviews: propertyData['numberOfReviews'],
+          averageRating: (propertyData['averageRating'] as num).toDouble(),
           createdAt: DateTime.parse(propertyData['createdAt']),
           updatedAt: DateTime.parse(propertyData['updatedAt']),
         );
@@ -175,6 +177,9 @@ class MyListingsRemoteDataSourceImpl implements MyListingsRemoteDataSource {
         images: List<String>.from(decodedBody['data']['property']['images']),
         isVerified: decodedBody['data']['property']['isVerified'],
         isActive: decodedBody['data']['property']['isActive'],
+        numberOfReviews: decodedBody['data']['property']['numberOfReviews'],
+        averageRating: (decodedBody['data']['property']['averageRating'] as num)
+            .toDouble(),
         createdAt: DateTime.parse(decodedBody['data']['property']['createdAt']),
         updatedAt: DateTime.parse(decodedBody['data']['property']['updatedAt']),
       );

@@ -265,12 +265,12 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
                           _buildAmenitiesSection(context, property),
 
                           // Add/Edit user reviews section
-                          // if (property.ownerId != userId)
-                          _buildAddOrEditReviewSection(
-                            context,
-                            property,
-                            userReview,
-                          ),
+                          if (property.ownerId != userId)
+                            _buildAddOrEditReviewSection(
+                              context,
+                              property,
+                              userReview,
+                            ),
 
                           // Reviews Section
                           _buildReviewsSection(context, _dummyReviews),

@@ -144,14 +144,14 @@ class PropertyCard extends StatelessWidget {
                     Icon(
                       Icons.location_on,
                       size: 16,
-                      color: colorScheme.onSurface.withOpacity(0.6),
+                      color: colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
                         '$address • ${distanceFromUniversity}km from CUHP',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurface.withOpacity(0.6),
+                          color: colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -170,7 +170,8 @@ class PropertyCard extends StatelessWidget {
                         color: colorScheme.primary,
                       ),
                       label: Text(propertyGenderAllowance.toUpperCase()),
-                      backgroundColor: colorScheme.primary.withOpacity(0.1),
+                      backgroundColor:
+                          colorScheme.primary.withValues(alpha: 0.1),
                       side: BorderSide.none,
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -184,7 +185,8 @@ class PropertyCard extends StatelessWidget {
                           color: colorScheme.secondary,
                         ),
                         label: const Text('FOOD'),
-                        backgroundColor: colorScheme.secondary.withOpacity(0.1),
+                        backgroundColor:
+                            colorScheme.secondary.withValues(alpha: 0.1),
                         side: BorderSide.none,
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,

@@ -19,6 +19,12 @@ import './features/splash/data/repositories/splash_repository_impl.dart';
 import './features/splash/domain/usecases/current_user.dart' as sp_current_user;
 import './features/splash/presentation/bloc/splash_bloc.dart';
 
+import './features/home/data/datasources/home_remote_datasource.dart';
+import './features/home/data/repositories/home_repository_impl.dart';
+import './features/home/domain/repository/home_repository.dart';
+import './features/home/domain/usecases/get_properties_by_pagination.dart';
+import './features/home/presentation/bloc/home_bloc.dart';
+
 import './features/auth/data/datasources/auth_remote_data_source.dart';
 import './features/auth/domain/repository/auth_repository.dart';
 import './features/auth/data/repositories/auth_repository_impl.dart';
@@ -137,6 +143,7 @@ Future<void> initDependencies() async {
   _initTokenHandler();
   _initSplash();
   _initAuth();
+  _initHome();
   _initVerifyEmailOrPhone();
   _initProfile();
   _initPropertyListings();
@@ -231,6 +238,30 @@ void _initAuth() {
       currentUser: serviceLocator(),
       appUserCubit: serviceLocator(),
       sfHandler: serviceLocator(),
+    ),
+  );
+}
+
+void _initHome() {
+  serviceLocator.registerFactory<HomeRemoteDatasource>(
+    () => HomeRemoteDatasourceImpl(dio: serviceLocator()),
+  );
+
+  serviceLocator.registerFactory<HomeRepository>(
+    () => HomeRepositoryImpl(
+      homeRemoteDatasource: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<GetPropertiesByPagination>(
+    () => GetPropertiesByPagination(
+      homeRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerLazySingleton<HomeBloc>(
+    () => HomeBloc(
+      getPropertiesByPagination: serviceLocator(),
     ),
   );
 }

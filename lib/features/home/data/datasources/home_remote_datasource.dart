@@ -2,11 +2,18 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 
-import '../../../../core/common/entities/property.dart';
 import '../../../../core/error/exception.dart';
 
+import '../models/paginated_property_response.dart';
+import '../models/property_filter.dart';
+
 abstract interface class HomeRemoteDatasource {
-  Future<List<Property>> getProperties(String token, int page, int limit);
+  Future<PaginatedPropertyResponse> getPropertiesByPagination(
+    int page,
+    int limit,
+    PropertyFilter filter,
+    String token,
+  );
 }
 
 class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
@@ -15,9 +22,39 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
   HomeRemoteDatasourceImpl({required this.dio});
 
   @override
-  Future<List<Property>> getProperties(String token, int page, int limit) {
+  Future<PaginatedPropertyResponse> getPropertiesByPagination(
+    int page,
+    int limit,
+    PropertyFilter filter,
+    String token,
+  ) async {
+    final Map<String, dynamic> queryParams = filter.toQueryParameters();
+    queryParams['page'] = page.toString();
+    queryParams['limit'] = limit.toString();
+
     try {
-      throw UnimplementedError('getProperties not implemented');
+      final res = await dio.get(
+        '/properties',
+        queryParameters: queryParams,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      final decodedBody = res.data;
+
+      return PaginatedPropertyResponse(
+        results: decodedBody['results'] as int,
+        pagination: Pagination.fromJson(
+          decodedBody['pagination'] as Map<String, dynamic>,
+        ),
+        data: Data.fromJson(
+          decodedBody['data'] as Map<String, dynamic>,
+        ),
+      );
     } on DioException catch (error) {
       if (error.type == DioExceptionType.connectionTimeout ||
           error.type == DioExceptionType.receiveTimeout ||

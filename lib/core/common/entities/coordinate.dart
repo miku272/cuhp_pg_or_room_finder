@@ -14,7 +14,10 @@ class Coordinate {
   });
 
   factory Coordinate.fromJson(Map<String, dynamic> json) {
-    return Coordinate(type: 'Point', coordinates: json['coordinates']);
+    return Coordinate(
+      type: 'Point',
+      coordinates: List<num>.from(json['coordinates']),
+    );
   }
 
   Map<String, dynamic> toJson() {

@@ -93,6 +93,9 @@ class PropertyDetailsRemoteDataSourceImpl
         images: List<String>.from(decodedBody['data']['property']['images']),
         isVerified: decodedBody['data']['property']['isVerified'],
         isActive: decodedBody['data']['property']['isActive'],
+        numberOfReviews: decodedBody['data']['property']['numberOfReviews'],
+        averageRating: (decodedBody['data']['property']['averageRating'] as num)
+            .toDouble(),
         createdAt: DateTime.parse(decodedBody['data']['property']['createdAt']),
         updatedAt: DateTime.parse(decodedBody['data']['property']['updatedAt']),
       );

@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -46,8 +45,6 @@ class PropertyListingRemoteDataSourceImpl
     String userName,
   ) async {
     try {
-      print(propertyFormData.coordinates!.toJson());
-
       final List<String> imageUrls = await SupabaseManager.uploadImages(images);
 
       final res = await dio.post('/add-property',
@@ -83,11 +80,6 @@ class PropertyListingRemoteDataSourceImpl
 
       final decodedBody = res.data;
 
-      log(
-        'Property listing remote data in add property listing: ',
-        error: decodedBody['data']['property']['_id'],
-      );
-
       final propertyListing = PropertyListingModel(
         id: decodedBody['data']['property']['_id'],
         ownerId: decodedBody['data']['property']['owner'],
@@ -122,6 +114,9 @@ class PropertyListingRemoteDataSourceImpl
         images: List<String>.from(decodedBody['data']['property']['images']),
         isVerified: decodedBody['data']['property']['isVerified'],
         isActive: decodedBody['data']['property']['isActive'],
+        numberOfReviews: decodedBody['data']['property']['numberOfReviews'],
+        averageRating: (decodedBody['data']['property']['averageRating'] as num)
+            .toDouble(),
         createdAt: DateTime.parse(decodedBody['data']['property']['createdAt']),
         updatedAt: DateTime.parse(decodedBody['data']['property']['updatedAt']),
       );
@@ -224,11 +219,6 @@ class PropertyListingRemoteDataSourceImpl
 
       final decodedBody = res.data;
 
-      log(
-        'Property listing remote data in add property listing: ',
-        error: decodedBody['data']['property']['_id'],
-      );
-
       final propertyListing = PropertyListingModel(
         id: decodedBody['data']['property']['_id'],
         ownerId: decodedBody['data']['property']['owner'],
@@ -263,6 +253,9 @@ class PropertyListingRemoteDataSourceImpl
         images: List<String>.from(decodedBody['data']['property']['images']),
         isVerified: decodedBody['data']['property']['isVerified'],
         isActive: decodedBody['data']['property']['isActive'],
+        numberOfReviews: decodedBody['data']['property']['numberOfReviews'],
+        averageRating: (decodedBody['data']['property']['averageRating'] as num)
+            .toDouble(),
         createdAt: DateTime.parse(decodedBody['data']['property']['createdAt']),
         updatedAt: DateTime.parse(decodedBody['data']['property']['updatedAt']),
       );

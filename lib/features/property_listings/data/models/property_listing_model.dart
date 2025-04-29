@@ -23,6 +23,8 @@ class PropertyListingModel extends Property {
     required List<String> super.images,
     required bool super.isVerified,
     required bool super.isActive,
+    required int super.numberOfReviews,
+    required double super.averageRating,
     required DateTime super.createdAt,
     required DateTime super.updatedAt,
   });
@@ -44,13 +46,15 @@ class PropertyListingModel extends Property {
       propertyGenderAllowance:
           Property.genderAllowanceFromString(json['propertyGenderAllowance']),
       rentAgreementAvailable: json['rentAgreementAvailable'] ?? false,
-      coordinates:
-          Coordinate.fromJson(Map<String, num>.from(json['coordinates'] ?? {})),
+      coordinates: Coordinate.fromJson(
+          Map<String, dynamic>.from(json['coordinates'] ?? {})),
       distanceFromUniversity: json['distanceFromUniversity'] ?? 0.0,
       services: Map<String, bool>.from(json['services'] ?? {}),
       images: List<String>.from(json['images'] ?? []),
       isVerified: json['isVerified'] ?? false,
       isActive: json['isActive'] ?? true,
+      numberOfReviews: json['numberOfReviews'] ?? 0,
+      averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0.0,
       createdAt:
           DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
       updatedAt:
@@ -81,6 +85,8 @@ class PropertyListingModel extends Property {
       'images': images,
       'isVerified': isVerified,
       'isActive': isActive,
+      'numberOfReviews': numberOfReviews,
+      'averageRating': averageRating,
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
