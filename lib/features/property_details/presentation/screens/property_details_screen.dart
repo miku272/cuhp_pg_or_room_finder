@@ -41,27 +41,6 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
   late AnimationController _animationController;
   late Animation<Offset> _slideAnimation;
 
-  final List<Review> _dummyReviews = List.generate(
-    7, // Generate 7 dummy reviews
-    (index) => Review(
-      id: 'review_$index',
-      property: PropertyInfo(
-        id: 'prop_1',
-        propertyName: 'Dummy Property',
-      ),
-      user: index % 3 != 0 // Make some anonymous
-          ? UserInfo(id: 'user_$index', name: 'User ${index + 1}')
-          : null,
-      rating: (index % 5) + 1, // Ratings from 1 to 5
-      review: index % 2 == 0
-          ? 'This is a great place to stay! Highly recommended. Amenities were good and the owner was helpful.'
-          : 'Decent place, good value for money.',
-      isAnonymous: index % 3 == 0,
-      createdAt: DateTime.now().subtract(Duration(days: index * 2)),
-      updatedAt: DateTime.now().subtract(Duration(days: index * 2)),
-    ),
-  );
-
   @override
   void initState() {
     super.initState();
@@ -80,6 +59,22 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
     context.read<PropertyDetailsBloc>().add(
           UpdatePropertyEvent(
             property: widget.property,
+          ),
+        );
+
+    context.read<PropertyDetailsBloc>().add(
+          GetPropertyReviewForCurrentUserEvent(
+            propertyId: widget.propertyId,
+            userId: userId,
+            token: userToken,
+          ),
+        );
+
+    context.read<PropertyDetailsBloc>().add(
+          GetRecentPropertyReviewsEvent(
+            propertyId: widget.propertyId,
+            limit: 5,
+            token: userToken,
           ),
         );
 
@@ -118,23 +113,47 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(bottomSheetContext).viewInsets.bottom,
           ),
-          child: ReviewEditor(propertyId: property.id!, review: review),
+          child: ReviewEditor(
+            propertyId: property.id!,
+            review: review,
+            token: userToken,
+          ),
         );
       },
     );
   }
 
-  // TODO: Delete this method when the backend is ready
-  Review? _findUserReview(List<Review> reviews, String currentUserId) {
-    try {
-      // Find the first review that is not anonymous and matches the current user's ID
-      return reviews.firstWhere(
-        (review) => review.user?.id == 'user_1',
-      );
-    } catch (e) {
-      // Return null if no review is found for the current user
-      return null;
-    }
+  void _showDeleteDialog(String reviewId) {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Delete Review'),
+            content: const Text('Are you sure you want to delete this review?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  context.pop();
+                },
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  context
+                      .read<PropertyDetailsBloc>()
+                      .add(DeletePropertyReviewEvent(
+                        reviewId: reviewId,
+                        token: userToken,
+                      ));
+
+                  context.pop();
+                },
+                child: const Text('Delete'),
+              ),
+            ],
+          );
+        });
   }
 
   Future<void> _launchMapsDirections(
@@ -151,24 +170,34 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
 
     final lng = property.coordinates!.coordinates[0];
     final lat = property.coordinates!.coordinates[1];
+    final encodedPropertyName = Uri.encodeComponent(
+      property.propertyName ?? '',
+    );
 
     late Uri mapUrl;
+    late Uri webUrl;
+
+    webUrl = Uri.parse(
+      'https://www.google.com/maps/search/?api=1&query=$lat,$lng',
+    );
 
     if (Platform.isAndroid) {
-      mapUrl = Uri.parse('google.navigation:q=$lat,$lng&mode=d');
+      mapUrl = Uri.parse('geo:$lat,$lng?q=$lat,$lng($encodedPropertyName)');
     } else if (Platform.isIOS) {
-      mapUrl = Uri.parse('https://maps.apple.com/?daddr=$lat,$lng&dirflg=d');
+      mapUrl = Uri.parse(
+        'https://maps.apple.com/?q=$encodedPropertyName&ll=$lat,$lng',
+      );
+    } else {
+      mapUrl = webUrl;
     }
 
     try {
       if (await canLaunchUrl(mapUrl)) {
-        await launchUrl(mapUrl);
-      } else {
-        final webUrl = Uri.parse(
-          'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving',
-        );
-
+        await launchUrl(mapUrl, mode: LaunchMode.externalApplication);
+      } else if (await canLaunchUrl(webUrl)) {
         await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+      } else {
+        throw 'Could not lauch any map application';
       }
     } catch (error) {
       if (context.mounted) {
@@ -188,6 +217,22 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
             token: userToken,
           ));
 
+      context.read<PropertyDetailsBloc>().add(
+            GetPropertyReviewForCurrentUserEvent(
+              propertyId: widget.propertyId,
+              userId: userId,
+              token: userToken,
+            ),
+          );
+
+      context.read<PropertyDetailsBloc>().add(
+            GetRecentPropertyReviewsEvent(
+              propertyId: widget.propertyId,
+              limit: 5,
+              token: userToken,
+            ),
+          );
+
       _animationController.reset();
       _animationController.forward();
     }
@@ -203,15 +248,16 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
   @override
   Widget build(BuildContext context) {
     Property property;
-    Review? userReview;
 
     return BlocConsumer<PropertyDetailsBloc, PropertyDetailsState>(
       listener: (context, state) {
         if (state is PropertyDetailsFailure) {
           if (state.status == 401) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                SnackBar(content: Text(state.message)),
+              );
 
             serviceLocator<JwtExpirationHandler>().stopExpiryCheck();
             context.read<AppUserCubit>().logoutUser(context);
@@ -223,15 +269,14 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
       builder: (context, state) {
         property = state.property ?? widget.property;
 
-        userReview = _findUserReview(_dummyReviews, userId);
-
         if (state is PropertyDetailsLoading) {
           return const Center(
             child: CircularProgressIndicator(),
           );
         }
 
-        if (state is PropertyDetailsFailure) {
+        if (state is PropertyDetailsFailure &&
+            state is! PropertyDetailsLoading) {
           return const Center(
             child: Text('Failed to load property details'),
           );
@@ -269,11 +314,10 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
                             _buildAddOrEditReviewSection(
                               context,
                               property,
-                              userReview,
                             ),
 
                           // Reviews Section
-                          _buildReviewsSection(context, _dummyReviews),
+                          _buildReviewsSection(context),
 
                           // Property Location
                           _buildLocationSection(context, property),
@@ -466,7 +510,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  '${property.propertyAddressLine1 ?? ''}, ${property.propertyVillageOrCity ?? ''}',
+                  '${property.propertyAddressLine1 ?? ''}, ${property.propertyVillageOrCity ?? ''}, ${property.propertyPincode ?? ''}',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
@@ -740,161 +784,248 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
   Widget _buildAddOrEditReviewSection(
     BuildContext context,
     Property property,
-    Review? userReview,
   ) {
     final theme = Theme.of(context);
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: theme.dividerColor),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              userReview == null ? 'Add Your Review' : 'Your Review',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+    return BlocBuilder<PropertyDetailsBloc, PropertyDetailsState>(
+      builder: (context, state) {
+        if (state is PropertyReviewLoading && state.currentUserReview == null) {
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(
+                child: CircularProgressIndicator(),
               ),
             ),
-            const SizedBox(height: 16),
-            if (userReview == null)
-              // Show "Add Review" button if user hasn't reviewed yet
-              Center(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    _showAddOrUpdateReviewSheet(context, property, userReview);
-                  },
-                  icon: const Icon(Icons.add_comment_outlined),
-                  label: const Text('Write a Review'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
-                  ),
-                ),
-              )
-            else
-              // Show the user's existing review with edit/delete options
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildReviewItem(
-                    context,
-                    userReview,
-                  ), // Reuse existing item builder
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton.icon(
-                        icon: const Icon(Icons.edit, size: 18),
-                        label: const Text('Edit'),
-                        onPressed: () {
-                          _showAddOrUpdateReviewSheet(
-                            context,
-                            property,
-                            userReview,
-                          );
-                        },
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      TextButton.icon(
-                        icon: Icon(Icons.delete_outline,
-                            size: 18, color: theme.colorScheme.error),
-                        label: Text('Delete',
-                            style: TextStyle(color: theme.colorScheme.error)),
-                        onPressed: () {
-                          // TODO: Show confirmation dialog and implement delete logic
-                        },
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
-                          foregroundColor: theme.colorScheme.error,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+          );
+        }
+
+        if (state is PropertyReviewFailure) {
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(
+                child: Text('Failed to load your review'),
               ),
-          ],
-        ),
-      ),
-    );
-  }
+            ),
+          );
+        }
 
-  Widget _buildReviewsSection(BuildContext context, List<Review> reviews) {
-    final theme = Theme.of(context);
-    final reviewsToShow = reviews.take(5).toList(); // Take only the first 5
-
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: theme.dividerColor),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return Card(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: theme.dividerColor),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Reviews (${reviews.length})', // Show total review count
+                  state.currentUserReview == null
+                      ? 'Add Your Review'
+                      : 'Your Review',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                if (reviews.length > 5)
-                  TextButton(
-                    onPressed: () {
-                      // TODO: Navigate to the full reviews screen
-                    },
-                    child: const Text('View All'),
+                const SizedBox(height: 16),
+                if (state.currentUserReview == null)
+                  Center(
+                    child: ElevatedButton.icon(
+                      onPressed: context.read<PropertyDetailsBloc>().state
+                              is PropertyReviewLoading
+                          ? null
+                          : () {
+                              _showAddOrUpdateReviewSheet(
+                                context,
+                                property,
+                                null,
+                              );
+                            },
+                      icon: const Icon(Icons.add_comment_outlined),
+                      label: const Text('Write a Review'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                      ),
+                    ),
+                  )
+                else
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildReviewItem(
+                        context,
+                        state.currentUserReview!,
+                      ), // Reuse existing item builder
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton.icon(
+                            icon: const Icon(Icons.edit, size: 18),
+                            label: const Text('Edit'),
+                            onPressed: context.read<PropertyDetailsBloc>().state
+                                    is PropertyReviewLoading
+                                ? null
+                                : () {
+                                    _showAddOrUpdateReviewSheet(
+                                      context,
+                                      property,
+                                      state.currentUserReview,
+                                    );
+                                  },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          TextButton.icon(
+                            icon: Icon(Icons.delete_outline,
+                                size: 18, color: theme.colorScheme.error),
+                            label: Text('Delete',
+                                style:
+                                    TextStyle(color: theme.colorScheme.error)),
+                            onPressed: context.read<PropertyDetailsBloc>().state
+                                    is PropertyReviewLoading
+                                ? null
+                                : () => _showDeleteDialog(
+                                      state.currentUserReview!.id,
+                                    ),
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                              foregroundColor: theme.colorScheme.error,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
               ],
             ),
-            const SizedBox(height: 16),
-            if (reviews.isEmpty)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 24.0),
-                  child: Text(
-                    'No reviews yet.',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildReviewsSection(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return BlocBuilder<PropertyDetailsBloc, PropertyDetailsState>(
+      builder: (context, state) {
+        if (state is PropertyRecentReviewsLoading) {
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          );
+        }
+
+        if (state is PropertyDetailsFailure) {
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(
+                child: Text('Failed to load reviews'),
+              ),
+            ),
+          );
+        }
+
+        return Card(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: theme.dividerColor),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Reviews (${state.totalReviewsCount})', // Show total review count
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (state.totalReviewsCount > 5)
+                      TextButton(
+                        onPressed: () {
+                          // TODO: Navigate to the full reviews screen
+                        },
+                        child: const Text('View All'),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                if (state.recentReviews.isEmpty)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24.0),
+                      child: Text(
+                        'No reviews yet.',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  ListView.separated(
+                    shrinkWrap: true, // Important inside SingleChildScrollView
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: state.recentReviews.length > 5
+                        ? 5
+                        : state.recentReviews.length,
+                    itemBuilder: (context, index) {
+                      final review = state.recentReviews[index];
+                      return _buildReviewItem(context, review);
+                    },
+                    separatorBuilder: (context, index) => Divider(
+                      height: 24,
+                      color: theme.dividerColor.withValues(alpha: 0.5),
                     ),
                   ),
-                ),
-              )
-            else
-              ListView.separated(
-                shrinkWrap: true, // Important inside SingleChildScrollView
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: reviewsToShow.length,
-                itemBuilder: (context, index) {
-                  final review = reviewsToShow[index];
-                  return _buildReviewItem(context, review);
-                },
-                separatorBuilder: (context, index) => Divider(
-                  height: 24,
-                  color: theme.dividerColor.withValues(alpha: 0.5),
-                ),
-              ),
-          ],
-        ),
-      ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -1023,7 +1154,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
                         onPressed: () =>
                             _launchMapsDirections(context, property),
                         icon: const Icon(Icons.directions, color: Colors.white),
-                        label: const Text('Get Directions'),
+                        label: const Text('Show on Map'),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 12),
@@ -1205,24 +1336,52 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
                     ),
                   ),
                   const SizedBox(width: 16),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        // TODO: Implement chat functionality
-                      },
-                      icon: const Icon(Icons.chat),
-                      label: Text(
-                        'Chat with ${property.propertyName}',
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12, horizontal: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                  BlocConsumer<PropertyDetailsBloc, PropertyDetailsState>(
+                    listener: (context, state) {
+                      if (state is InitializeChatSuccess) {
+                        context.push(
+                          '/chat/messages/${state.chat!.id}',
+                          extra: state.chat!,
+                        );
+                      }
+                    },
+                    builder: (context, state) {
+                      return Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: state is InitializeChatLoading
+                              ? null
+                              : () {
+                                  if (state.chat == null) {
+                                    context.read<PropertyDetailsBloc>().add(
+                                          InitializeChatEvent(
+                                            propertyId: widget.propertyId,
+                                            token: userToken,
+                                          ),
+                                        );
+                                  } else {
+                                    context.push(
+                                      '/chat/messages/${state.chat!.id}',
+                                      extra: state.chat!,
+                                    );
+                                  }
+                                },
+                          icon: state is InitializeChatLoading
+                              ? const CircularProgressIndicator(strokeWidth: 10)
+                              : const Icon(Icons.chat),
+                          label: Text(
+                            'Chat with ${property.propertyName}',
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ],
               ),

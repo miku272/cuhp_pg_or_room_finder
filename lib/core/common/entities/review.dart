@@ -103,15 +103,15 @@ class PropertyInfo {
 }
 
 class UserInfo {
-  final String id;
+  final String? id;
   final String name;
 
   UserInfo({
-    required this.id,
+    this.id,
     required this.name,
   });
 
-  Map<String, String> toJson() {
+  Map<String, dynamic> toJson() {
     return {
       '_id': id,
       'name': name,
@@ -120,7 +120,7 @@ class UserInfo {
 
   factory UserInfo.fromJson(Map<String, dynamic> json) {
     return UserInfo(
-      id: json['_id'] as String,
+      id: json['_id'] as String?,
       name: json['name'] as String,
     );
   }

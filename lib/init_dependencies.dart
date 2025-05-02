@@ -75,6 +75,10 @@ import './features/property_details/domain/usecases/get_property_details.dart';
 import './features/property_details/domain/usecases/add_property_review.dart';
 import './features/property_details/domain/usecases/update_property_review.dart';
 import './features/property_details/domain/usecases/delete_property_review.dart';
+import './features/property_details/domain/usecases/get_current_user_review.dart';
+import './features/property_details/domain/usecases/get_recent_property_reviews.dart';
+import './features/property_details/domain/usecases/initialize_chat.dart'
+    as property_initialize_chat;
 import './features/property_details/presentation/bloc/property_details_bloc.dart';
 
 import './features/chat/data/datasources/chat_socket_datasource.dart';
@@ -445,12 +449,33 @@ void _initPropertyDetails() {
     ),
   );
 
+  serviceLocator.registerFactory<GetCurrentUserReview>(
+    () => GetCurrentUserReview(
+      propertyDetailsRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<GetRecentPropertyReviews>(
+    () => GetRecentPropertyReviews(
+      propertyDetailsRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<property_initialize_chat.InitializeChat>(
+    () => property_initialize_chat.InitializeChat(
+      propertyDetailsRepository: serviceLocator(),
+    ),
+  );
+
   serviceLocator.registerLazySingleton<PropertyDetailsBloc>(
     () => PropertyDetailsBloc(
       getPropertyDetails: serviceLocator(),
       addPropertyReview: serviceLocator(),
       updatePropertyReview: serviceLocator(),
       deletePropertyReview: serviceLocator(),
+      getCurrentUserReview: serviceLocator(),
+      getRecentPropertyReviews: serviceLocator(),
+      initializeChat: serviceLocator<property_initialize_chat.InitializeChat>(),
     ),
   );
 }

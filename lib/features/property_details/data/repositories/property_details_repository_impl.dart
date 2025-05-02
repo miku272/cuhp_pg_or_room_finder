@@ -1,5 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 
+import '../../../../core/common/entities/chat.dart';
 import '../../../../core/common/entities/property.dart';
 import '../../../../core/common/entities/review.dart';
 import '../../../../core/error/exception.dart';
@@ -7,6 +8,7 @@ import '../../../../core/error/failures.dart';
 
 import '../../domain/repository/property_details_repository.dart';
 import '../datasources/property_details_remote_datasource.dart';
+import '../models/recent_property_reviews_response.dart';
 
 class PropertyDetailsRepositoryImpl implements PropertyDetailsRepository {
   final PropertyDetailsRemoteDatasource propertyDetailsRemoteDatasource;
@@ -105,6 +107,75 @@ class PropertyDetailsRepositoryImpl implements PropertyDetailsRepository {
       );
 
       return right(updatedReviewResponse);
+    } on ServerException catch (error) {
+      return left(Failure(status: error.status, message: error.message));
+    } on UserException catch (error) {
+      return left(Failure(status: error.status, message: error.message));
+    } catch (error) {
+      return left(Failure(message: error.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Review>> getCurrentUserReview({
+    required String propertyId,
+    required String userId,
+    required String token,
+  }) async {
+    try {
+      final review = await propertyDetailsRemoteDatasource.getCurrentUserReview(
+        propertyId,
+        userId,
+        token,
+      );
+
+      return right(review);
+    } on ServerException catch (error) {
+      return left(Failure(status: error.status, message: error.message));
+    } on UserException catch (error) {
+      return left(Failure(status: error.status, message: error.message));
+    } catch (error) {
+      return left(Failure(message: error.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, RecentPropertyReviewsResponse>>
+      getRecentPropertyReviews({
+    required String propertyId,
+    required int limit,
+    required String token,
+  }) async {
+    try {
+      final recentPropertyReviewsResponse =
+          await propertyDetailsRemoteDatasource.getRecentPropertyReviews(
+        propertyId,
+        limit,
+        token,
+      );
+
+      return right(recentPropertyReviewsResponse);
+    } on ServerException catch (error) {
+      return left(Failure(status: error.status, message: error.message));
+    } on UserException catch (error) {
+      return left(Failure(status: error.status, message: error.message));
+    } catch (error) {
+      return left(Failure(message: error.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Chat>> initializeChat({
+    required String propertyId,
+    required String token,
+  }) async {
+    try {
+      final chat = await propertyDetailsRemoteDatasource.initializeChat(
+        propertyId,
+        token,
+      );
+
+      return right(chat);
     } on ServerException catch (error) {
       return left(Failure(status: error.status, message: error.message));
     } on UserException catch (error) {

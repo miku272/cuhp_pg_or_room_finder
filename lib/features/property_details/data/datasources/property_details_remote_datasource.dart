@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 
+import '../../../../core/common/entities/chat.dart';
 import '../../../../core/common/entities/coordinate.dart';
 import '../../../../core/common/entities/property.dart';
 import '../../../../core/common/entities/review.dart';
 import '../../../../core/error/exception.dart';
+import '../models/recent_property_reviews_response.dart';
 
 abstract interface class PropertyDetailsRemoteDatasource {
   Future<Property> getPropertyDetails(String propertyId, String token);
@@ -29,6 +31,20 @@ abstract interface class PropertyDetailsRemoteDatasource {
     String reviewId,
     String token,
   );
+
+  Future<Review> getCurrentUserReview(
+    String propertyId,
+    String userId,
+    String token,
+  );
+
+  Future<RecentPropertyReviewsResponse> getRecentPropertyReviews(
+    String propertyId,
+    int limit,
+    String token,
+  );
+
+  Future<Chat> initializeChat(String propertyId, String token);
 }
 
 class PropertyDetailsRemoteDataSourceImpl
@@ -306,6 +322,196 @@ class PropertyDetailsRemoteDataSourceImpl
       final reviewData = Review.fromJson(decodedBody['data']['review']);
 
       return reviewData;
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout) {
+        throw ServerException(
+          status: 503,
+          message: 'Unable to connect to the server',
+        );
+      }
+
+      final errors = error.response;
+
+      if (errors != null) {
+        if (errors.statusCode.toString().startsWith('5')) {
+          throw ServerException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (errors.statusCode.toString().startsWith('4')) {
+          throw UserException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (!errors.statusCode.toString().startsWith('2')) {
+          throw Exception('An error occurred');
+        }
+      }
+
+      rethrow;
+    } on SocketException catch (_) {
+      throw ServerException(
+        status: 503,
+        message: 'Unable to connect to the server',
+      );
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Review> getCurrentUserReview(
+    String propertyId,
+    String userId,
+    String token,
+  ) async {
+    try {
+      final res = await dio.get(
+        '/review/property/$propertyId/user/$userId',
+        options: Options(headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        }),
+      );
+
+      final decodedBody = res.data;
+
+      final reviewData = Review.fromJson(decodedBody['data']['review']);
+
+      return reviewData;
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout) {
+        throw ServerException(
+          status: 503,
+          message: 'Unable to connect to the server',
+        );
+      }
+
+      final errors = error.response;
+
+      if (errors != null) {
+        if (errors.statusCode.toString().startsWith('5')) {
+          throw ServerException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (errors.statusCode.toString().startsWith('4')) {
+          throw UserException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (!errors.statusCode.toString().startsWith('2')) {
+          throw Exception('An error occurred');
+        }
+      }
+
+      rethrow;
+    } on SocketException catch (_) {
+      throw ServerException(
+        status: 503,
+        message: 'Unable to connect to the server',
+      );
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<RecentPropertyReviewsResponse> getRecentPropertyReviews(
+    String propertyId,
+    int limit,
+    String token,
+  ) async {
+    try {
+      final res = await dio.get(
+        '/review/property/$propertyId/?limit=$limit',
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      final decodedBody = res.data;
+
+      final recentPropertyReviewsResponse =
+          RecentPropertyReviewsResponse.fromJson(decodedBody);
+
+      return recentPropertyReviewsResponse;
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout) {
+        throw ServerException(
+          status: 503,
+          message: 'Unable to connect to the server',
+        );
+      }
+
+      final errors = error.response;
+
+      if (errors != null) {
+        if (errors.statusCode.toString().startsWith('5')) {
+          throw ServerException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (errors.statusCode.toString().startsWith('4')) {
+          throw UserException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (!errors.statusCode.toString().startsWith('2')) {
+          throw Exception('An error occurred');
+        }
+      }
+
+      rethrow;
+    } on SocketException catch (_) {
+      throw ServerException(
+        status: 503,
+        message: 'Unable to connect to the server',
+      );
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Chat> initializeChat(String propertyId, String token) async {
+    try {
+      final res = await dio.post(
+        '/chat/initialize',
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        ),
+        data: {
+          'propertyId': propertyId,
+        },
+      );
+
+      final decodedBody = res.data;
+
+      final chat = Chat.fromJson(decodedBody['data']['chat']);
+
+      return chat;
     } on DioException catch (error) {
       if (error.type == DioExceptionType.connectionTimeout ||
           error.type == DioExceptionType.receiveTimeout) {

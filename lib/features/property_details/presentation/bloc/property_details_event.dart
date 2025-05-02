@@ -23,10 +23,24 @@ final class UpdatePropertyEvent extends PropertyDetailsEvent {
 
 final class GetPropertyReviewForCurrentUserEvent extends PropertyDetailsEvent {
   final String propertyId;
+  final String userId;
   final String token;
 
   GetPropertyReviewForCurrentUserEvent({
     required this.propertyId,
+    required this.userId,
+    required this.token,
+  });
+}
+
+final class GetRecentPropertyReviewsEvent extends PropertyDetailsEvent {
+  final String propertyId;
+  final int limit;
+  final String token;
+
+  GetRecentPropertyReviewsEvent({
+    required this.propertyId,
+    required this.limit,
     required this.token,
   });
 }
@@ -69,6 +83,16 @@ final class DeletePropertyReviewEvent extends PropertyDetailsEvent {
 
   DeletePropertyReviewEvent({
     required this.reviewId,
+    required this.token,
+  });
+}
+
+final class InitializeChatEvent extends PropertyDetailsEvent {
+  final String propertyId;
+  final String token;
+
+  InitializeChatEvent({
+    required this.propertyId,
     required this.token,
   });
 }
