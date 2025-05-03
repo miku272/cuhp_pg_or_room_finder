@@ -8,6 +8,7 @@ import '../../domain/repository/profile_repository.dart';
 import '../datasources/profile_remote_datasource.dart';
 
 import '../models/properties_active_and_inactive_count_response.dart';
+import '../models/user_review_metadata_response.dart';
 
 class ProfileRepositoryImpl implements ProfileRepository {
   final ProfileRemoteDatasource profileRemoteDatasource;
@@ -55,6 +56,26 @@ class ProfileRepositoryImpl implements ProfileRepository {
           await profileRemoteDatasource.getTotalPropertiesCount(token);
 
       return right(totalPropertiesCount);
+    } on ServerException catch (error) {
+      return left(Failure(status: error.status, message: error.message));
+    } on UserException catch (error) {
+      return left(Failure(status: error.status, message: error.message));
+    } catch (error) {
+      return left(Failure(message: error.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserReviewMetadataResponse>> getUserReviewMetadata(
+    String token,
+  ) async {
+    try {
+      final userReviewMetadata =
+          await profileRemoteDatasource.getUserReviewMetadata(
+        token,
+      );
+
+      return right(userReviewMetadata);
     } on ServerException catch (error) {
       return left(Failure(status: error.status, message: error.message));
     } on UserException catch (error) {

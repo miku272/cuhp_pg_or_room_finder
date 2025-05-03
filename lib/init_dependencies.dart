@@ -51,7 +51,7 @@ import './features/profile/domain/usecases/get_current_user.dart'
     as profile_current_user;
 import './features/profile/domain/usecases/get_properties_active_and_inactive_count.dart';
 import './features/profile/domain/usecases/get_total_properties_count.dart';
-
+import './features/profile/domain/usecases/get_user_review_metadata.dart';
 import './features/profile/presentation/bloc/profile_bloc.dart';
 
 import './features/property_listings/data/datasources/property_listing_remote_datasource.dart';
@@ -344,11 +344,18 @@ void _initProfile() {
     ),
   );
 
+  serviceLocator.registerFactory<GetUserReviewMetadata>(
+    () => GetUserReviewMetadata(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
   serviceLocator.registerLazySingleton<ProfileBloc>(
     () => ProfileBloc(
       getCurrentUser: serviceLocator(),
       getTotalPropertiesCount: serviceLocator(),
       getPropertiesActiveAndInactiveCount: serviceLocator(),
+      getCurrentUserReviewMetadata: serviceLocator(),
       sfHandler: serviceLocator(),
       appUserCubit: serviceLocator(),
     ),

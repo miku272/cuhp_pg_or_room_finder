@@ -20,3 +20,9 @@ final class ProfileGetCurrentUser extends ProfileEvent {
 
   ProfileGetCurrentUser({required this.token});
 }
+
+final class ProfileGetUserReviewsMetadata extends ProfileEvent {
+  final String token;
+
+  ProfileGetUserReviewsMetadata({required this.token});
+}

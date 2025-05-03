@@ -6,6 +6,7 @@ import '../../../../core/common/entities/user.dart';
 import '../../../../core/error/exception.dart';
 
 import '../models/properties_active_and_inactive_count_response.dart';
+import '../models/user_review_metadata_response.dart';
 
 abstract interface class ProfileRemoteDatasource {
   Future<User> getCurrentUser(String token);
@@ -14,6 +15,7 @@ abstract interface class ProfileRemoteDatasource {
       getPropertiesActiveAndInactiveCount(
     String token,
   );
+  Future<UserReviewMetadataResponse> getUserReviewMetadata(String token);
 }
 
 class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
@@ -177,6 +179,72 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
       );
 
       return propertiesActiveAndInactiveCount;
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout) {
+        throw ServerException(
+          status: 503,
+          message: 'Unable to connect to the server',
+        );
+      }
+
+      final errors = error.response;
+
+      if (errors != null) {
+        if (errors.statusCode.toString().startsWith('5')) {
+          throw ServerException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (errors.statusCode.toString().startsWith('4')) {
+          throw UserException(
+            status: errors.statusCode,
+            message: errors.data['message'],
+          );
+        }
+
+        if (!errors.statusCode.toString().startsWith('2')) {
+          throw Exception('An error occurred');
+        }
+      }
+
+      rethrow;
+    } on SocketException catch (_) {
+      throw ServerException(
+        status: 503,
+        message: 'Unable to connect to the server',
+      );
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<UserReviewMetadataResponse> getUserReviewMetadata(String token) async {
+    try {
+      final res = await dio.get(
+        '/user-review-metadata',
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      final decodedBody = res.data;
+
+      print('Response: $decodedBody');
+
+      final userReviewsMetadata = UserReviewMetadataResponse(
+        totalReviews: decodedBody['data']['totalReviews'],
+        overallAverageRating:
+            (decodedBody['data']['overallAverageRating'] as num).toDouble(),
+      );
+
+      return userReviewsMetadata;
     } on DioException catch (error) {
       if (error.type == DioExceptionType.connectionTimeout ||
           error.type == DioExceptionType.receiveTimeout) {

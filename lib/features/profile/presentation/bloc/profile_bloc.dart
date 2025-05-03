@@ -8,9 +8,9 @@ import '../../../../core/utils/sf_handler.dart';
 import '../../domain/usecases/get_current_user.dart';
 import '../../domain/usecases/get_properties_active_and_inactive_count.dart';
 import '../../domain/usecases/get_total_properties_count.dart';
+import '../../domain/usecases/get_user_review_metadata.dart';
 
 part 'profile_event.dart';
-
 part 'profile_state.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
@@ -18,6 +18,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final GetTotalPropertiesCount _getTotalPropertiesCount;
   final GetPropertiesActiveAndInactiveCount
       _getPropertiesActiveAndInactiveCount;
+  final GetUserReviewMetadata _getCurrentUserReviewMetadata;
   final SFHandler _sfHandler;
   final AppUserCubit _appUserCubit;
 
@@ -26,12 +27,14 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     required GetTotalPropertiesCount getTotalPropertiesCount,
     required GetPropertiesActiveAndInactiveCount
         getPropertiesActiveAndInactiveCount,
+    required GetUserReviewMetadata getCurrentUserReviewMetadata,
     required SFHandler sfHandler,
     required AppUserCubit appUserCubit,
   })  : _getCurrentUser = getCurrentUser,
         _getTotalPropertiesCount = getTotalPropertiesCount,
         _getPropertiesActiveAndInactiveCount =
             getPropertiesActiveAndInactiveCount,
+        _getCurrentUserReviewMetadata = getCurrentUserReviewMetadata,
         _sfHandler = sfHandler,
         _appUserCubit = appUserCubit,
         super(const ProfileInitial()) {
@@ -43,6 +46,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         inactiveCount: state.inactiveCount,
         user: state.user,
         totalCount: state.totalCount,
+        overallAverageRating: state.overallAverageRating,
+        totalReviews: state.totalReviews,
       ));
 
       final res =
@@ -57,6 +62,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
             inactiveCount: state.inactiveCount,
             user: state.user,
             totalCount: state.totalCount,
+            overallAverageRating: state.overallAverageRating,
+            totalReviews: state.totalReviews,
           ),
         ),
         (user) {
@@ -74,6 +81,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
             activeCount: state.activeCount,
             inactiveCount: state.inactiveCount,
             totalCount: state.totalCount,
+            overallAverageRating: state.overallAverageRating,
+            totalReviews: state.totalReviews,
           ));
         },
       );
@@ -85,6 +94,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         inactiveCount: state.inactiveCount,
         user: state.user,
         totalCount: state.totalCount,
+        overallAverageRating: state.overallAverageRating,
+        totalReviews: state.totalReviews,
       ));
 
       final res = await _getTotalPropertiesCount(
@@ -99,6 +110,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           inactiveCount: state.inactiveCount,
           user: state.user,
           totalCount: state.totalCount,
+          overallAverageRating: state.overallAverageRating,
+          totalReviews: state.totalReviews,
         )),
         (totalCount) {
           emit(
@@ -107,6 +120,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
               user: state.user,
               activeCount: state.activeCount,
               inactiveCount: state.inactiveCount,
+              overallAverageRating: state.overallAverageRating,
+              totalReviews: state.totalReviews,
             ),
           );
         },
@@ -119,6 +134,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         inactiveCount: state.inactiveCount,
         user: state.user,
         totalCount: state.totalCount,
+        overallAverageRating: state.overallAverageRating,
+        totalReviews: state.totalReviews,
       ));
 
       final res = await _getPropertiesActiveAndInactiveCount(
@@ -133,6 +150,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           inactiveCount: state.inactiveCount,
           user: state.user,
           totalCount: state.totalCount,
+          overallAverageRating: state.overallAverageRating,
+          totalReviews: state.totalReviews,
         )),
         (counts) {
           emit(
@@ -141,6 +160,49 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
               inactiveCount: counts.inactivePropertyCount,
               user: state.user,
               totalCount: state.totalCount,
+              overallAverageRating: state.overallAverageRating,
+              totalReviews: state.totalReviews,
+            ),
+          );
+        },
+      );
+    });
+
+    on<ProfileGetUserReviewsMetadata>((event, emit) async {
+      emit(UserReviewMetadataLoading(
+        activeCount: state.activeCount,
+        inactiveCount: state.inactiveCount,
+        user: state.user,
+        totalCount: state.totalCount,
+        overallAverageRating: state.overallAverageRating,
+        totalReviews: state.totalReviews,
+      ));
+
+      final res = await _getCurrentUserReviewMetadata(
+        GetUserReviewMetadataParams(token: event.token),
+      );
+
+      res.fold(
+        (failure) => emit(UserReviewMetadataFailure(
+          status: failure.status,
+          message: failure.message,
+          activeCount: state.activeCount,
+          inactiveCount: state.inactiveCount,
+          user: state.user,
+          totalCount: state.totalCount,
+          overallAverageRating: state.overallAverageRating,
+          totalReviews: state.totalReviews,
+        )),
+        (userReviewMetadataResponse) {
+          emit(
+            UserReviewMetadataSuccess(
+              user: state.user,
+              activeCount: state.activeCount,
+              inactiveCount: state.inactiveCount,
+              totalCount: state.totalCount,
+              overallAverageRating:
+                  userReviewMetadataResponse.overallAverageRating,
+              totalReviews: userReviewMetadataResponse.totalReviews,
             ),
           );
         },

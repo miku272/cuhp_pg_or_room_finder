@@ -38,6 +38,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context.read<ProfileBloc>().add(
             ProfileGetPropertiesActiveAndInactiveCount(token: token),
           );
+
+      context.read<ProfileBloc>().add(
+            ProfileGetUserReviewsMetadata(token: token),
+          );
     });
   }
 
@@ -70,6 +74,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
       context.read<ProfileBloc>().add(
             ProfileGetPropertiesActiveAndInactiveCount(token: token),
+          );
+      context.read<ProfileBloc>().add(
+            ProfileGetUserReviewsMetadata(token: token),
           );
     }
   }
@@ -334,21 +341,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             const SizedBox(height: 16),
 
                             // Reviews Card
-                            const Card(
-                              child: Column(
-                                children: [
-                                  ListTile(
-                                    leading: Icon(Icons.star_outline),
-                                    title: Text('Reviews'),
-                                    trailing: Text('4.5★'),
+                            BlocBuilder<ProfileBloc, ProfileState>(
+                              builder: (context, state) {
+                                return Card(
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                        leading: const Icon(Icons.star_outline),
+                                        title: const Text('Reviews'),
+                                        trailing: state
+                                                is UserReviewMetadataLoading
+                                            ? const CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              )
+                                            : Text(
+                                                state.overallAverageRating ==
+                                                        null
+                                                    ? '-'
+                                                    : '${state.overallAverageRating}★',
+                                              ),
+                                      ),
+                                      const Divider(),
+                                      ListTile(
+                                        title: const Text('Total Reviews'),
+                                        trailing: Text(
+                                          state.totalReviews == null
+                                              ? '-'
+                                              : '${state.totalReviews}',
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Divider(),
-                                  ListTile(
-                                    title: Text('Total Reviews'),
-                                    trailing: Text('12'),
-                                  ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
                             const SizedBox(height: 16),
                             Card(

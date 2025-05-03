@@ -23,7 +23,8 @@ class VerifyEmailOrPhoneRemoteDataSourceImpl
   @override
   Future<void> sendEmailOtp(String id, String token) async {
     try {
-      final res = await dio.post('/send-email-otp',
+      // final res =
+      await dio.post('/send-email-otp',
           options: Options(headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $token',
@@ -32,7 +33,7 @@ class VerifyEmailOrPhoneRemoteDataSourceImpl
             '_id': id,
           });
 
-      final decodedBody = res.data;
+      // final decodedBody = res.data;
     } on DioException catch (error) {
       if (error.type == DioExceptionType.connectionTimeout ||
           error.type == DioExceptionType.receiveTimeout ||
@@ -86,7 +87,8 @@ class VerifyEmailOrPhoneRemoteDataSourceImpl
   @override
   Future<bool> verifyEmailOtp(String id, String token, String otp) async {
     try {
-      final res = await dio.post('/verify-email-otp',
+      // final res =
+      await dio.post('/verify-email-otp',
           options: Options(headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $token',
@@ -96,7 +98,7 @@ class VerifyEmailOrPhoneRemoteDataSourceImpl
             'emailOtp': otp,
           });
 
-      final decodedBody = res.data;
+      // final decodedBody = res.data;
 
       return true;
     } on DioException catch (error) {
