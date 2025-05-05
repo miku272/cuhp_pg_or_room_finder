@@ -184,10 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          BlocConsumer<HomeBloc, HomeState>(
-            listener: (context, state) {
-              // TODO: implement listener
-            },
+          BlocBuilder<HomeBloc, HomeState>(
             builder: (context, state) {
               final bool isLoadingMore =
                   state is HomeLoading && state.properties.isNotEmpty;

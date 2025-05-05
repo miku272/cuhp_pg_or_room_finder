@@ -12,8 +12,11 @@ class PropertiesSavedScreen extends StatelessWidget {
     return const Column(
       children: <Widget>[
         CustomAppBar(appBarTitle: 'My saved properties'),
-        Expanded(
-          child: NoPropertySaved(),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Center(
+            child: NoPropertySaved(),
+          ),
         ),
       ],
     );
