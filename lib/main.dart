@@ -13,8 +13,9 @@ import './core/common/cubits/app_socket/app_socket_cubit.dart';
 
 import './features/splash/presentation/bloc/splash_bloc.dart';
 import './features/auth/presentation/bloc/auth_bloc.dart';
-import './features/home/presentation/bloc/home_bloc.dart';
 import './features/verify_email_or_phone/presentation/bloc/verify_email_or_phone_bloc.dart';
+import './features/home/presentation/bloc/home_bloc.dart';
+import './features/properties_saved/presentation/bloc/properties_saved_bloc.dart';
 import './features/profile/presentation/bloc/profile_bloc.dart';
 import './features/property_listings/presentation/bloc/property_listings_bloc.dart';
 import './features/my_listings/presentation/bloc/my_listings_bloc.dart';
@@ -49,6 +50,9 @@ Future<void> main() async {
         ),
         BlocProvider(
           create: (context) => serviceLocator<HomeBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => serviceLocator<PropertiesSavedBloc>(),
         ),
         BlocProvider(
           create: (context) => serviceLocator<AuthBloc>(),

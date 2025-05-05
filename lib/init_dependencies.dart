@@ -25,6 +25,14 @@ import './features/home/domain/repository/home_repository.dart';
 import './features/home/domain/usecases/get_properties_by_pagination.dart';
 import './features/home/presentation/bloc/home_bloc.dart';
 
+import './features/properties_saved/data/datasources/properties_saved_remote_datasource.dart';
+import './features/properties_saved/data/repositories/properties_saved_repository_impl.dart';
+import './features/properties_saved/domain/repository/properties_saved_repository.dart';
+import './features/properties_saved/domain/usecases/add_saved_item.dart';
+import './features/properties_saved/domain/usecases/remove_saved_item.dart';
+import './features/properties_saved/domain/usecases/get_saved_items.dart';
+import './features/properties_saved/presentation/bloc/properties_saved_bloc.dart';
+
 import './features/auth/data/datasources/auth_remote_data_source.dart';
 import './features/auth/domain/repository/auth_repository.dart';
 import './features/auth/data/repositories/auth_repository_impl.dart';
@@ -147,8 +155,9 @@ Future<void> initDependencies() async {
   _initTokenHandler();
   _initSplash();
   _initAuth();
-  _initHome();
   _initVerifyEmailOrPhone();
+  _initHome();
+  _initSavedProperties();
   _initProfile();
   _initPropertyListings();
   _initMyListings();
@@ -266,6 +275,46 @@ void _initHome() {
   serviceLocator.registerLazySingleton<HomeBloc>(
     () => HomeBloc(
       getPropertiesByPagination: serviceLocator(),
+    ),
+  );
+}
+
+void _initSavedProperties() {
+  serviceLocator.registerFactory<PropertiesSavedRemoteDatasource>(
+    () => PropertiesSavedRemoteDatasourceImpl(
+      dio: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<PropertiesSavedRepository>(
+    () => PropertiesSavedRepositoryImpl(
+      propertiesSavedRemoteDatasource: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<AddSavedItem>(
+    () => AddSavedItem(
+      propertiesSavedRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<RemoveSavedItem>(
+    () => RemoveSavedItem(
+      propertiesSavedRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<GetSavedItems>(
+    () => GetSavedItems(
+      propertiesSavedRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerLazySingleton<PropertiesSavedBloc>(
+    () => PropertiesSavedBloc(
+      addSavedItem: serviceLocator(),
+      removeSavedItem: serviceLocator(),
+      getSavedItems: serviceLocator(),
     ),
   );
 }

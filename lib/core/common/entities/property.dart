@@ -149,4 +149,32 @@ class Property {
           : null,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'owner': ownerId,
+      'propertyName': propertyName,
+      'propertyAddressLine1': propertyAddressLine1,
+      'propertyAddressLine2': propertyAddressLine2,
+      'propertyVillageOrCity': propertyVillageOrCity,
+      'propertyPincode': propertyPincode,
+      'ownerName': ownerName,
+      'ownerPhone': ownerPhone,
+      'ownerEmail': ownerEmail,
+      'pricePerMonth': pricePerMonth,
+      'propertyType': Property.propertyTypeToString(propertyType!),
+      'propertyGenderAllowance':
+          Property.genderAllowanceToString(propertyGenderAllowance!),
+      'rentAgreementAvailable': rentAgreementAvailable,
+      'coordinates': coordinates?.toJson(),
+      'distanceFromUniversity': distanceFromUniversity,
+      'services': services,
+      'images': images,
+      'isVerified': isVerified,
+      'isActive': isActive,
+      'numberOfReviews': numberOfReviews,
+      'averageRating': averageRating,
+    };
+  }
 }
