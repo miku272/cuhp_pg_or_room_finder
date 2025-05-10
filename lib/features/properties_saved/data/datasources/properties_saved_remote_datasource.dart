@@ -97,7 +97,7 @@ class PropertiesSavedRemoteDatasourceImpl
   ) async {
     try {
       final res = await dio.get(
-        '/get-saved-by-user?page=$page&limit=$limit',
+        '/saved/get-saved-by-user?page=$page&limit=$limit',
         options: Options(
           headers: {
             'Content-Type': 'application/json',
@@ -160,7 +160,7 @@ class PropertiesSavedRemoteDatasourceImpl
   Future<bool> removeSavedItem(String savedItemId, String token) async {
     try {
       await dio.delete(
-        '/remove-saved/$savedItemId',
+        '/saved/remove-saved/$savedItemId',
         options: Options(
           headers: {
             'Content-Type': 'application/json',

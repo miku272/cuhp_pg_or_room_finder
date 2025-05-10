@@ -12,6 +12,8 @@ class PropertyCard extends StatelessWidget {
   final String propertyGenderAllowance;
   final Map<String, bool> services;
   final double distanceFromUniversity;
+  final bool isSaved;
+  final VoidCallback? onFavoritePressed;
 
   final bool showFavouriteButton;
 
@@ -26,6 +28,8 @@ class PropertyCard extends StatelessWidget {
     required this.services,
     required this.distanceFromUniversity,
     this.showFavouriteButton = true,
+    this.isSaved = false,
+    this.onFavoritePressed,
   });
 
   @override
@@ -105,8 +109,10 @@ class PropertyCard extends StatelessWidget {
                   top: 8,
                   right: 8,
                   child: IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.favorite_border),
+                    onPressed: onFavoritePressed ?? () {},
+                    icon: Icon(
+                      isSaved ? Icons.favorite_rounded : Icons.favorite_border,
+                    ),
                     style: IconButton.styleFrom(
                       backgroundColor: colorScheme.surface,
                       foregroundColor: colorScheme.primary,

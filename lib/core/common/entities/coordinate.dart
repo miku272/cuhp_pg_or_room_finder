@@ -41,6 +41,16 @@ class Coordinate {
     };
   }
 
+  Coordinate copyWith({
+    String? type,
+    List<num>? coordinates,
+  }) {
+    return Coordinate(
+      type: type ?? this.type,
+      coordinates: coordinates ?? this.coordinates,
+    );
+  }
+
   /// Calculates the distance in kilometers between this coordinate and the Central University of Himachal Pradesh default location.
   ///
   /// Uses the Haversine formula to calculate the great-circle distance between two points

@@ -31,6 +31,7 @@ class Property {
   final bool? isActive;
   final int? numberOfReviews;
   final double? averageRating;
+  final bool? isSaved;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -51,6 +52,7 @@ class Property {
     required this.rentAgreementAvailable,
     required this.coordinates,
     this.distanceFromUniversity,
+    this.isSaved,
     this.services,
     this.images,
     this.isVerified,
@@ -132,6 +134,7 @@ class Property {
           ? Coordinate.fromJson(json['coordinates'] as Map<String, dynamic>)
           : null,
       distanceFromUniversity: calculatedDistance,
+      isSaved: json['isSaved'] as bool?,
       services: (json['services'] as Map<String, dynamic>?)
           ?.map((key, value) => MapEntry(key, value as bool)),
       images: (json['images'] as List<dynamic>?)
@@ -169,6 +172,7 @@ class Property {
       'rentAgreementAvailable': rentAgreementAvailable,
       'coordinates': coordinates?.toJson(),
       'distanceFromUniversity': distanceFromUniversity,
+      'isSaved': isSaved,
       'services': services,
       'images': images,
       'isVerified': isVerified,
@@ -176,5 +180,64 @@ class Property {
       'numberOfReviews': numberOfReviews,
       'averageRating': averageRating,
     };
+  }
+
+  Property copyWith({
+    String? id,
+    String? ownerId,
+    String? propertyName,
+    String? propertyAddressLine1,
+    String? propertyAddressLine2,
+    String? propertyVillageOrCity,
+    String? propertyPincode,
+    String? ownerName,
+    String? ownerPhone,
+    String? ownerEmail,
+    int? pricePerMonth,
+    PropertyType? propertyType,
+    GenderAllowance? propertyGenderAllowance,
+    bool? rentAgreementAvailable,
+    Coordinate? coordinates,
+    num? distanceFromUniversity,
+    Map<String, bool>? services,
+    List<String>? images,
+    bool? isVerified,
+    bool? isActive,
+    bool? isSaved,
+    int? numberOfReviews,
+    double? averageRating,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return Property(
+      id: id ?? this.id,
+      ownerId: ownerId ?? this.ownerId,
+      propertyName: propertyName ?? this.propertyName,
+      propertyAddressLine1: propertyAddressLine1 ?? this.propertyAddressLine1,
+      propertyAddressLine2: propertyAddressLine2 ?? this.propertyAddressLine2,
+      propertyVillageOrCity:
+          propertyVillageOrCity ?? this.propertyVillageOrCity,
+      propertyPincode: propertyPincode ?? this.propertyPincode,
+      ownerName: ownerName ?? this.ownerName,
+      ownerPhone: ownerPhone ?? this.ownerPhone,
+      ownerEmail: ownerEmail ?? this.ownerEmail,
+      pricePerMonth: pricePerMonth ?? this.pricePerMonth,
+      propertyType: propertyType ?? this.propertyType,
+      propertyGenderAllowance:
+          propertyGenderAllowance ?? this.propertyGenderAllowance,
+      rentAgreementAvailable:
+          rentAgreementAvailable ?? this.rentAgreementAvailable,
+      coordinates: coordinates ?? this.coordinates?.copyWith(),
+      distanceFromUniversity:
+          distanceFromUniversity ?? this.distanceFromUniversity,
+      services:
+          services ?? this.services?.map((key, value) => MapEntry(key, value)),
+      images: images ?? this.images?.toList(),
+      isVerified: isVerified ?? this.isVerified,
+      isActive: isActive ?? this.isActive,
+      isSaved: isSaved ?? this.isSaved,
+      numberOfReviews: numberOfReviews ?? this.numberOfReviews,
+      averageRating: averageRating ?? this.averageRating?.toDouble(),
+    );
   }
 }

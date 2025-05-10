@@ -19,6 +19,7 @@ class PropertyListingModel extends Property {
     required bool super.rentAgreementAvailable,
     required Coordinate super.coordinates,
     required num super.distanceFromUniversity,
+    required bool super.isSaved,
     required Map<String, bool> super.services,
     required List<String> super.images,
     required bool super.isVerified,
@@ -49,6 +50,7 @@ class PropertyListingModel extends Property {
       coordinates: Coordinate.fromJson(
           Map<String, dynamic>.from(json['coordinates'] ?? {})),
       distanceFromUniversity: json['distanceFromUniversity'] ?? 0.0,
+      isSaved: json['isSaved'] ?? false,
       services: Map<String, bool>.from(json['services'] ?? {}),
       images: List<String>.from(json['images'] ?? []),
       isVerified: json['isVerified'] ?? false,
@@ -62,6 +64,7 @@ class PropertyListingModel extends Property {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
@@ -81,6 +84,7 @@ class PropertyListingModel extends Property {
       'rentAgreementAvailable': rentAgreementAvailable,
       'coordinates': coordinates?.toJson(),
       'distanceFromUniversity': distanceFromUniversity,
+      'isSaved': isSaved,
       'services': services,
       'images': images,
       'isVerified': isVerified,

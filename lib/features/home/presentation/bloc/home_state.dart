@@ -37,11 +37,34 @@ final class HomeLoading extends HomeState {
   });
 }
 
+final class HomeSavedItemLoading extends HomeState {
+  const HomeSavedItemLoading({
+    super.properties,
+    super.propertyFilter,
+    super.currentPage,
+    super.totalPages,
+    super.hasReachedMax,
+  });
+}
+
 final class HomeLoadingSuccess extends HomeState {
   const HomeLoadingSuccess({
     required super.properties,
     super.propertyFilter,
     required super.currentPage,
+    super.totalPages,
+    super.hasReachedMax,
+  });
+}
+
+final class HomeSavedItemSuccess extends HomeState {
+  final String propertyId;
+
+  const HomeSavedItemSuccess({
+    required this.propertyId,
+    super.properties,
+    super.propertyFilter,
+    super.currentPage,
     super.totalPages,
     super.hasReachedMax,
   });
@@ -54,6 +77,23 @@ final class HomeLoadingFailure extends HomeState {
   const HomeLoadingFailure({
     this.status,
     required this.message,
+    super.properties,
+    super.propertyFilter,
+    super.currentPage,
+    super.totalPages,
+    super.hasReachedMax,
+  });
+}
+
+final class SavedItemFailure extends HomeState {
+  final int? status;
+  final String message;
+  final String propertyId;
+
+  const SavedItemFailure({
+    this.status,
+    required this.message,
+    required this.propertyId,
     super.properties,
     super.propertyFilter,
     super.currentPage,

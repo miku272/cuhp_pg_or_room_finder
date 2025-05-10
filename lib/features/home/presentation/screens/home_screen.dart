@@ -232,6 +232,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
                               return InkWell(
+                                key: ValueKey(
+                                  state.properties[index].id,
+                                ),
                                 onTap: () {
                                   context.push(
                                     '/my-listings/property/${state.properties[index].id}',
@@ -239,6 +242,39 @@ class _HomeScreenState extends State<HomeScreen> {
                                   );
                                 },
                                 child: PropertyCard(
+                                  showFavouriteButton:
+                                      state.properties[index].ownerId !=
+                                          currentUser.id,
+                                  isSaved:
+                                      state.properties[index].isSaved ?? false,
+                                  onFavoritePressed: () {
+                                    print(
+                                      'Is Saved: ${state.properties[index].isSaved}',
+                                    );
+
+                                    if (state.properties[index].isSaved ==
+                                        false) {
+                                      context.read<HomeBloc>().add(
+                                            HomeAddSavedItemEvent(
+                                              propertyId:
+                                                  state.properties[index].id ??
+                                                      '',
+                                              token: currentUser.jwtToken,
+                                            ),
+                                          );
+                                    } else if (state
+                                            .properties[index].isSaved ==
+                                        true) {
+                                      context.read<HomeBloc>().add(
+                                            HomeRemoveSavedItemEvent(
+                                              propertyId:
+                                                  state.properties[index].id ??
+                                                      '',
+                                              token: currentUser.jwtToken,
+                                            ),
+                                          );
+                                    }
+                                  },
                                   images: state.properties[index].images ?? [],
                                   propertyName:
                                       state.properties[index].propertyName ??

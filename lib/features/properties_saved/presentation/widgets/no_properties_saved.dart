@@ -9,7 +9,8 @@ class NoPropertySaved extends StatelessWidget {
     final theme = Theme.of(context);
 
     return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.all(24),
       children: <Widget>[
         const SizedBox(height: 40),

@@ -3,6 +3,8 @@ part of 'properties_saved_bloc.dart';
 @immutable
 sealed class PropertiesSavedEvent {}
 
+final class PropertiesSavedResetEvent extends PropertiesSavedEvent {}
+
 final class AddSavedItemEvent extends PropertiesSavedEvent {
   final String propertyId;
   final String token;

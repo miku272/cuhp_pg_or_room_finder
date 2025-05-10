@@ -62,7 +62,7 @@ class PaginationData {
       currentPage: json['currentPage'] as int,
       totalPages: json['totalPages'] as int,
       totalSaved: json['totalSaved'] as int,
-      limit: json['limit'] as int,
+      limit: int.tryParse(json['limit']) ?? 10,
     );
   }
 

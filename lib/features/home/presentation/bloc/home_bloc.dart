@@ -2,18 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/common/entities/property.dart';
+
 import '../../data/models/property_filter.dart';
 import '../../domain/usecases/get_properties_by_pagination.dart';
+import '../../domain/usecases/home_add_saved_item.dart';
+import '../../domain/usecases/home_remove_saved_item.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetPropertiesByPagination _getPropertiesByPagination;
+  final HomeAddSavedItem _homeAddSavedItem;
+  final HomeRemoveSavedItem _homeRemoveSavedItem;
 
   HomeBloc({
     required GetPropertiesByPagination getPropertiesByPagination,
+    required HomeAddSavedItem homeAddSavedItem,
+    required HomeRemoveSavedItem homeRemoveSavedItem,
   })  : _getPropertiesByPagination = getPropertiesByPagination,
+        _homeAddSavedItem = homeAddSavedItem,
+        _homeRemoveSavedItem = homeRemoveSavedItem,
         super(const HomeInitial(
           properties: [],
           propertyFilter: PropertyFilter(),
@@ -23,6 +32,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         )) {
     on<UpdatePropertyFilterEvent>(_onUpdatePropertyFilter);
     on<GetPropertiesByPaginationEvent>(_onGetPropertiesByPagination);
+    on<HomeAddSavedItemEvent>(_onHomeAddSavedItem);
+    on<HomeRemoveSavedItemEvent>(_onHomeRemoveSavedItem);
   }
 
   void _onUpdatePropertyFilter(
@@ -94,6 +105,127 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           totalPages: paginatedResponse.pagination.totalPages,
           hasReachedMax: hasReachedMax,
         ));
+      },
+    );
+  }
+
+  void _onHomeAddSavedItem(
+    HomeAddSavedItemEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    emit(HomeSavedItemLoading(
+      properties: state.properties,
+      propertyFilter: state.propertyFilter,
+      currentPage: state.currentPage,
+      totalPages: state.totalPages,
+      hasReachedMax: state.hasReachedMax,
+    ));
+
+    final res = await _homeAddSavedItem(
+      HomeAddSavedItemParams(
+        propertyId: event.propertyId,
+        token: event.token,
+      ),
+    );
+
+    res.fold(
+      (failure) => emit(SavedItemFailure(
+        status: failure.status,
+        message: failure.message,
+        propertyId: event.propertyId,
+        properties: state.properties,
+        propertyFilter: state.propertyFilter,
+        currentPage: state.currentPage,
+        totalPages: state.totalPages,
+        hasReachedMax: state.hasReachedMax,
+      )),
+      (reviewItem) {
+        final updatedProperties = state.properties.map((property) {
+          if (property.id == event.propertyId) {
+            return property.copyWith(isSaved: true);
+          }
+
+          return property;
+        }).toList();
+
+        emit(
+          HomeSavedItemSuccess(
+            propertyId: event.propertyId,
+            properties: updatedProperties,
+            propertyFilter: state.propertyFilter,
+            currentPage: state.currentPage,
+            totalPages: state.totalPages,
+            hasReachedMax: state.hasReachedMax,
+          ),
+        );
+      },
+    );
+  }
+
+  void _onHomeRemoveSavedItem(
+    HomeRemoveSavedItemEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    emit(HomeSavedItemLoading(
+      properties: state.properties,
+      propertyFilter: state.propertyFilter,
+      currentPage: state.currentPage,
+      totalPages: state.totalPages,
+      hasReachedMax: state.hasReachedMax,
+    ));
+
+    final res = await _homeRemoveSavedItem(HomeRemoveSavedItemParams(
+      propertyId: event.propertyId,
+      token: event.token,
+    ));
+
+    res.fold(
+      (failure) {
+        print('Error: ${failure.message}');
+
+        emit(SavedItemFailure(
+          status: failure.status,
+          message: failure.message,
+          propertyId: event.propertyId,
+          properties: state.properties,
+          propertyFilter: state.propertyFilter,
+          currentPage: state.currentPage,
+          totalPages: state.totalPages,
+          hasReachedMax: state.hasReachedMax,
+        ));
+      },
+      (isRemoved) {
+        if (isRemoved) {
+          final updatedProperties = state.properties.map((property) {
+            if (property.id == event.propertyId) {
+              return property.copyWith(isSaved: false);
+            }
+
+            return property;
+          }).toList();
+
+          emit(
+            HomeSavedItemSuccess(
+              propertyId: event.propertyId,
+              properties: updatedProperties,
+              propertyFilter: state.propertyFilter,
+              currentPage: state.currentPage,
+              totalPages: state.totalPages,
+              hasReachedMax: state.hasReachedMax,
+            ),
+          );
+        } else {
+          emit(SavedItemFailure(
+            propertyId: event.propertyId,
+            status: 500,
+            message: 'Failed to remove saved item',
+            properties: state.properties,
+            propertyFilter: state.propertyFilter,
+            currentPage: state.currentPage,
+            totalPages: state.totalPages,
+            hasReachedMax: state.hasReachedMax,
+          ));
+        }
       },
     );
   }

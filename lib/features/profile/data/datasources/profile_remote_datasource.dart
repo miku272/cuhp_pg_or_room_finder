@@ -225,7 +225,7 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
   Future<UserReviewMetadataResponse> getUserReviewMetadata(String token) async {
     try {
       final res = await dio.get(
-        '/user-review-metadata',
+        '/review/user-review-metadata',
         options: Options(
           headers: {
             'Content-Type': 'application/json',
@@ -235,8 +235,6 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
       );
 
       final decodedBody = res.data;
-
-      print('Response: $decodedBody');
 
       final userReviewsMetadata = UserReviewMetadataResponse(
         totalReviews: decodedBody['data']['totalReviews'],

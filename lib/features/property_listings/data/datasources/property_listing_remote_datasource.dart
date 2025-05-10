@@ -109,6 +109,7 @@ class PropertyListingRemoteDataSourceImpl
         ),
         distanceFromUniversity: decodedBody['data']['property']
             ['distanceFromUniversity'],
+        isSaved: decodedBody['data']['property']['isSaved'],
         services:
             Map<String, bool>.from(decodedBody['data']['property']['services']),
         images: List<String>.from(decodedBody['data']['property']['images']),
@@ -248,6 +249,7 @@ class PropertyListingRemoteDataSourceImpl
         ),
         distanceFromUniversity: decodedBody['data']['property']
             ['distanceFromUniversity'],
+        isSaved: decodedBody['data']['property']['isSaved'],
         services:
             Map<String, bool>.from(decodedBody['data']['property']['services']),
         images: List<String>.from(decodedBody['data']['property']['images']),

@@ -23,6 +23,8 @@ import './features/home/data/datasources/home_remote_datasource.dart';
 import './features/home/data/repositories/home_repository_impl.dart';
 import './features/home/domain/repository/home_repository.dart';
 import './features/home/domain/usecases/get_properties_by_pagination.dart';
+import './features/home/domain/usecases/home_add_saved_item.dart';
+import './features/home/domain/usecases/home_remove_saved_item.dart';
 import './features/home/presentation/bloc/home_bloc.dart';
 
 import './features/properties_saved/data/datasources/properties_saved_remote_datasource.dart';
@@ -272,9 +274,23 @@ void _initHome() {
     ),
   );
 
+  serviceLocator.registerFactory<HomeAddSavedItem>(
+    () => HomeAddSavedItem(
+      homeRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<HomeRemoveSavedItem>(
+    () => HomeRemoveSavedItem(
+      homeRepository: serviceLocator(),
+    ),
+  );
+
   serviceLocator.registerLazySingleton<HomeBloc>(
     () => HomeBloc(
       getPropertiesByPagination: serviceLocator(),
+      homeAddSavedItem: serviceLocator(),
+      homeRemoveSavedItem: serviceLocator(),
     ),
   );
 }

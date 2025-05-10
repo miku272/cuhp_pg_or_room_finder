@@ -66,6 +66,7 @@ class PropertyFormData extends Property {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -94,6 +95,7 @@ class PropertyFormData extends Property {
     };
   }
 
+  @override
   PropertyFormData copyWith({
     String? id,
     String? ownerId,
@@ -110,11 +112,14 @@ class PropertyFormData extends Property {
     GenderAllowance? propertyGenderAllowance,
     bool? rentAgreementAvailable,
     Coordinate? coordinates,
-    double? distanceFromUniversity,
+    num? distanceFromUniversity,
     Map<String, bool>? services,
     List<String>? images,
     bool? isVerified,
     bool? isActive,
+    bool? isSaved,
+    int? numberOfReviews,
+    double? averageRating,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {

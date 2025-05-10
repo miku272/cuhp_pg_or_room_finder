@@ -6,7 +6,7 @@ import './shell_scaffold.dart';
 import './features/splash/presentation/screens/splash_screen.dart';
 import './features/not_found/presentation/screens/not_found_screen.dart';
 import './features/my_listings/presentation/screens/my_listings_screen.dart';
-import './features/properties_saved/presentation/widgets/no_properties_saved.dart';
+import 'features/properties_saved/presentation/screens/properties_saved_screen.dart';
 import './features/property_listings/data/models/property_form_data.dart';
 import './features/property_listings/presentation/screens/add_property_screen.dart';
 import './features/auth/presentation/screens/login_screen.dart';
@@ -20,9 +20,9 @@ import './features/property_listings/presentation/screens/add_property_success_s
 import './features/property_listings/presentation/screens/google_maps_screen.dart';
 import './features/property_details/presentation/screens/property_details_screen.dart';
 import './features/chat/presentation/screens/chat_list_screen.dart';
+import './features/chat/presentation/screens/messages_screen.dart';
 
 import 'core/common/entities/chat.dart';
-import './features/chat/presentation/screens/messages_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -56,7 +56,7 @@ class AppRouter {
           ),
           GoRoute(
             path: '/saved',
-            builder: (context, state) => const NoPropertySaved(),
+            builder: (context, state) => const PropertiesSavedScreen(),
             routes: <GoRoute>[_propertyDetails()],
           ),
           GoRoute(

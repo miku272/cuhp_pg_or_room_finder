@@ -67,6 +67,7 @@ class MyListingsRemoteDataSourceImpl implements MyListingsRemoteDataSource {
                 List<num>.from(propertyData['coordinates']['coordinates']),
           ),
           distanceFromUniversity: propertyData['distanceFromUniversity'],
+          isSaved: propertyData['isSaved'],
           services: Map<String, bool>.from(propertyData['services']),
           images: List<String>.from(propertyData['images']),
           isVerified: propertyData['isVerified'],
@@ -172,6 +173,7 @@ class MyListingsRemoteDataSourceImpl implements MyListingsRemoteDataSource {
         ),
         distanceFromUniversity: decodedBody['data']['property']
             ['distanceFromUniversity'],
+        isSaved: decodedBody['data']['property']['isSaved'],
         services:
             Map<String, bool>.from(decodedBody['data']['property']['services']),
         images: List<String>.from(decodedBody['data']['property']['images']),

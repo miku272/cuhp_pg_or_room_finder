@@ -133,7 +133,15 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
       builder: (context, state) {
         return Column(
           children: <Widget>[
-            const CustomAppBar(appBarTitle: 'My Listings'),
+            CustomAppBar(
+              appBarTitle: 'My Listings',
+              actions: <Widget>[
+                IconButton(
+                  onPressed: _refreshProperties,
+                  icon: const Icon(Icons.refresh),
+                ),
+              ],
+            ),
             Expanded(
               child: RefreshIndicator(
                 onRefresh: _refreshProperties,
@@ -155,6 +163,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                     itemBuilder: (context, index) {
                       final property = state.properties[index];
                       return MyPropertyCard(
+                        key: ValueKey(property.id),
                         property: property,
                         togglePropertyActivation: _togglePropertyActivation,
                       );

@@ -26,3 +26,23 @@ final class GetPropertiesByPaginationEvent extends HomeEvent {
     required this.token,
   });
 }
+
+final class HomeAddSavedItemEvent extends HomeEvent {
+  final String propertyId;
+  final String token;
+
+  HomeAddSavedItemEvent({
+    required this.propertyId,
+    required this.token,
+  });
+}
+
+final class HomeRemoveSavedItemEvent extends HomeEvent {
+  final String propertyId;
+  final String token;
+
+  HomeRemoveSavedItemEvent({
+    required this.propertyId,
+    required this.token,
+  });
+}
