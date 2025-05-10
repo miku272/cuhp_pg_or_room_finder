@@ -3,6 +3,8 @@ part of 'chat_bloc.dart';
 @immutable
 sealed class ChatEvent {}
 
+final class ChatResetEvent extends ChatEvent {}
+
 // --- Remote/REST Events ---
 final class ChatFetchUserChats extends ChatEvent {
   final String token;

@@ -6,7 +6,6 @@ import '../../domain/usecases/get_properties_by_id.dart';
 import '../../domain/usecases/toggle_property_activation.dart';
 
 part 'my_listings_event.dart';
-
 part 'my_listings_state.dart';
 
 class MyListingsBloc extends Bloc<MyListingsEvent, MyListingsState> {
@@ -19,6 +18,10 @@ class MyListingsBloc extends Bloc<MyListingsEvent, MyListingsState> {
   })  : _getPropertiesById = getPropertiesById,
         _togglePropertyActivation = togglePropertyActivation,
         super(const MyListingsInitial()) {
+    on<MyListingsResetEvent>((event, emit) {
+      emit(const MyListingsInitial());
+    });
+
     on<GetPropertiesByIdEvent>((event, emit) async {
       emit(MyListingsLoading(properties: state.properties));
 

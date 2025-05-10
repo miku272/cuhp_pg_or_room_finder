@@ -30,6 +30,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           totalPages: 0,
           hasReachedMax: false,
         )) {
+    on<HomeResetEvent>((event, emit) {
+      emit(const HomeInitial());
+    });
+
     on<UpdatePropertyFilterEvent>(_onUpdatePropertyFilter);
     on<GetPropertiesByPaginationEvent>(_onGetPropertiesByPagination);
     on<HomeAddSavedItemEvent>(_onHomeAddSavedItem);

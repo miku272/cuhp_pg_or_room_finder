@@ -89,18 +89,54 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ThemeCubit, ThemeState>(
-      builder: (context, state) {
-        ThemeData themeData =
-            state.isDarkMode ? AppThemes.darkTheme : AppThemes.lightTheme;
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<AppUserCubit, AppUserState>(
+          listener: (context, state) {
+            if (state is AppUserInitial) {
+              context.read<HomeBloc>().add(HomeResetEvent());
+              context.read<PropertiesSavedBloc>().add(
+                    PropertiesSavedResetEvent(),
+                  );
+              context.read<AuthBloc>().add(AuthResetEvent());
+              context.read<VerifyEmailOrPhoneBloc>().add(
+                    VerifyEmailOrPhoneResetEvent(),
+                  );
+              context.read<ProfileBloc>().add(
+                    ProfileResetEvent(),
+                  );
+              context.read<PropertyListingsBloc>().add(
+                    PropertyListingsResetEvent(),
+                  );
+              context.read<MyListingsBloc>().add(
+                    MyListingsResetEvent(),
+                  );
+              context.read<PropertyDetailsBloc>().add(
+                    PropertyDetailsResetEvent(),
+                  );
+              context.read<ChatBloc>().add(
+                    ChatResetEvent(),
+                  );
+              context.read<MessagesBloc>().add(
+                    MessagesResetEvent(),
+                  );
+            }
+          },
+        ),
+      ],
+      child: BlocBuilder<ThemeCubit, ThemeState>(
+        builder: (context, state) {
+          ThemeData themeData =
+              state.isDarkMode ? AppThemes.darkTheme : AppThemes.lightTheme;
 
-        return MaterialApp.router(
-          title: 'CUHP PG or Room Finder',
-          debugShowCheckedModeBanner: false,
-          theme: themeData,
-          routerConfig: AppRouter.router,
-        );
-      },
+          return MaterialApp.router(
+            title: 'CUHP PG or Room Finder',
+            debugShowCheckedModeBanner: false,
+            theme: themeData,
+            routerConfig: AppRouter.router,
+          );
+        },
+      ),
     );
   }
 }

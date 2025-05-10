@@ -70,3 +70,17 @@ final class ChatState {
     );
   }
 }
+
+final class ChatInitial extends ChatState {
+  const ChatInitial({
+    super.status = ChatStatus.initial,
+    super.chats = const [],
+    super.errorMessage,
+    super.errorStatus,
+    super.newlyInitializedChat,
+    super.newlyFetchedChat,
+    super.newlySentMessage,
+    super.typingUserIdByChatId = const {},
+    super.readReceiptData,
+  });
+}

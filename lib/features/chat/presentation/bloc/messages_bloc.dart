@@ -44,8 +44,12 @@ class MessagesBloc extends Bloc<MessagesEvent, MessagesState> {
         _appUserCubit = appUserCubit,
         _socketManager = socketManager,
         _appSocketCubit = appSocketCubit,
-        super(MessagesInitial()) {
+        super(const MessagesInitial()) {
     // Initial state doesn't need connection info
+
+    on<MessagesResetEvent>((event, emit) {
+      emit(const MessagesInitial());
+    });
 
     // Register event handlers
     on<GetMessagesViaAPIEvent>(_onGetMessagesViaAPIEvent);

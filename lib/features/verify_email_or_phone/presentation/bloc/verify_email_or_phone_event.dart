@@ -3,7 +3,7 @@ part of 'verify_email_or_phone_bloc.dart';
 @immutable
 sealed class VerifyEmailOrPhoneEvent {}
 
-final class VerifyEmailOrPhoneInitialEvent extends VerifyEmailOrPhoneEvent {}
+final class VerifyEmailOrPhoneResetEvent extends VerifyEmailOrPhoneEvent {}
 
 final class SendEmailOtpEvent extends VerifyEmailOrPhoneEvent {
   final String id;

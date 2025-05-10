@@ -19,11 +19,11 @@ sealed class HomeState {
 
 final class HomeInitial extends HomeState {
   const HomeInitial({
-    super.properties,
-    super.propertyFilter,
-    super.currentPage,
-    super.totalPages,
-    super.hasReachedMax,
+    super.properties = const [],
+    super.propertyFilter = const PropertyFilter(),
+    super.currentPage = 1,
+    super.totalPages = 0,
+    super.hasReachedMax = false,
   });
 }
 

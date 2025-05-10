@@ -56,6 +56,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         _appUserCubit = appUserCubit,
         _appSocketCubit = appSocketCubit,
         super(const ChatState()) {
+    on<ChatResetEvent>((event, emit) {
+      emit(const ChatInitial());
+    });
+
     // Initial state doesn't need isSocketConnected
     // Register event handlers
     on<ChatFetchUserChats>(_onFetchUserChats);

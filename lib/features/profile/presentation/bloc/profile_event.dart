@@ -3,6 +3,8 @@ part of 'profile_bloc.dart';
 @immutable
 sealed class ProfileEvent {}
 
+final class ProfileResetEvent extends ProfileEvent {}
+
 final class ProfileGetTotalPropertiesCount extends ProfileEvent {
   final String token;
 

@@ -40,6 +40,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         super(const ProfileInitial()) {
     // on<ProfileEvent>((event, emit) => emit(const ProfileLoading()));
 
+    on<ProfileResetEvent>((event, emit) {
+      emit(const ProfileInitial());
+    });
+
     on<ProfileGetCurrentUser>((event, emit) async {
       emit(ProfileLoading(
         activeCount: state.activeCount,

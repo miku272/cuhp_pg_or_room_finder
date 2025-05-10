@@ -3,6 +3,8 @@ part of 'messages_bloc.dart';
 @immutable
 sealed class MessagesEvent {}
 
+final class MessagesResetEvent extends MessagesEvent {}
+
 // --- API Event ---
 final class GetMessagesViaAPIEvent extends MessagesEvent {
   final String chatId;

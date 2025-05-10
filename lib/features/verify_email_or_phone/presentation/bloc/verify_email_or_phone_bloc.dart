@@ -29,6 +29,12 @@ class VerifyEmailOrPhoneBloc
       (event, emit) => VerifyEmailOrPhoneLoadingState(),
     );
 
+    on<VerifyEmailOrPhoneResetEvent>(
+      (event, emit) {
+        emit(VerifyEmailOrPhoneInitialState());
+      },
+    );
+
     on<SendEmailOtpEvent>(
       (event, emit) async {
         final res = await _sendEmailOtp(SendEmailOtpParams(

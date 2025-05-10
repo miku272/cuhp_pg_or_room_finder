@@ -60,7 +60,13 @@ final class MessagesConcreteState extends MessagesState {
   }
 }
 
-final class MessagesInitial extends MessagesState {}
+final class MessagesInitial extends MessagesState {
+  const MessagesInitial({
+    super.chatData = const {},
+    super.typingStatus = const {},
+    super.readReceipts = const {},
+  });
+}
 
 // Loading state specifically for API calls
 final class MessagesLoadingAPI extends MessagesState {

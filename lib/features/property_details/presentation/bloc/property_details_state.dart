@@ -21,8 +21,8 @@ final class PropertyDetailsInitial extends PropertyDetailsState {
   const PropertyDetailsInitial({
     super.property,
     super.currentUserReview,
-    super.totalReviewsCount,
-    super.recentReviews,
+    super.totalReviewsCount = 0,
+    super.recentReviews = const [],
     super.chat,
   });
 }

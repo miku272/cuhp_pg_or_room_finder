@@ -49,6 +49,10 @@ class PropertyDetailsBloc
     //   )),
     // );
 
+    on<PropertyDetailsResetEvent>((event, emit) {
+      emit(const PropertyDetailsInitial());
+    });
+
     on<GetPropertyDetailsEvent>((event, emit) async {
       emit(PropertyDetailsLoading(
         property: state.property,

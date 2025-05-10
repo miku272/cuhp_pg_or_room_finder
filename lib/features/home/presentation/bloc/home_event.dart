@@ -3,6 +3,10 @@ part of 'home_bloc.dart';
 @immutable
 sealed class HomeEvent {}
 
+final class HomeResetEvent extends HomeEvent {
+  HomeResetEvent();
+}
+
 final class UpdatePropertyFilterEvent extends HomeEvent {
   final PropertyFilter propertyFilter;
   final String token;

@@ -11,7 +11,6 @@ import '../../domain/usecases/add_property_listing.dart';
 import '../../domain/usecases/update_property_listing.dart';
 
 part 'property_listings_event.dart';
-
 part 'property_listings_state.dart';
 
 class PropertyListingsBloc
@@ -29,6 +28,10 @@ class PropertyListingsBloc
         _updatePropertyListing = updatePropertyListing,
         super(PropertyListingsInitial()) {
     on<PropertyListingsEvent>((event, emit) => emit(PropertyListingsLoading()));
+
+    on<PropertyListingsResetEvent>((event, emit) {
+      emit(PropertyListingsInitial());
+    });
 
     on<PropertyListingAddEvent>((event, emit) async {
       final res = await _addPropertyListing(AddPropertyListingParams(

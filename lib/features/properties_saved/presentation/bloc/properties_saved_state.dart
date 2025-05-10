@@ -23,6 +23,7 @@ final class PropertiesSavedInitial extends PropertiesSavedState {
   const PropertiesSavedInitial({
     super.totalPages = 0,
     super.currentPage = 0,
+    super.currentLimit = 10,
     super.hasReachedMax = false,
     super.totalSavedInDatabase = 0,
     super.savedItems = const [],
