@@ -23,22 +23,33 @@ This application serves as the client-side interface for the [CUHP PG or Room Fi
 
 Below are some representative screenshots of the application (From an Android physical device):
 
-<div style="display: flex; flex-wrap: wrap; justify-content: flex-start;">
-    <img src="assets/screenshots/login_screen.jpg" alt="Login Screen" width="300" style="margin: 30px;" />
-    <img src="assets/screenshots/signup_screen.jpg" alt="Signup Screen" width="300" style="margin: 30px;" />
-    <img src="assets/screenshots/verification_screen.jpg" alt="Verification Screen" width="300" style="margin: 30px;" />
-    <img src="assets/screenshots/home_screen.jpg" alt="Home Screen" width="300" style="margin: 30px;" />
-    <img src="assets/screenshots/property_listings_details_screen_1.jpg" alt="Property Listings Details Screen 1" width="300" style="margin: 30px;" />
-    <img src="assets/screenshots/property_listings_details_screen_2.jpg" alt="Property Listings Details Screen 2" width="300" style="margin: 30px;" />
-    <img src="assets/screenshots/google_maps_screen.jpg" alt="Google Maps Screen" width="300" style="margin: 30px;" />
-    <img src="assets/screenshots/saved_screen.jpg" alt="Saved Properties Screen" width="300" style="margin: 30px;" />
-    <img src="assets/screenshots/chat_list_screen.jpg" alt="Chat List Screen" width="300" style="margin: 30px;" />
-    <img src="assets/screenshots/messages_screen.jpg" alt="Messages Screen" width="300" style="margin: 30px;" />
-    <img src="assets/screenshots/add_property_listing_screen.jpg" alt="Add Property Listing Screen" width="300" style="margin: 30px;" />
-    <img src="assets/screenshots/my_listings_screen.jpg" alt="My Listings Screen" width="300" style="margin: 30px;" />
-    <img src="assets/screenshots/profile_screen_1.jpg" alt="Profile Screen 1" width="300" style="margin: 30px;" />
-    <img src="assets/screenshots/profile_screen_2.jpg" alt="Profile Screen 2" width="300" style="margin: 30px;" />
-</div>
+<table>
+  <tr>
+    <td align="center"><img src="assets/screenshots/login_screen.jpg" alt="Login Screen" width="280"></td>
+    <td align="center"><img src="assets/screenshots/signup_screen.jpg" alt="Signup Screen" width="280"></td>
+    <td align="center"><img src="assets/screenshots/verification_screen.jpg" alt="Verification Screen" width="280"></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/screenshots/home_screen.jpg" alt="Home Screen" width="280"></td>
+    <td align="center"><img src="assets/screenshots/property_listings_details_screen_1.jpg" alt="Property Listings Details Screen 1" width="280"></td>
+    <td align="center"><img src="assets/screenshots/property_listings_details_screen_2.jpg" alt="Property Listings Details Screen 2" width="280"></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/screenshots/google_maps_screen.jpg" alt="Google Maps Screen" width="280"></td>
+    <td align="center"><img src="assets/screenshots/saved_screen.jpg" alt="Saved Properties Screen" width="280"></td>
+    <td align="center"><img src="assets/screenshots/chat_list_screen.jpg" alt="Chat List Screen" width="280"></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/screenshots/messages_screen.jpg" alt="Messages Screen" width="280"></td>
+    <td align="center"><img src="assets/screenshots/add_property_listing_screen.jpg" alt="Add Property Listing Screen" width="280"></td>
+    <td align="center"><img src="assets/screenshots/my_listings_screen.jpg" alt="My Listings Screen" width="280"></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/screenshots/profile_screen_1.jpg" alt="Profile Screen 1" width="280"></td>
+    <td align="center"><img src="assets/screenshots/profile_screen_2.jpg" alt="Profile Screen 2" width="280"></td>
+    <td align="center">&nbsp;</td>
+  </tr>
+</table>
 
 _(More screenshots can be found in the `assets/screenshots/` directory.)_
 
