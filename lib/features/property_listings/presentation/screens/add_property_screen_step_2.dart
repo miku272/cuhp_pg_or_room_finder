@@ -120,7 +120,7 @@ class _AddPropertyScreenStep2State extends State<AddPropertyScreenStep2> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
+                  color: theme.scaffoldBackgroundColor,
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(32),
                     bottomRight: Radius.circular(32),
