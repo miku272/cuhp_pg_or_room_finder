@@ -13,7 +13,7 @@ class GetSavedItemsResponseModel {
 
   factory GetSavedItemsResponseModel.fromJson(Map<String, dynamic> json) {
     return GetSavedItemsResponseModel(
-      results: json['results'] as int,
+      results: json['results'],
       paginationData: PaginationData.fromJson(json['pagination']),
       savedItems: (json['data']['saved'] as List<dynamic>)
           .map((item) => SavedItem.fromJson(item as Map<String, dynamic>))
@@ -59,10 +59,10 @@ class PaginationData {
 
   factory PaginationData.fromJson(Map<String, dynamic> json) {
     return PaginationData(
-      currentPage: json['currentPage'] as int,
-      totalPages: json['totalPages'] as int,
-      totalSaved: json['totalSaved'] as int,
-      limit: int.tryParse(json['limit']) ?? 10,
+      currentPage: json['currentPage'],
+      totalPages: json['totalPages'],
+      totalSaved: json['totalSaved'],
+      limit: json['limit'],
     );
   }
 
