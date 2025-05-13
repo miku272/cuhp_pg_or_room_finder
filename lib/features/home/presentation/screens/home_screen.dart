@@ -248,6 +248,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                           if (position != null) {
                             _updateFilter(currentFilter.copyWith(
+                              propertyType: currentFilter.propertyType,
                               nearMeLat: position.latitude,
                               nearMeLng: position.longitude,
                             ));
