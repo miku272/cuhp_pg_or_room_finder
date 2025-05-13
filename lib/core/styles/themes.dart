@@ -22,10 +22,11 @@ class AppThemes {
       onError: AppColors.lightOnError,
     ),
     appBarTheme: AppBarTheme(
-      color: AppColors.lightPrimary,
-      iconTheme: const IconThemeData(color: AppColors.lightOnPrimary),
+      color: AppColors.lightBackground,
+      elevation: 0,
+      iconTheme: const IconThemeData(color: AppColors.lightOnBackground),
       titleTextStyle: GoogleFonts.roboto(
-        color: AppColors.lightOnPrimary,
+        color: AppColors.lightOnBackground,
         fontSize: 20,
         fontWeight: FontWeight.bold,
       ),
@@ -144,10 +145,11 @@ class AppThemes {
       onError: AppColors.darkOnError,
     ),
     appBarTheme: AppBarTheme(
-      color: AppColors.darkPrimary,
-      iconTheme: const IconThemeData(color: AppColors.darkOnPrimary),
+      color: AppColors.darkBackground,
+      elevation: 0,
+      iconTheme: const IconThemeData(color: AppColors.darkOnBackground),
       titleTextStyle: GoogleFonts.roboto(
-        color: AppColors.darkOnPrimary,
+        color: AppColors.darkOnBackground,
         fontSize: 20,
         fontWeight: FontWeight.bold,
       ),

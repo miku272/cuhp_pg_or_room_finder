@@ -9,7 +9,6 @@ class CustomAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      elevation: 4,
       child: AppBar(
         toolbarHeight: 80,
         title: Text(appBarTitle),

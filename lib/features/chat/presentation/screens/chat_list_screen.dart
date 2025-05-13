@@ -399,9 +399,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
       child: Container(
         height: 48,
         decoration: BoxDecoration(
-          color: theme.brightness == Brightness.light
-              ? Colors.grey.shade200
-              : theme.colorScheme.surfaceContainerHighest,
+          color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(24),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16),

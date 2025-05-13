@@ -110,7 +110,7 @@ class _AddPropertyScreenStep2State extends State<AddPropertyScreenStep2> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Add Your Property'),
+          title: Text('${widget.isEditing ? 'Update' : 'Add'} Your Property'),
           elevation: 0,
         ),
         body: SingleChildScrollView(
@@ -131,13 +131,13 @@ class _AddPropertyScreenStep2State extends State<AddPropertyScreenStep2> {
                     Icon(
                       Icons.contact_phone_rounded,
                       size: 64,
-                      color: theme.colorScheme.onPrimary,
+                      color: theme.colorScheme.primary,
                     ),
                     const SizedBox(height: 16),
                     Text(
                       'Contact Information',
                       style: theme.textTheme.headlineSmall?.copyWith(
-                        color: theme.colorScheme.onPrimary,
+                        color: theme.colorScheme.primary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -145,7 +145,7 @@ class _AddPropertyScreenStep2State extends State<AddPropertyScreenStep2> {
                     Text(
                       'Step 2 of 3',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onPrimary.withValues(alpha: 0.8),
+                        color: theme.colorScheme.primary.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -271,7 +271,8 @@ class _AddPropertyScreenStep2State extends State<AddPropertyScreenStep2> {
                             child: OutlinedButton(
                               onPressed: () => context.pop(),
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -284,7 +285,8 @@ class _AddPropertyScreenStep2State extends State<AddPropertyScreenStep2> {
                             child: ElevatedButton(
                               onPressed: _onNext,
                               style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),

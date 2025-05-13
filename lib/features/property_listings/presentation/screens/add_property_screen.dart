@@ -155,7 +155,7 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
+                  color: theme.scaffoldBackgroundColor,
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(32),
                     bottomRight: Radius.circular(32),
@@ -166,13 +166,13 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
                     Icon(
                       Icons.home_work_rounded,
                       size: 64,
-                      color: theme.colorScheme.onPrimary,
+                      color: theme.colorScheme.primary,
                     ),
                     const SizedBox(height: 16),
                     Text(
                       'Property Details',
                       style: theme.textTheme.headlineSmall?.copyWith(
-                        color: theme.colorScheme.onPrimary,
+                        color: theme.colorScheme.primary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -180,8 +180,7 @@ class _PropertyDetailsScreenState extends State<AddPropertyScreen> {
                     Text(
                       'Step 1 of 3',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color:
-                            theme.colorScheme.onPrimary.withValues(alpha: 0.8),
+                        color: theme.colorScheme.primary.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
