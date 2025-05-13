@@ -81,14 +81,14 @@ final class PropertyFilter {
       minPrice: minPrice ?? this.minPrice,
       maxPrice: maxPrice ?? this.maxPrice,
       maxDistance: maxDistance ?? this.maxDistance,
-      propertyType: propertyType ?? this.propertyType,
+      propertyType: propertyType,
       genderAllowance: genderAllowance ?? this.genderAllowance,
       services: services ?? this.services,
       rentAgreementAvailable:
           rentAgreementAvailable ?? this.rentAgreementAvailable,
       isVerified: isVerified ?? this.isVerified,
-      nearMeLat: nearMeLat ?? this.nearMeLat,
-      nearMeLng: nearMeLng ?? this.nearMeLng,
+      nearMeLat: nearMeLat,
+      nearMeLng: nearMeLng,
       nearMeRadius: nearMeRadius ?? this.nearMeRadius,
       sortBy: sortBy ?? this.sortBy,
     );

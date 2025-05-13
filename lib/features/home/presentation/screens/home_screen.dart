@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/common/cubits/app_user/app_user_cubit.dart';
@@ -47,6 +48,90 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<Position?> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (!serviceEnabled) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text('Location services are disabled'),
+            ),
+          );
+      }
+      return null;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+
+      if (permission == LocationPermission.denied) {
+        if (mounted) {
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+              const SnackBar(
+                content: Text('Location permissions are denied'),
+              ),
+            );
+        }
+        return null;
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+              const SnackBar(
+                content: Text(
+                    'Location permission are permanently denied. Please enable them in the app settings.'),
+              ),
+            );
+          await Geolocator.openAppSettings();
+        }
+        return null;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'Location permission are permanently denied. Please enable them in the app settings.'),
+            ),
+          );
+        await Geolocator.openAppSettings();
+      }
+      return null;
+    }
+
+    try {
+      return await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.best,
+        ),
+      );
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(content: Text('Failed to get current location.')),
+          );
+      }
+
+      return null;
+    }
+  }
+
   void _updateFilter(PropertyFilter newFilter) {
     context.read<HomeBloc>().add(UpdatePropertyFilterEvent(
           propertyFilter: newFilter,
@@ -57,8 +142,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final currentFilter = context.watch<HomeBloc>().state.propertyFilter;
-    final bool isNearMeSelected =
-        currentFilter.nearMeLat != null && currentFilter.nearMeLng != null;
 
     return GestureDetector(
       onTap: () {
@@ -93,6 +176,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           if (selected) {
                             _updateFilter(currentFilter.copyWith(
                               propertyType: null,
+                              nearMeLat: currentFilter.nearMeLat,
+                              nearMeLng: currentFilter.nearMeLng,
                             ));
                           }
                         },
@@ -105,6 +190,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           if (selected) {
                             _updateFilter(currentFilter.copyWith(
                               propertyType: PropertyType.pg,
+                              nearMeLat: currentFilter.nearMeLat,
+                              nearMeLng: currentFilter.nearMeLng,
                             ));
                           }
                         },
@@ -118,6 +205,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           if (selected) {
                             _updateFilter(currentFilter.copyWith(
                               propertyType: PropertyType.room,
+                              nearMeLat: currentFilter.nearMeLat,
+                              nearMeLng: currentFilter.nearMeLng,
                             ));
                           }
                         },
@@ -125,15 +214,43 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(width: 8),
                       ChoiceChip(
                         label: const Text('Near Me'),
-                        selected: isNearMeSelected,
-                        onSelected: (selected) {
-                          if (selected) {
-                            // TODO: Get user's location and update the filter
+                        selected: context
+                                    .watch<HomeBloc>()
+                                    .state
+                                    .propertyFilter
+                                    .nearMeLat !=
+                                null &&
+                            context
+                                    .watch<HomeBloc>()
+                                    .state
+                                    .propertyFilter
+                                    .nearMeLng !=
+                                null,
+                        onSelected: (selected) async {
+                          final currentFilter =
+                              context.read<HomeBloc>().state.propertyFilter;
 
-                            // _updateFilter(currentFilter.copyWith(
-                            //   nearMeLat: _nearMeLat,
-                            //   nearMeLng: _nearMeLng,
-                            // ));
+                          final isSelected = currentFilter.nearMeLat != null &&
+                              currentFilter.nearMeLng != null;
+
+                          if (isSelected) {
+                            _updateFilter(currentFilter.copyWith(
+                              propertyType: currentFilter.propertyType,
+                              nearMeLat: null,
+                              nearMeLng: null,
+                            ));
+
+                            return;
+                          }
+
+                          final Position? position =
+                              await _getCurrentLocation();
+
+                          if (position != null) {
+                            _updateFilter(currentFilter.copyWith(
+                              nearMeLat: position.latitude,
+                              nearMeLng: position.longitude,
+                            ));
                           }
                         },
                       ),
@@ -170,6 +287,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         if (returnedFilter != null && context.mounted) {
                           final finalFilter = returnedFilter.copyWith(
+                            propertyType: returnedFilter.propertyType,
                             nearMeLat: currentFilter.nearMeLat,
                             nearMeLng: currentFilter.nearMeLng,
                           );
@@ -248,10 +366,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   isSaved:
                                       state.properties[index].isSaved ?? false,
                                   onFavoritePressed: () {
-                                    print(
-                                      'Is Saved: ${state.properties[index].isSaved}',
-                                    );
-
                                     if (state.properties[index].isSaved ==
                                         false) {
                                       context.read<HomeBloc>().add(

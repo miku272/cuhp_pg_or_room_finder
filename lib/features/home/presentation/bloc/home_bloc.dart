@@ -185,8 +185,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     res.fold(
       (failure) {
-        print('Error: ${failure.message}');
-
         emit(SavedItemFailure(
           status: failure.status,
           message: failure.message,
