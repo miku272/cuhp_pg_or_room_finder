@@ -111,8 +111,6 @@ class _PropertiesSavedScreenState extends State<PropertiesSavedScreen> {
         BlocConsumer<PropertiesSavedBloc, PropertiesSavedState>(
           listener: (context, state) {
             if (state is PropertiesSavedFailure) {
-              print('PropertiesSavedFailure: ${state.message}');
-
               if (state.status == 401) {
                 ScaffoldMessenger.of(context)
                   ..clearSnackBars()
@@ -128,8 +126,6 @@ class _PropertiesSavedScreenState extends State<PropertiesSavedScreen> {
             }
 
             if (state is GetPropertiesSavedFailure) {
-              print('GetPropertiesSavedFailure: ${state.message}');
-
               if (state.status == 401) {
                 ScaffoldMessenger.of(context)
                   ..clearSnackBars()
