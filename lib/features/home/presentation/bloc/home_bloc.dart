@@ -44,6 +44,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<HomeAddSavedItemEvent>(_onHomeAddSavedItem);
     on<HomeRemoveSavedItemEvent>(_onHomeRemoveSavedItem);
     on<GetAutocompletePropertiesEvent>(_onGetAutocompleteProperties);
+    on<ClearAutocompletePropertiesEvent>(_onClearAutocompleteProperties);
   }
 
   void _onUpdatePropertyFilter(
@@ -291,5 +292,19 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         hasReachedMax: state.hasReachedMax,
       ));
     });
+  }
+
+  void _onClearAutocompleteProperties(
+    ClearAutocompletePropertiesEvent event,
+    Emitter<HomeState> emit,
+  ) {
+    emit(HomeGetAutocompletePropertiesSuccess(
+      autocomleteProperties: const [],
+      properties: state.properties,
+      propertyFilter: state.propertyFilter,
+      currentPage: state.currentPage,
+      totalPages: state.totalPages,
+      hasReachedMax: state.hasReachedMax,
+    ));
   }
 }

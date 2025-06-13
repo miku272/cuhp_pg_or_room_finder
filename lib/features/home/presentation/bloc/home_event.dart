@@ -60,3 +60,7 @@ final class GetAutocompletePropertiesEvent extends HomeEvent {
     required this.token,
   });
 }
+
+final class ClearAutocompletePropertiesEvent extends HomeEvent {
+  ClearAutocompletePropertiesEvent();
+}

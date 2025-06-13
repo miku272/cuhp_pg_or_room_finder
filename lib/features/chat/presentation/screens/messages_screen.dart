@@ -216,235 +216,241 @@ class _MessagesScreenState extends State<MessagesScreen> {
     final theme = Theme.of(context);
     final currentUserId = _currentUser?.id;
 
-    return MultiBlocListener(
-      listeners: [
-        // Listener for MessagesBloc state changes (API results, message updates)
-        BlocListener<MessagesBloc, MessagesState>(
-          listener: (context, state) {
-            // Handle API fetch results for pagination
-            if (state is GetMessagesViaAPISuccess ||
-                state is GetMessagesViaAPIFailure) {
-              if (state is GetMessagesViaAPIFailure &&
-                  state.failedChatId == widget.chatId) {
-                ScaffoldMessenger.of(context)
-                  ..clearSnackBars()
-                  ..showSnackBar(SnackBar(
-                    content:
-                        Text('Failed to load older messages: ${state.message}'),
-                    duration: const Duration(seconds: 3),
-                  ));
-              }
-              // Reset loading state regardless of success/failure for this chat
-              if (_isLoadingMore) {
-                setState(() {
-                  _isLoadingMore = false;
-                });
-              }
-              // Update _canLoadMore based on the latest data
-              final chatData = state.chatData[widget.chatId];
-              if (chatData != null) {
-                final canStillLoad = chatData.currentPage < chatData.totalPages;
-                if (_canLoadMore != canStillLoad) {
+    return SafeArea(
+      top: false,
+      child: MultiBlocListener(
+        listeners: [
+          // Listener for MessagesBloc state changes (API results, message updates)
+          BlocListener<MessagesBloc, MessagesState>(
+            listener: (context, state) {
+              // Handle API fetch results for pagination
+              if (state is GetMessagesViaAPISuccess ||
+                  state is GetMessagesViaAPIFailure) {
+                if (state is GetMessagesViaAPIFailure &&
+                    state.failedChatId == widget.chatId) {
+                  ScaffoldMessenger.of(context)
+                    ..clearSnackBars()
+                    ..showSnackBar(SnackBar(
+                      content: Text(
+                          'Failed to load older messages: ${state.message}'),
+                      duration: const Duration(seconds: 3),
+                    ));
+                }
+                // Reset loading state regardless of success/failure for this chat
+                if (_isLoadingMore) {
                   setState(() {
-                    _canLoadMore = canStillLoad;
+                    _isLoadingMore = false;
                   });
+                }
+                // Update _canLoadMore based on the latest data
+                final chatData = state.chatData[widget.chatId];
+                if (chatData != null) {
+                  final canStillLoad =
+                      chatData.currentPage < chatData.totalPages;
+                  if (_canLoadMore != canStillLoad) {
+                    setState(() {
+                      _canLoadMore = canStillLoad;
+                    });
+                  }
+                }
+
+                // Scroll to bottom only on initial load (page 1 success)
+                if (state is GetMessagesViaAPISuccess &&
+                    state.chatData[widget.chatId]?.currentPage == 1) {
+                  _scrollToBottom(animate: false);
                 }
               }
 
-              // Scroll to bottom only on initial load (page 1 success)
-              if (state is GetMessagesViaAPISuccess &&
-                  state.chatData[widget.chatId]?.currentPage == 1) {
-                _scrollToBottom(animate: false);
+              // Handle new message received (via MessagesUpdated or ConcreteState)
+              // Check if the state contains data for the current chat
+              final chatData = state.chatData[widget.chatId];
+              if (chatData != null) {
+                // Simple scroll logic: if near bottom, scroll down.
+                if (_scrollController.hasClients &&
+                    _scrollController.position.extentAfter < 200) {
+                  _scrollToBottom();
+                }
+                // Mark as read if the new message is not from the current user
+                final lastMessage = chatData.messages.isNotEmpty
+                    ? chatData.messages.last
+                    : null;
+                if (lastMessage != null &&
+                    lastMessage.senderId != currentUserId) {
+                  context
+                      .read<MessagesBloc>()
+                      .add(MarkMessagesAsReadEvent(chatId: widget.chatId));
+                }
               }
-            }
-
-            // Handle new message received (via MessagesUpdated or ConcreteState)
-            // Check if the state contains data for the current chat
-            final chatData = state.chatData[widget.chatId];
-            if (chatData != null) {
-              // Simple scroll logic: if near bottom, scroll down.
-              if (_scrollController.hasClients &&
-                  _scrollController.position.extentAfter < 200) {
-                _scrollToBottom();
-              }
-              // Mark as read if the new message is not from the current user
-              final lastMessage =
-                  chatData.messages.isNotEmpty ? chatData.messages.last : null;
-              if (lastMessage != null &&
-                  lastMessage.senderId != currentUserId) {
+            },
+          ),
+          // Listener for AppSocketCubit state changes (Connection status, global errors)
+          BlocListener<AppSocketCubit, AppSocketState>(
+            listener: (context, socketState) {
+              if (socketState is AppSocketError) {
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(SnackBar(
+                    content: Text('Connection Error: ${socketState.message}'),
+                    duration: const Duration(seconds: 3),
+                    backgroundColor: Colors.red,
+                  ));
+              } else if (socketState is AppSocketDisconnected) {
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(SnackBar(
+                    content: Text(
+                        'Disconnected: ${socketState.reason ?? "Connection lost"}'),
+                    duration: const Duration(seconds: 3),
+                    backgroundColor: Colors.orange,
+                  ));
+              } else if (socketState is AppSocketConnecting) {
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(const SnackBar(
+                    content: Text('Connecting...'),
+                    duration: Duration(seconds: 1), // Short duration
+                  ));
+              } else if (socketState is AppSocketConnected) {
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(const SnackBar(
+                    content: Text('Connected'),
+                    duration: Duration(seconds: 2),
+                    backgroundColor: Colors.green,
+                  ));
+                // Re-join chat if connection was re-established
                 context
                     .read<MessagesBloc>()
-                    .add(MarkMessagesAsReadEvent(chatId: widget.chatId));
+                    .add(JoinChatEvent(chatId: widget.chatId));
               }
-            }
-          },
-        ),
-        // Listener for AppSocketCubit state changes (Connection status, global errors)
-        BlocListener<AppSocketCubit, AppSocketState>(
-          listener: (context, socketState) {
-            if (socketState is AppSocketError) {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(SnackBar(
-                  content: Text('Connection Error: ${socketState.message}'),
-                  duration: const Duration(seconds: 3),
-                  backgroundColor: Colors.red,
-                ));
-            } else if (socketState is AppSocketDisconnected) {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(SnackBar(
-                  content: Text(
-                      'Disconnected: ${socketState.reason ?? "Connection lost"}'),
-                  duration: const Duration(seconds: 3),
-                  backgroundColor: Colors.orange,
-                ));
-            } else if (socketState is AppSocketConnecting) {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(const SnackBar(
-                  content: Text('Connecting...'),
-                  duration: Duration(seconds: 1), // Short duration
-                ));
-            } else if (socketState is AppSocketConnected) {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(const SnackBar(
-                  content: Text('Connected'),
-                  duration: Duration(seconds: 2),
-                  backgroundColor: Colors.green,
-                ));
-              // Re-join chat if connection was re-established
-              context
-                  .read<MessagesBloc>()
-                  .add(JoinChatEvent(chatId: widget.chatId));
-            }
-          },
-        ),
-      ],
-      child: BlocBuilder<MessagesBloc, MessagesState>(
-        builder: (context, state) {
-          final chatMessagesData = _getChatMessagesData(state);
-          final messages = chatMessagesData?.messages ?? [];
-          // Use the specific loading state for API calls
-          final isLoadingInitial = state is MessagesLoadingAPI &&
-              state.loadingChatId == widget.chatId &&
-              messages.isEmpty;
-          final recipientName = _getRecipientName(state);
-          final propertyInfo = _getPropertyInfo(state);
-          // Get typing status from the bloc state
-          final isTyping = state.typingStatus[widget.chatId] ?? false;
+            },
+          ),
+        ],
+        child: BlocBuilder<MessagesBloc, MessagesState>(
+          builder: (context, state) {
+            final chatMessagesData = _getChatMessagesData(state);
+            final messages = chatMessagesData?.messages ?? [];
+            // Use the specific loading state for API calls
+            final isLoadingInitial = state is MessagesLoadingAPI &&
+                state.loadingChatId == widget.chatId &&
+                messages.isEmpty;
+            final recipientName = _getRecipientName(state);
+            final propertyInfo = _getPropertyInfo(state);
+            // Get typing status from the bloc state
+            final isTyping = state.typingStatus[widget.chatId] ?? false;
 
-          debugPrint(
-            "MessagesScreen Build: ChatID=${widget.chatId}, TypingStatusMap=${state.typingStatus}, isTyping=$isTyping",
-          );
+            debugPrint(
+              "MessagesScreen Build: ChatID=${widget.chatId}, TypingStatusMap=${state.typingStatus}, isTyping=$isTyping",
+            );
 
-          return Scaffold(
-            appBar: AppBar(
-              titleSpacing: 0,
-              elevation: 1,
-              title: Row(
-                children: [
-                  // Back button is implicitly added by Navigator
-                  const SizedBox(width: 4), // Adjust spacing if needed
-                  CircleAvatar(
-                    // Placeholder/Actual image logic
-                    backgroundColor: Colors.grey.shade300,
-                    child: Text(
-                        recipientName.isNotEmpty ? recipientName[0] : '?',
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          recipientName,
-                          style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        if (propertyInfo.isNotEmpty && !isTyping)
+            return Scaffold(
+              appBar: AppBar(
+                titleSpacing: 0,
+                elevation: 1,
+                title: Row(
+                  children: [
+                    // Back button is implicitly added by Navigator
+                    const SizedBox(width: 4), // Adjust spacing if needed
+                    CircleAvatar(
+                      // Placeholder/Actual image logic
+                      backgroundColor: Colors.grey.shade300,
+                      child: Text(
+                          recipientName.isNotEmpty ? recipientName[0] : '?',
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Text(
-                            propertyInfo,
-                            style:
-                                TextStyle(fontSize: 12, color: theme.hintColor),
+                            recipientName,
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                             overflow: TextOverflow.ellipsis,
                           ),
-                        // Display typing indicator here
-                        if (isTyping)
-                          Text(
-                            'typing...',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontStyle: FontStyle.italic,
-                              color: theme.hintColor,
+                          if (propertyInfo.isNotEmpty && !isTyping)
+                            Text(
+                              propertyInfo,
+                              style: TextStyle(
+                                  fontSize: 12, color: theme.hintColor),
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                      ],
+                          // Display typing indicator here
+                          if (isTyping)
+                            Text(
+                              'typing...',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontStyle: FontStyle.italic,
+                                color: theme.hintColor,
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
+                  ],
+                ),
+                actions: [
+                  // Optional: Connection status indicator using AppSocketCubit state
+                  BlocBuilder<AppSocketCubit, AppSocketState>(
+                    builder: (context, socketState) {
+                      IconData? icon;
+                      Color color;
+                      if (socketState is AppSocketConnected) {
+                        icon = null;
+                        color = Colors.green;
+                      } else if (socketState is AppSocketConnecting) {
+                        icon = Icons.wifi_off;
+                        color = Colors.orange; // Or a spinning icon
+                      } else {
+                        // Disconnected or Error
+                        icon = Icons.wifi_off;
+                        color = Colors.red;
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Icon(icon, color: color, size: 20),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.more_vert),
+                    onPressed: () {
+                      // TODO: Implement more options menu
+                    },
                   ),
                 ],
               ),
-              actions: [
-                // Optional: Connection status indicator using AppSocketCubit state
-                BlocBuilder<AppSocketCubit, AppSocketState>(
-                  builder: (context, socketState) {
-                    IconData? icon;
-                    Color color;
-                    if (socketState is AppSocketConnected) {
-                      icon = null;
-                      color = Colors.green;
-                    } else if (socketState is AppSocketConnecting) {
-                      icon = Icons.wifi_off;
-                      color = Colors.orange; // Or a spinning icon
-                    } else {
-                      // Disconnected or Error
-                      icon = Icons.wifi_off;
-                      color = Colors.red;
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Icon(icon, color: color, size: 20),
-                    );
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.more_vert),
-                  onPressed: () {
-                    // TODO: Implement more options menu
-                  },
-                ),
-              ],
-            ),
-            body: Column(
-              children: [
-                // Show loading indicator at the top when loading more
-                if (_isLoadingMore)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: Center(
-                        child: SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(strokeWidth: 2))),
+              body: Column(
+                children: [
+                  // Show loading indicator at the top when loading more
+                  if (_isLoadingMore)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                      child: Center(
+                          child: SizedBox(
+                              height: 24,
+                              width: 24,
+                              child:
+                                  CircularProgressIndicator(strokeWidth: 2))),
+                    ),
+                  Expanded(
+                    child: isLoadingInitial
+                        ? const Center(child: CircularProgressIndicator())
+                        : messages.isEmpty
+                            ? _buildEmptyChat(theme)
+                            : _buildMessagesList(
+                                theme, messages, currentUserId ?? ''),
                   ),
-                Expanded(
-                  child: isLoadingInitial
-                      ? const Center(child: CircularProgressIndicator())
-                      : messages.isEmpty
-                          ? _buildEmptyChat(theme)
-                          : _buildMessagesList(
-                              theme, messages, currentUserId ?? ''),
-                ),
-                _buildDivider(),
-                _buildAttachmentMenu(theme),
-                _buildMessageInput(theme),
-              ],
-            ),
-          );
-        },
+                  _buildDivider(),
+                  _buildAttachmentMenu(theme),
+                  _buildMessageInput(theme),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -804,6 +810,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 decoration: InputDecoration(
                   hintText: 'Type a message...',
                   border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
                   hintStyle: TextStyle(color: theme.hintColor),
                 ),
                 textCapitalization: TextCapitalization.sentences,
