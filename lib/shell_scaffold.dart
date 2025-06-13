@@ -40,40 +40,27 @@ class ShellScaffold extends StatelessWidget {
           }
         },
         destinations: const <Widget>[
-          NavigationDestination(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.favorite),
-            label: 'Saved',
-          ),
+          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.favorite), label: 'Saved'),
           NavigationDestination(
             icon: Icon(Icons.real_estate_agent),
             label: 'My Listings',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+          NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
-      floatingActionButton:
-          (currentIndex == 0 || currentIndex == 2) && !isPropertyDetailsScreen
-              ? FloatingActionButton.extended(
-                  onPressed: () {
-                    context.push('/add-property', extra: <String, dynamic>{});
-                  },
-                  tooltip: 'Add new Property',
-                  label: const Row(
-                    spacing: 10.0,
-                    children: <Widget>[
-                      Icon(Icons.add),
-                      Text('Add Property'),
-                    ],
-                  ),
-                )
-              : null,
+      floatingActionButton: currentIndex == 2 && !isPropertyDetailsScreen
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                context.push('/add-property', extra: <String, dynamic>{});
+              },
+              tooltip: 'Add new Property',
+              label: const Row(
+                spacing: 10.0,
+                children: <Widget>[Icon(Icons.add), Text('Add Property')],
+              ),
+            )
+          : null,
     );
   }
 }
