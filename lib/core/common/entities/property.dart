@@ -240,4 +240,25 @@ class Property {
       averageRating: averageRating ?? this.averageRating?.toDouble(),
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    return other is Property &&
+        other.id == id &&
+        other.propertyName == propertyName &&
+        other.ownerId == ownerId;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(
+      id,
+      propertyName,
+      ownerId,
+    );
+  }
 }

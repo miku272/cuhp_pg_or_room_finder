@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -25,6 +27,9 @@ class _HomeScreenState extends State<HomeScreen> {
   // num? _nearMeLng;
 
   late User currentUser;
+  Timer? _debounce;
+  final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -36,7 +41,11 @@ class _HomeScreenState extends State<HomeScreen> {
       currentUser = user;
     } else {
       context.go('/login');
+
+      return;
     }
+
+    _scrollController.addListener(_onScroll);
 
     if (context.read<HomeBloc>().state.properties.isEmpty) {
       context.read<HomeBloc>().add(GetPropertiesByPaginationEvent(
@@ -46,6 +55,32 @@ class _HomeScreenState extends State<HomeScreen> {
             token: currentUser.jwtToken,
           ));
     }
+  }
+
+  void _onScroll() {
+    if (_isBottom) {
+      final homeBloc = context.read<HomeBloc>();
+      final currentState = homeBloc.state;
+
+      if (!currentState.hasReachedMax && currentState is! HomeLoading) {
+        homeBloc.add(GetPropertiesByPaginationEvent(
+          page: currentState.currentPage + 1,
+          limit: 10,
+          filter: currentState.propertyFilter,
+          token: currentUser.jwtToken,
+        ));
+      }
+    }
+  }
+
+  bool get _isBottom {
+    if (!_scrollController.hasClients) {
+      return false;
+    }
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+
+    return currentScroll >= (maxScroll * 0.9);
   }
 
   Future<Position?> _getCurrentLocation() async {
@@ -137,6 +172,16 @@ class _HomeScreenState extends State<HomeScreen> {
           propertyFilter: newFilter,
           token: currentUser.jwtToken,
         ));
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _searchController.dispose();
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+
+    super.dispose();
   }
 
   @override
@@ -265,6 +310,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: <Widget>[
                     Expanded(
                       child: TextField(
+                        controller: _searchController,
                         decoration: InputDecoration(
                           hintText: 'Search properties...',
                           prefixIcon: const Icon(Icons.search),
@@ -272,6 +318,24 @@ class _HomeScreenState extends State<HomeScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
+                        onChanged: (query) {
+                          setState(() {});
+
+                          if (_debounce?.isActive ?? false) {
+                            _debounce!.cancel();
+                          }
+
+                          _debounce =
+                              Timer(const Duration(milliseconds: 500), () {
+                            if (query.trim().isNotEmpty) {
+                              context.read<HomeBloc>().add(
+                                    GetAutocompletePropertiesEvent(
+                                        term: query.trim(),
+                                        token: currentUser.jwtToken),
+                                  );
+                            }
+                          });
+                        },
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -329,6 +393,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
               return Expanded(
                 child: ListView(
+                  controller: _scrollController,
                   children: <Widget>[
                     Padding(
                       padding: const EdgeInsets.symmetric(
@@ -436,7 +501,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: EdgeInsets.all(16.0),
                         child: Center(child: CircularProgressIndicator()),
                       ),
-                    // TODO: Implement pagination trigger (e.g., on scroll)
                   ],
                 ),
               );

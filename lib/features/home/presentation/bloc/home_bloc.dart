@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/common/entities/property.dart';
 
 import '../../data/models/property_filter.dart';
+import '../../domain/usecases/get_autocomplete_properties.dart';
 import '../../domain/usecases/get_properties_by_pagination.dart';
 import '../../domain/usecases/home_add_saved_item.dart';
 import '../../domain/usecases/home_remove_saved_item.dart';
@@ -15,16 +16,20 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetPropertiesByPagination _getPropertiesByPagination;
   final HomeAddSavedItem _homeAddSavedItem;
   final HomeRemoveSavedItem _homeRemoveSavedItem;
+  final GetAutocompleteProperties _getAutocompleteProperties;
 
   HomeBloc({
     required GetPropertiesByPagination getPropertiesByPagination,
     required HomeAddSavedItem homeAddSavedItem,
     required HomeRemoveSavedItem homeRemoveSavedItem,
+    required GetAutocompleteProperties getAutocompleteProperties,
   })  : _getPropertiesByPagination = getPropertiesByPagination,
         _homeAddSavedItem = homeAddSavedItem,
         _homeRemoveSavedItem = homeRemoveSavedItem,
+        _getAutocompleteProperties = getAutocompleteProperties,
         super(const HomeInitial(
           properties: [],
+          autocomleteProperties: [],
           propertyFilter: PropertyFilter(),
           currentPage: 1,
           totalPages: 0,
@@ -38,6 +43,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<GetPropertiesByPaginationEvent>(_onGetPropertiesByPagination);
     on<HomeAddSavedItemEvent>(_onHomeAddSavedItem);
     on<HomeRemoveSavedItemEvent>(_onHomeRemoveSavedItem);
+    on<GetAutocompletePropertiesEvent>(_onGetAutocompleteProperties);
   }
 
   void _onUpdatePropertyFilter(
@@ -46,6 +52,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) {
     emit(HomeInitial(
       properties: const [],
+      autocomleteProperties: const [],
       propertyFilter: event.propertyFilter,
       currentPage: 1,
       totalPages: 0,
@@ -70,6 +77,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     emit(HomeLoading(
       properties: state.properties,
+      autocomleteProperties: state.autocomleteProperties,
       propertyFilter: state.propertyFilter,
       currentPage: state.currentPage,
       totalPages: state.totalPages,
@@ -90,6 +98,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         status: failure.status,
         message: failure.message,
         properties: state.properties,
+        autocomleteProperties: state.autocomleteProperties,
         propertyFilter: state.propertyFilter,
         currentPage: state.currentPage,
         totalPages: state.totalPages,
@@ -104,6 +113,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
         emit(HomeLoadingSuccess(
           properties: updatedProperties,
+          autocomleteProperties: state.autocomleteProperties,
           propertyFilter: event.filter,
           currentPage: paginatedResponse.pagination.currentPage,
           totalPages: paginatedResponse.pagination.totalPages,
@@ -119,6 +129,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async {
     emit(HomeSavedItemLoading(
       properties: state.properties,
+      autocomleteProperties: state.autocomleteProperties,
       propertyFilter: state.propertyFilter,
       currentPage: state.currentPage,
       totalPages: state.totalPages,
@@ -138,6 +149,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         message: failure.message,
         propertyId: event.propertyId,
         properties: state.properties,
+        autocomleteProperties: state.autocomleteProperties,
         propertyFilter: state.propertyFilter,
         currentPage: state.currentPage,
         totalPages: state.totalPages,
@@ -156,6 +168,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           HomeSavedItemSuccess(
             propertyId: event.propertyId,
             properties: updatedProperties,
+            autocomleteProperties: state.autocomleteProperties,
             propertyFilter: state.propertyFilter,
             currentPage: state.currentPage,
             totalPages: state.totalPages,
@@ -172,6 +185,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async {
     emit(HomeSavedItemLoading(
       properties: state.properties,
+      autocomleteProperties: state.autocomleteProperties,
       propertyFilter: state.propertyFilter,
       currentPage: state.currentPage,
       totalPages: state.totalPages,
@@ -190,6 +204,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           message: failure.message,
           propertyId: event.propertyId,
           properties: state.properties,
+          autocomleteProperties: state.autocomleteProperties,
           propertyFilter: state.propertyFilter,
           currentPage: state.currentPage,
           totalPages: state.totalPages,
@@ -210,6 +225,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             HomeSavedItemSuccess(
               propertyId: event.propertyId,
               properties: updatedProperties,
+              autocomleteProperties: state.autocomleteProperties,
               propertyFilter: state.propertyFilter,
               currentPage: state.currentPage,
               totalPages: state.totalPages,
@@ -222,6 +238,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             status: 500,
             message: 'Failed to remove saved item',
             properties: state.properties,
+            autocomleteProperties: state.autocomleteProperties,
             propertyFilter: state.propertyFilter,
             currentPage: state.currentPage,
             totalPages: state.totalPages,
@@ -230,5 +247,49 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         }
       },
     );
+  }
+
+  void _onGetAutocompleteProperties(
+    GetAutocompletePropertiesEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    emit(HomeGetAutocompletePropertiesLoading(
+      properties: state.properties,
+      autocomleteProperties: state.autocomleteProperties,
+      propertyFilter: state.propertyFilter,
+      currentPage: state.currentPage,
+      totalPages: state.totalPages,
+      hasReachedMax: state.hasReachedMax,
+    ));
+
+    final res = await _getAutocompleteProperties(
+      GetAutocompletePropertiesParams(
+        term: event.term,
+        token: event.token,
+      ),
+    );
+
+    res.fold(
+        (failure) => emit(
+              HomeGetAutocompletePropertiesFailure(
+                status: failure.status,
+                message: failure.message,
+                properties: state.properties,
+                autocomleteProperties: state.autocomleteProperties,
+                propertyFilter: state.propertyFilter,
+                currentPage: state.currentPage,
+                totalPages: state.totalPages,
+                hasReachedMax: state.hasReachedMax,
+              ),
+            ), (autocompletedProperties) {
+      emit(HomeGetAutocompletePropertiesSuccess(
+        autocomleteProperties: autocompletedProperties,
+        properties: state.properties,
+        propertyFilter: state.propertyFilter,
+        currentPage: state.currentPage,
+        totalPages: state.totalPages,
+        hasReachedMax: state.hasReachedMax,
+      ));
+    });
   }
 }

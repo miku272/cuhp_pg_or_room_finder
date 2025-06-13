@@ -1,5 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 
+import '../../../../core/common/entities/property.dart';
 import '../../../../core/common/entities/saved_item.dart';
 import '../../../../core/error/failures.dart';
 
@@ -19,6 +20,10 @@ abstract interface class HomeRepository {
   });
   Future<Either<Failure, bool>> removeSavedItem({
     required String propertyId,
+    required String token,
+  });
+  Future<Either<Failure, List<Property>>> getAutocompleteProperties({
+    required String term,
     required String token,
   });
 }

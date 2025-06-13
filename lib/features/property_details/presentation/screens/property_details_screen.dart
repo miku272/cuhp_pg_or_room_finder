@@ -461,6 +461,9 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
   Widget _buildPropertyHeader(BuildContext context, Property property) {
     final theme = Theme.of(context);
 
+    final distanceFromUniversity = property.distanceFromUniversity ??
+        property.coordinates?.calculateDistanceFromUniversity();
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -535,15 +538,14 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen>
                 padding: EdgeInsets.zero,
               ),
               const SizedBox(width: 8),
-              if (property.distanceFromUniversity != null)
-                Chip(
-                  label: Text('${property.distanceFromUniversity}KM FROM CUHP'),
-                  backgroundColor: theme.colorScheme.secondary.withValues(
-                    alpha: 0.1,
-                  ),
-                  side: BorderSide.none,
-                  padding: EdgeInsets.zero,
+              Chip(
+                label: Text('${distanceFromUniversity ?? 0.0}KM FROM CUHP'),
+                backgroundColor: theme.colorScheme.secondary.withValues(
+                  alpha: 0.1,
                 ),
+                side: BorderSide.none,
+                padding: EdgeInsets.zero,
+              ),
             ],
           ),
           const SizedBox(height: 16),

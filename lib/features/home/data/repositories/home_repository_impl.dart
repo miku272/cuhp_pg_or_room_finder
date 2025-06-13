@@ -1,5 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 
+import '../../../../core/common/entities/property.dart';
 import '../../../../core/common/entities/saved_item.dart';
 import '../../../../core/error/exception.dart';
 import '../../../../core/error/failures.dart';
@@ -76,6 +77,28 @@ class HomeRepositoryImpl implements HomeRepository {
       );
 
       return right(isRemoved);
+    } on ServerException catch (error) {
+      return left(Failure(status: error.status, message: error.message));
+    } on UserException catch (error) {
+      return left(Failure(status: error.status, message: error.message));
+    } catch (error) {
+      return left(Failure(message: error.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Property>>> getAutocompleteProperties({
+    required String term,
+    required String token,
+  }) async {
+    try {
+      final List<Property> properties =
+          await homeRemoteDatasource.getAutocompleteProperties(
+        term,
+        token,
+      );
+
+      return right(properties);
     } on ServerException catch (error) {
       return left(Failure(status: error.status, message: error.message));
     } on UserException catch (error) {

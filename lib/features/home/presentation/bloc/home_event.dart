@@ -50,3 +50,13 @@ final class HomeRemoveSavedItemEvent extends HomeEvent {
     required this.token,
   });
 }
+
+final class GetAutocompletePropertiesEvent extends HomeEvent {
+  final String term;
+  final String token;
+
+  GetAutocompletePropertiesEvent({
+    required this.term,
+    required this.token,
+  });
+}

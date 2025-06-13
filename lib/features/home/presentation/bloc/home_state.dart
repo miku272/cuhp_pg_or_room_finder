@@ -3,6 +3,7 @@ part of 'home_bloc.dart';
 @immutable
 sealed class HomeState {
   final List<Property> properties;
+  final List<Property> autocomleteProperties;
   final PropertyFilter propertyFilter;
   final int currentPage;
   final int totalPages;
@@ -10,6 +11,7 @@ sealed class HomeState {
 
   const HomeState({
     this.properties = const [],
+    this.autocomleteProperties = const [],
     this.propertyFilter = const PropertyFilter(),
     this.currentPage = 1,
     this.totalPages = 0,
@@ -20,6 +22,7 @@ sealed class HomeState {
 final class HomeInitial extends HomeState {
   const HomeInitial({
     super.properties = const [],
+    super.autocomleteProperties = const [],
     super.propertyFilter = const PropertyFilter(),
     super.currentPage = 1,
     super.totalPages = 0,
@@ -30,6 +33,7 @@ final class HomeInitial extends HomeState {
 final class HomeLoading extends HomeState {
   const HomeLoading({
     super.properties,
+    super.autocomleteProperties,
     super.propertyFilter,
     super.currentPage,
     super.totalPages,
@@ -40,6 +44,18 @@ final class HomeLoading extends HomeState {
 final class HomeSavedItemLoading extends HomeState {
   const HomeSavedItemLoading({
     super.properties,
+    super.autocomleteProperties,
+    super.propertyFilter,
+    super.currentPage,
+    super.totalPages,
+    super.hasReachedMax,
+  });
+}
+
+final class HomeGetAutocompletePropertiesLoading extends HomeState {
+  const HomeGetAutocompletePropertiesLoading({
+    super.properties,
+    super.autocomleteProperties,
     super.propertyFilter,
     super.currentPage,
     super.totalPages,
@@ -50,6 +66,7 @@ final class HomeSavedItemLoading extends HomeState {
 final class HomeLoadingSuccess extends HomeState {
   const HomeLoadingSuccess({
     required super.properties,
+    super.autocomleteProperties,
     super.propertyFilter,
     required super.currentPage,
     super.totalPages,
@@ -62,6 +79,18 @@ final class HomeSavedItemSuccess extends HomeState {
 
   const HomeSavedItemSuccess({
     required this.propertyId,
+    super.properties,
+    super.autocomleteProperties,
+    super.propertyFilter,
+    super.currentPage,
+    super.totalPages,
+    super.hasReachedMax,
+  });
+}
+
+final class HomeGetAutocompletePropertiesSuccess extends HomeState {
+  const HomeGetAutocompletePropertiesSuccess({
+    required super.autocomleteProperties,
     super.properties,
     super.propertyFilter,
     super.currentPage,
@@ -78,6 +107,7 @@ final class HomeLoadingFailure extends HomeState {
     this.status,
     required this.message,
     super.properties,
+    super.autocomleteProperties,
     super.propertyFilter,
     super.currentPage,
     super.totalPages,
@@ -95,6 +125,23 @@ final class SavedItemFailure extends HomeState {
     required this.message,
     required this.propertyId,
     super.properties,
+    super.autocomleteProperties,
+    super.propertyFilter,
+    super.currentPage,
+    super.totalPages,
+    super.hasReachedMax,
+  });
+}
+
+final class HomeGetAutocompletePropertiesFailure extends HomeState {
+  final int? status;
+  final String message;
+
+  const HomeGetAutocompletePropertiesFailure({
+    this.status,
+    required this.message,
+    super.properties,
+    super.autocomleteProperties,
     super.propertyFilter,
     super.currentPage,
     super.totalPages,
