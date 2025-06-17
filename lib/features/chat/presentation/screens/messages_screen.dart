@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../core/common/cubits/app_socket/app_socket_cubit.dart'; // Import AppSocketCubit
+import '../../../../core/common/cubits/app_socket/app_socket_cubit.dart';
 import '../../../../core/common/cubits/app_user/app_user_cubit.dart';
 import '../../../../core/common/entities/message.dart';
 import '../../../../core/common/entities/chat.dart';
@@ -40,7 +41,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchInitialMessages(); // Renamed for clarity
+    _fetchInitialMessages();
     _scrollController.addListener(_onScroll);
     _messageController.addListener(_onTextChanged);
   }
@@ -507,6 +508,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         }
 
         return Column(
+          key: ValueKey(message.id),
           children: [
             if (showDate) _buildDateSeparator(message.createdAt, theme),
             _buildMessageItem(message, isCurrentUser, theme),
@@ -549,14 +551,26 @@ class _MessagesScreenState extends State<MessagesScreen> {
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         margin: const EdgeInsets.symmetric(vertical: 4),
-        child: Column(
-          crossAxisAlignment:
-              isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-          children: [
-            _buildMessageContent(message, isCurrentUser, theme),
-            const SizedBox(height: 2),
-            _buildMessageTimestamp(message, isCurrentUser, theme),
-          ],
+        child: GestureDetector(
+          onLongPress: () {
+            Clipboard.setData(ClipboardData(text: message.content));
+
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                const SnackBar(content: Text('Message copied to clipboard')),
+              );
+          },
+          child: Column(
+            crossAxisAlignment: isCurrentUser
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.start,
+            children: [
+              _buildMessageContent(message, isCurrentUser, theme),
+              const SizedBox(height: 2),
+              _buildMessageTimestamp(message, isCurrentUser, theme),
+            ],
+          ),
         ),
       ),
     );
